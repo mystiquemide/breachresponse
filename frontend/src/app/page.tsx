@@ -117,7 +117,7 @@ export default function LandingPage() {
       <nav className="absolute w-full flex justify-between items-center py-6 px-8 md:px-16 z-50">
         <div className="flex items-center gap-3">
           <img src="/logo.png" alt="BreachResponse Logo" className="w-8 h-8 object-contain" />
-          <span className="text-lg font-bold tracking-widest text-white drop-shadow-md">BREACHRESPONSE</span>
+          <span className="text-lg font-bold tracking-widest text-white drop-shadow-md">BREACH RESPONSE</span>
         </div>
         <div className="hidden md:flex gap-8 text-xs tracking-widest uppercase font-bold text-gray-300 drop-shadow-md">
           <Link href="#features" className="hover:text-white transition-colors">Features</Link>
