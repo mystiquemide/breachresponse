@@ -436,10 +436,10 @@ export default function LandingPage() {
       </section>
 
       {/* Interactive Integration Code Terminal */}
-      <section className="py-24 px-8 md:px-16 max-w-6xl mx-auto relative z-40 bg-[#09090B] border-t border-gray-900">
+      <section className="py-24 px-8 md:px-16 max-w-6xl mx-auto relative z-40 bg-transparent">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Developer first.</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Developer first</h2>
             <p className="text-gray-400 mb-8 font-sans leading-relaxed text-sm">
               Deploying Breach Response is straightforward Install the package, hook up your contract sentinel, and let the AI guard system secure your transaction state No complex infrastructure necessary
             </p>
