@@ -347,37 +347,7 @@ export default function Dashboard() {
           )}
         </div>
       </header>
-
-      {(!isConnected || !isCorrectNetwork) && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-          <div className="bg-[#09090B] border border-gray-800 p-8 rounded-xl max-w-md text-center shadow-2xl">
-            <Lock className="w-12 h-12 text-[#10B981] mx-auto mb-4" />
-            <h2 className="text-xl font-bold mb-2">Access Restricted</h2>
-            <p className="text-gray-400 text-sm mb-6">
-              You must connect your wallet to the Mantle Sepolia network to access the Command Center.
-            </p>
-            {!isConnected ? (
-              <button 
-                onClick={() => connect({ connector: injected() })} 
-                className="w-full bg-[#10B981] text-black font-bold py-3 rounded text-sm hover:bg-green-400 transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] flex items-center justify-center gap-2"
-              >
-                <Power className="w-4 h-4" /> Connect Wallet
-              </button>
-            ) : (
-              <button 
-                onClick={() => switchChain && switchChain({ chainId: mantleSepoliaTestnet.id })} 
-                className="w-full bg-red-500 text-white font-bold py-3 rounded text-sm hover:bg-red-400 transition-all shadow-[0_0_15px_rgba(239,68,68,0.3)] flex items-center justify-center gap-2"
-              >
-                <AlertTriangle className="w-4 h-4" /> Switch to Mantle Sepolia
-              </button>
-            )}
-            
-            <Link href="/" className="mt-4 block w-full py-3 text-center text-sm text-gray-500 hover:text-white transition-colors border border-gray-800 rounded">
-              Return to Homepage
-            </Link>
-          </div>
-        </div>
-      )}
+      <div className="fixed top-1/3 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#10B981]/5 rounded-full blur-[150px] pointer-events-none z-0" />
 
       {/* Stats Strip Bar */}
       <motion.section 
