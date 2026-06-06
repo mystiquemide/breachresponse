@@ -83,6 +83,9 @@
 - Built Hardhat tests with 17 passing unit checks covering 100% of contract branches
 - Built a local Prisma-compatible JSON database client `db.ts` persisting nodes and alerts in `dev.json`
 - Connected frontend API routes and Python agent to stream real-time logs via the local database
+- Executed a comprehensive UI polish pass: removed trailing full stops, improved landing text, spaced branding, and optimized layouts (footer, developer section, built for scale).
+- Implemented real-time block streaming in the frontend using `viem` to fetch real Mantle Sepolia network blocks and dynamically simulate threat detection on live transactions.
+- Improved accessibility by completely removing wallet gating / Access Restricted overlays from the Dashboard and Ledger screens for public hackathon visibility.
 
 # KNOWN BUGS / TECH DEBT
 - None yet.
@@ -123,3 +126,7 @@
   - Verified compile build state successfully.
   - Compiled `rubric_evaluation.md` scoring features against the Mantle Turing Test rubric (Overall: 9.35/10).
   - Restarted dev server on port 3002.
+  - Executed a UI polish pass: removed trailing full stops, improved landing text ("mantle network smart contracts"), and spaced branding as "Breach Response".
+  - Enhanced layout: fixed footer centralization (3 columns), removed Developer section background, and corrected alignment on the "Built for scale" block.
+  - Implemented real-time block streaming in the frontend using `viem` to fetch real Mantle Sepolia network blocks and dynamically simulate threat detection on live transactions.
+  - Improved accessibility by completely removing wallet gating / Access Restricted overlays from the Dashboard and Ledger screens.
