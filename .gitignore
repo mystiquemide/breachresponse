@@ -1,15 +1,39 @@
-
+# Node & Next.js
 node_modules/
 .next/
-dist/
+out/
 build/
-coverage/
-.env
-.env.local
-.env.*.local
+dist/
+.npm/
+
+# Python
 venv/
 __pycache__/
 *.pyc
-contracts/artifacts/
-contracts/cache/
-contracts/typechain-types/
+*.pyo
+*.pyd
+.Python
+env/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Hardhat
+cache/
+artifacts/
+typechain-types/
+
+# Environment Variables
+.env
+.env.*
+!.env.example
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db

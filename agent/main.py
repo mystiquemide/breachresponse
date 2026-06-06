@@ -80,15 +80,16 @@ def get_registered_protocols():
         req = urllib.request.Request(url, method='GET')
         with urllib.request.urlopen(req, timeout=3) as res:
             data = json.loads(res.read().decode('utf-8'))
-            # Return lowercase addresses for easy comparison
-            return [node['address'].lower() for node in data if 'address' in node]
+            # Return lowercase addresses for easy comparison + hardcoded live vault for demo
+            db_addrs = [node['address'].lower() for node in data if 'address' in node]
+            return db_addrs + ["0x596Ff2Ca0f781a2CED29EC685cD1ba038378dE02".lower()]
     except Exception as e:
         print(f"[FRONTEND-BRIDGE] Warning: Failed to fetch sentinels: {e}")
         return []
 
-def pause_target_vault(vault_address: str):
+def pause_target_vault(vault_address: str, custom_calldata: str = '0x8456cb59'):
     """
-    Sends an on-chain signed transaction to pause the vulnerable vault.
+    Sends an on-chain signed transaction to pause the vulnerable vault using the recommended calldata.
     """
     if not w3 or not agent_address or not PRIVATE_KEY:
         print("[SENTINEL] Error: On-chain client not configured or private key missing.")
@@ -97,7 +98,6 @@ def pause_target_vault(vault_address: str):
     try:
         print(f"[SENTINEL] Initiating on-chain emergency pause on vault: {vault_address}")
         
-        # Keccak256 hash for "pause()" is "0x84b09db5"
         tx_data = {
             'chainId': 5003, # Mantle Sepolia
             'from': agent_address,
@@ -106,7 +106,7 @@ def pause_target_vault(vault_address: str):
             'maxPriorityFeePerGas': w3.to_wei(1.5, 'gwei'),
             'nonce': w3.eth.get_transaction_count(agent_address),
             'to': Web3.to_checksum_address(vault_address),
-            'data': '0x8456cb59'
+            'data': custom_calldata
         }
         
         try:
@@ -210,7 +210,11 @@ def run_sentinel_loop():
                                             
                                             if confidence > 0.9:
                                                 print(f"[SENTINEL] Threat verified. Broadcasting emergency pause transaction...")
-                                                pause_tx_hash = pause_target_vault(vault_addr)
+                                                
+                                                # Use LLM formulation for the mitigation
+                                                rescue_tx = byreal.formulate_rescue_transaction(vault_addr, byreal.last_analysis.get("exploit_type", "Reentrancy"))
+                                                
+                                                pause_tx_hash = pause_target_vault(vault_addr, rescue_tx["data"])
                                                 
                                                 if pause_tx_hash:
                                                     post_log_to_frontend(
