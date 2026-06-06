@@ -382,8 +382,8 @@ export default function LandingPage() {
       <section id="features" className="py-32 px-8 md:px-16 max-w-6xl mx-auto relative z-40 bg-transparent">
         <motion.div initial="initial" whileInView="animate" viewport={{ once: true, margin: "-100px" }} variants={fadeInUp} className="container mx-auto px-6 relative z-10">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Built for scale</h2>
-          <p className="text-xl text-gray-400 mb-16 max-w-2xl mx-auto font-sans text-sm">
-            Traditional security platforms rely on alerting you after the funds are stolen. We formulate the counter transaction before the attacker's block is confirmed
+          <p className="text-xl text-gray-400 mb-16 max-w-2xl font-sans text-sm">
+            Traditional security platforms rely on alerting you after the funds are stolen, we formulate the counter transaction before the attacker's block is confirmed
           </p>
         </motion.div>
         <motion.div variants={staggerContainer} initial="initial" whileInView="animate" viewport={{ once: true, margin: "-50px" }} className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -593,7 +593,7 @@ export default function LandingPage() {
       <section className="py-24 px-8 md:px-16 max-w-6xl mx-auto relative z-40 bg-transparent border-t border-gray-900/30">
         <div className="relative py-16 px-8 md:px-16 flex flex-col items-center text-center">
           <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 tracking-tight">
-            Neutralize threats before block finality.
+            Neutralize threats before block finality
           </h2>
           <p className="text-base text-gray-400 max-w-xl mx-auto mb-10 font-sans leading-relaxed">
             Attach sentinels to monitor, pause, and safeguard your smart contracts on Mantle Network.
