@@ -1,0 +1,20 @@
+{
+  "name": "sentinel-contracts",
+  "version": "1.0.0",
+  "description": "Smart contracts for Sentinel.ax BreachResponse",
+  "main": "index.js",
+  "scripts": {
+    "test": "hardhat test",
+    "compile": "hardhat compile"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "@types/node": "^20.12.7",
+    "hardhat": "^2.22.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "dotenv": "^17.4.2"
+  }
+}
