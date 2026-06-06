@@ -628,20 +628,20 @@ export default function LandingPage() {
       </section>
 
       <footer className="bg-black/40 backdrop-blur-sm border-t border-gray-800/40 py-16 px-8 md:px-16 relative z-40">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
-          <div className="col-span-1 md:col-span-1">
+        <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
+          <div className="flex flex-col items-center md:items-start text-center md:text-left">
             <div className="flex items-center gap-3 mb-6">
               <img src="/logo.png" alt="BreachResponse Logo" className="w-6 h-6 object-contain" />
               <span className="text-lg font-bold tracking-widest text-white">BREACH RESPONSE</span>
             </div>
-            <p className="text-gray-500 text-sm leading-relaxed mb-6 font-sans">
+            <p className="text-gray-500 text-sm leading-relaxed font-sans max-w-xs">
               The active immune system for mantle network smart contracts
             </p>
           </div>
           
 
 
-          <div>
+          <div className="flex flex-col items-center md:items-start text-center md:text-left">
             <h4 className="text-white font-bold mb-6 tracking-widest uppercase text-xs">Networks</h4>
             <ul className="space-y-4 flex flex-col">
               <a href="https://www.mantle.xyz/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#10B981] transition-colors text-sm font-sans">Mantle Network</a>
@@ -650,7 +650,7 @@ export default function LandingPage() {
             </ul>
           </div>
 
-          <div>
+          <div className="flex flex-col items-center md:items-start text-center md:text-left">
             <h4 className="text-white font-bold mb-6 tracking-widest uppercase text-xs">Agents</h4>
             <ul className="space-y-4 flex flex-col">
               <a href="https://github.com/byreal/byreal-skills" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#10B981] transition-colors text-sm font-sans">Byreal SDK</a>
