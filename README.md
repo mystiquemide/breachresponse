@@ -1,65 +1,76 @@
-# 🛡️ Sentinel.ax: Active Defense for Mantle
-> The active immune system for Mantle smart contracts. Detects reentrancy, flashes, and anomalies in the mempool, then formulates and executes 1-click rescue transactions before the exploit finalizes.
+# BreachResponse (Sentinel.ax)
 
-![Mantle](https://img.shields.io/badge/Network-Mantle_Sepolia-black?style=for-the-badge&logo=mantle)
-![Next.js](https://img.shields.io/badge/Frontend-Next.js_14-black?style=for-the-badge&logo=next.js)
-![Python](https://img.shields.io/badge/Agent-Python_3.10-black?style=for-the-badge&logo=python)
-![Solidity](https://img.shields.io/badge/Smart_Contracts-Solidity_0.8.24-black?style=for-the-badge&logo=solidity)
+> Proactive smart contract immune system powered by Web3.py and OpenAI GPT-5.5.
 
-## ⚡ The Problem & Solution
-Smart contract exploits cost the Web3 ecosystem billions annually. Most protocols rely on reactive measures—audits (which catch bugs *before* deployment) and insurance (which pays out *after* the hack). 
+![Mantle Sepolia](https://img.shields.io/badge/Mantle-Sepolia_Testnet-10B981?style=flat-square&logo=ethereum)
+![Next.js](https://img.shields.io/badge/Next.js-16.2-black?style=flat-square&logo=next.js)
+![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python)
+![OpenAI](https://img.shields.io/badge/AI-GPT--5.5-412991?style=flat-square&logo=openai)
+![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)
 
-**Sentinel.ax provides an active defense layer.** 
-By acting as an intelligent watchdog over your deployed Vaults, Sentinel.ax scans live blocks and mempools. When an anomaly is detected (like a malicious Reentrancy loop), the Python AI Agent instantly formulates a defensive payload and broadcasts a `pause()` transaction to the Mantle network, locking the vault and saving user funds before the attacker can drain them.
+BreachResponse is an active-defense system built for the Mantle ecosystem. Instead of simply alerting you after your funds are stolen, BreachResponse scans the mempool, detects malicious transactions using OpenAI GPT-5.5, and automatically formulates and executes an emergency pause transaction to your smart contract before the attacker's block is confirmed.
 
-## 🏗️ Live Deployments (Mantle Sepolia)
-- **SentinelRegistry:** `0xea3C039795B5b04105B795c8B0cB85e0a42Cc85C`
-- **TargetVault (Vulnerable Demo):** `0x596Ff2Ca0f781a2CED29EC685cD1ba038378dE02`
+## Features
 
-## 🧠 Architecture Overview
-1. **The Python Sentinel Agent**: Runs off-chain, listening to Mantle Sepolia blocks and simulating pending mempool transactions. It evaluates transaction calldata for malicious intent using heuristic and LLM analysis.
-2. **The Target Vault & Registry**: The `TargetVault` contains a deliberate vulnerability, but implements an `onlySentinelOrOwner` pause mechanism. It is registered on the `SentinelRegistry`.
-3. **The Next.js Command Center**: A stunning, real-time dashboard that visualizes the Agent's telemetry via Server-Sent Events (SSE) and allows developers to manage their registered protocols.
+- **Mempool Scanning**: Deep inspection of unconfirmed transactions on the Mantle Sepolia network.
+- **AI Payload Formulation**: Uses GPT-5.5 to dynamically analyze exploit signatures and formulate rescue payload calldata.
+- **1-Click Defense**: A premium Command Center UI that allows you to review the AI's analysis and execute a defensive transaction directly to your multisig or admin wallet using Wagmi.
+- **God Mode**: Fully autonomous execution for sub-second defense without human-in-the-loop delay.
+- **Mantle Registry**: Operates as a multi-tenant platform via `SentinelRegistry.sol` deployed on Mantle Sepolia.
 
-## 🚀 Quick Start (Demo the Attack Simulator!)
+## Tech Stack
 
-### 1. Setup & Install
+- **Frontend**: Next.js (App Router), TailwindCSS, Framer Motion, Wagmi, Viem.
+- **Backend / Agent**: Python, Web3.py, OpenAI SDK.
+- **Smart Contracts**: Solidity, Hardhat.
+
+## Quick Start
+
+### 1. Clone & Install
 ```bash
-git clone https://github.com/yourusername/sentinel.ax.git
-cd sentinel.ax
+git clone https://github.com/mystiquemide/breachresponse.git
+cd breachresponse
+```
 
-# Install Frontend
-cd frontend && npm install
+### 2. Frontend Setup
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-# Install Contracts
-cd ../contracts && npm install
-
-# Install Python Agent
-cd ../agent
+### 3. Agent Setup
+```bash
+cd agent
 python -m venv venv
-source venv/Scripts/activate # Windows
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### 2. Run the Command Center & Agent
-In Terminal 1 (Frontend):
+### 4. Environment Variables
+Copy `.env.example` to `.env` in the root directory and fill in your keys:
 ```bash
-cd frontend
-npm run dev
+cp .env.example .env
 ```
-In Terminal 2 (Python Agent):
+Ensure you have your `OPENAI_API_KEY`, `PRIVATE_KEY`, and `NEXT_PUBLIC_WALLETCONNECT_ID` set.
+
+### 5. Run the Sentinel
 ```bash
 cd agent
 python main.py
 ```
 
-### 3. Trigger the On-Chain Attack!
-Watch the magic happen. In Terminal 3, run the exploit simulator script. This script deploys a malicious contract and attempts a Reentrancy attack against the live Vault.
-```bash
-cd contracts
-npx hardhat run scripts/simulateAttack.ts --network mantle_sepolia
-```
-**Look at the Dashboard and the Python terminal:** The agent will catch the `withdraw()` loop, calculate a 98% threat confidence, and execute an emergency `pause()` transaction directly to Mantle Sepolia, mitigating the threat.
+## Repository Layout
+- `/frontend`: The Next.js Command Center dashboard.
+- `/agent`: The Python Sentinel logic for mempool scanning and AI evaluation.
+- `/contracts`: The Solidity registry and mock target vaults for simulation.
+- `/docs`: Architecture, deployment, and product specs.
 
----
-*Built with ❤️ for the Mantle Ecosystem.*
+## Documentation
+- [Deployment Guide](./docs/DEPLOYMENT.md)
+- [Architecture & Design](./docs/ARCHITECTURE.md)
+- [Security Policy](./SECURITY.md)
+- [Contributing](./CONTRIBUTING.md)
+
+## License
+MIT License. See `LICENSE` for details.
