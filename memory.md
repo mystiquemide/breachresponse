@@ -63,7 +63,10 @@
 - [x] [DEVOPS] Wire Next.js API endpoints to write logs and CRUD nodes using local database
 - [x] [AGENT] Hook up Python mempool agent to POST logs to API bridge in real-time
 - [ ] [QA] Simulate end-to-end exploit and defense checks on live Mantle Sepolia network
-- [ ] [DEVOPS] Prepare Vercel and Testnet deployment scripts
+- [ ] [DEVOPS] Deploy frontend to Vercel (or preferred hosting)
+- [ ] [DOCS] Record 3-minute hackathon demo video showcasing the live scans and UI
+- [ ] [DOCS] Finalize GitHub README and Devpost/Hackathon submission details
+- [ ] [SUBMIT] Submit project to the Mantle Turing Test Hackathon
 
 # COMPLETED FEATURES
 - Project Ideation
