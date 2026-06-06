@@ -1,0 +1,159 @@
+@import "tailwindcss";
+
+:root {
+  --background: #050507;
+  --foreground: #ffffff;
+  --surface: #101014;
+  --mantle-mint: #10B981;
+  --cyber-red: #EF4444;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* 
+  Dual-layer Engineering Grid System
+  Minor grid: 40px cells (faint mint, 1px)
+  Major grid: 200px cells (sharper mint, 1px)
+*/
+.bg-engineer-grid {
+  background-size: 40px 40px, 40px 40px, 200px 200px, 200px 200px;
+  background-image: 
+    linear-gradient(to right, rgba(16, 185, 129, 0.02) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(16, 185, 129, 0.02) 1px, transparent 1px),
+    linear-gradient(to right, rgba(16, 185, 129, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(16, 185, 129, 0.06) 1px, transparent 1px);
+}
+
+/* Dot matrix pattern for subtle data hud styling */
+.bg-dot-matrix {
+  background-image: radial-gradient(rgba(16, 185, 129, 0.08) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* CRT Scanline scan pattern */
+.bg-crt-lines {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.25) 50%
+  );
+  background-size: 100% 4px;
+}
+
+/* Vignette gradient overlay to blur edges of the grid */
+.vignette-mask {
+  mask-image: radial-gradient(circle at center, black 30%, transparent 95%);
+  -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 95%);
+}
+
+.text-glow {
+  text-shadow: 0 0 10px rgba(16, 185, 129, 0.4);
+}
+
+.text-glow-red {
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.4);
+}
+
+/* Premium Cyberpunk / Web3 Card Styling */
+.sci-fi-panel {
+  position: relative;
+  background: 
+    linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(5, 5, 7, 0.9) 100%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  /* Sci-Fi Chamfered Edges (Top-Right and Bottom-Left) */
+  clip-path: polygon(
+    0 0, 
+    calc(100% - 24px) 0, 
+    100% 24px, 
+    100% 100%, 
+    24px 100%, 
+    0 calc(100% - 24px)
+  );
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sci-fi-panel:hover {
+  border-color: rgba(16, 185, 129, 0.4);
+  box-shadow: inset 0 0 30px rgba(16, 185, 129, 0.05);
+}
+
+/* Laser Accents */
+.sci-fi-panel::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 30%; height: 2px;
+  background: linear-gradient(90deg, #10B981, transparent);
+  opacity: 0.5;
+  transition: width 0.3s ease;
+}
+
+.sci-fi-panel:hover::before {
+  width: 60%;
+  opacity: 1;
+  box-shadow: 0 0 10px #10B981;
+}
+
+.sci-fi-panel::after {
+  content: '';
+  position: absolute;
+  bottom: 0; right: 0;
+  width: 30%; height: 2px;
+  background: linear-gradient(270deg, #10B981, transparent);
+  opacity: 0.5;
+  transition: width 0.3s ease;
+}
+
+.sci-fi-panel:hover::after {
+  width: 60%;
+  opacity: 1;
+  box-shadow: 0 0 10px #10B981;
+}
+
+/* Active state for Onboarding Highlight */
+.onboarding-active {
+  position: relative !important;
+  z-index: 101 !important;
+  transform: scale(1.02);
+  border-color: rgba(16, 185, 129, 0.8) !important;
+  box-shadow: 0 0 50px rgba(16, 185, 129, 0.3), inset 0 0 30px rgba(16, 185, 129, 0.1) !important;
+}
+
+.border-glow {
+  box-shadow: 0 0 15px rgba(16, 185, 129, 0.05);
+}
+
+.glass-panel {
+  background: rgba(16, 16, 20, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+.animate-scanline {
+  animation: scanline 8s linear infinite;
+}
+
+@keyframes terminalGlow {
+  0%, 100% { box-shadow: inset 0 0 20px rgba(16, 185, 129, 0.05), 0 0 15px rgba(16, 185, 129, 0.1); }
+  50% { box-shadow: inset 0 0 30px rgba(16, 185, 129, 0.1), 0 0 25px rgba(16, 185, 129, 0.2); }
+}
+
+.terminal-container {
+  animation: terminalGlow 4s ease-in-out infinite;
+}
+

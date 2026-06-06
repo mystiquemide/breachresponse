@@ -1,0 +1,4165 @@
+{
+  "sentinelNodes": [
+    {
+      "id": "3s46vnvsf",
+      "name": "TargetVault",
+      "address": "0x9d9b602CFe69cfF9706EAc399808E84682ce94FB",
+      "status": "ACTIVE",
+      "latency": "6.4ms",
+      "events": 0,
+      "registeredAt": "2026-06-06T12:43:06.325Z"
+    }
+  ],
+  "alerts": [
+    {
+      "id": "4zlpqi0nm",
+      "txHash": "0x99fa...154674",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T15:59:32.344Z"
+    },
+    {
+      "id": "en7w6m9r1",
+      "txHash": "0x60fa...343407",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T15:52:15.680Z"
+    },
+    {
+      "id": "z32py7tt0",
+      "txHash": "0x12fa...148677",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T15:49:18.667Z"
+    },
+    {
+      "id": "7zqnldey8",
+      "txHash": "0x86fa...542174",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T15:45:38.184Z"
+    },
+    {
+      "id": "mya8h65tp",
+      "txHash": "0x25fa...399034",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T15:43:33.183Z"
+    },
+    {
+      "id": "drmtjfr59",
+      "txHash": "0x16fa...476614",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T15:41:15.800Z"
+    },
+    {
+      "id": "m0kbcm9nk",
+      "txHash": "0x14fa...448565",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T15:39:07.204Z"
+    },
+    {
+      "id": "peej60roh",
+      "txHash": "0x20fa...143692",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T15:38:09.582Z"
+    },
+    {
+      "id": "0zydf0r86",
+      "txHash": "0x50fa...770489",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T15:37:14.562Z"
+    },
+    {
+      "id": "h5mjw8xaa",
+      "txHash": "0x19fa...838408",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T15:37:02.328Z"
+    },
+    {
+      "id": "774v79q7x",
+      "txHash": "0x74fa...929199",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T15:36:50.132Z"
+    },
+    {
+      "id": "8gojq2ga3",
+      "txHash": "0xec9a93d4c9ee98346dcb0e1c3a9930254996e123fa3e1ec95d382de67913f107",
+      "protocol": "TargetVault",
+      "type": "On-Chain Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:47:50.188Z"
+    },
+    {
+      "id": "ukmpxxfwk",
+      "txHash": "0x64fa...904175",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:47:03.595Z"
+    },
+    {
+      "id": "5wv4i75il",
+      "txHash": "0x41fa...337483",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:42:21.829Z"
+    },
+    {
+      "id": "e4zkcr8um",
+      "txHash": "0x10fa...573674",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:37:54.590Z"
+    },
+    {
+      "id": "j60y9leqw",
+      "txHash": "0x67fa...758203",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:37:34.168Z"
+    },
+    {
+      "id": "6hmpmqbti",
+      "txHash": "0x64fa...123967",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:37:17.048Z"
+    },
+    {
+      "id": "jl0so8uat",
+      "txHash": "0x92fa...989674",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:37:03.000Z"
+    },
+    {
+      "id": "0n95b2f9c",
+      "txHash": "0x24fa...791094",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:36:49.015Z"
+    },
+    {
+      "id": "2owaun6gd",
+      "txHash": "0x26fa...340969",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:36:38.240Z"
+    },
+    {
+      "id": "ihln3rpis",
+      "txHash": "0x72fa...270224",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:36:29.997Z"
+    },
+    {
+      "id": "i967afszm",
+      "txHash": "0x49fa...750948",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:33:01.549Z"
+    },
+    {
+      "id": "vlruk365a",
+      "txHash": "0x91fa...350810",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:32:58.206Z"
+    },
+    {
+      "id": "18b5rmx21",
+      "txHash": "0x54fa...788533",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:32:54.851Z"
+    },
+    {
+      "id": "v66n41j8w",
+      "txHash": "0x32fa...907927",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:32:50.986Z"
+    },
+    {
+      "id": "644l145t6",
+      "txHash": "0x82fa...624583",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:32:47.609Z"
+    },
+    {
+      "id": "409cm71d1",
+      "txHash": "0x55fa...426360",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:32:41.723Z"
+    },
+    {
+      "id": "eay3t28ue",
+      "txHash": "0x51fa...215549",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:32:38.686Z"
+    },
+    {
+      "id": "rnie16szk",
+      "txHash": "0x52fa...427329",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:32:35.646Z"
+    },
+    {
+      "id": "ukxw1o9zt",
+      "txHash": "0x70fa...241190",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:32:32.601Z"
+    },
+    {
+      "id": "a92bhi6id",
+      "txHash": "0x74fa...745100",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:32:29.574Z"
+    },
+    {
+      "id": "a9qyonn3d",
+      "txHash": "0x69fa...801926",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:32:03.706Z"
+    },
+    {
+      "id": "2ryk2cux8",
+      "txHash": "0x41fa...686483",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:26:24.471Z"
+    },
+    {
+      "id": "c0lo8aypj",
+      "txHash": "0x54fa...858892",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:25:02.112Z"
+    },
+    {
+      "id": "j0psgzzl0",
+      "txHash": "0x22fa...415814",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:23:20.928Z"
+    },
+    {
+      "id": "q49ufm1su",
+      "txHash": "0x26fa...538646",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:22:35.588Z"
+    },
+    {
+      "id": "8mx4ixilh",
+      "txHash": "0x94fa...353759",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:22:32.554Z"
+    },
+    {
+      "id": "k3y1uh51x",
+      "txHash": "0x75fa...909651",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:22:29.492Z"
+    },
+    {
+      "id": "yysppfw1w",
+      "txHash": "0x24fa...978492",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:21:08.261Z"
+    },
+    {
+      "id": "t22galyw3",
+      "txHash": "0x20fa...887420",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:19:29.942Z"
+    },
+    {
+      "id": "ch17p4sn8",
+      "txHash": "0x85fa...721277",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:19:20.059Z"
+    },
+    {
+      "id": "pfb8trrzu",
+      "txHash": "0x81fa...681150",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:19:08.082Z"
+    },
+    {
+      "id": "9rvb59cmh",
+      "txHash": "0x52fa...328134",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:18:56.696Z"
+    },
+    {
+      "id": "i2kxgh8f8",
+      "txHash": "0x73fa...711931",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:18:48.073Z"
+    },
+    {
+      "id": "t683qtt4r",
+      "txHash": "0x79fa...641770",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:18:40.274Z"
+    },
+    {
+      "id": "51bh8w4p6",
+      "txHash": "0x89fa...398804",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:18:31.200Z"
+    },
+    {
+      "id": "xcfe0usbb",
+      "txHash": "0x74fa...999782",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:18:24.938Z"
+    },
+    {
+      "id": "rn8pxocd1",
+      "txHash": "0x64fa...259559",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:18:18.332Z"
+    },
+    {
+      "id": "pmtyp7jgf",
+      "txHash": "0x17fa...827390",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:15:56.181Z"
+    },
+    {
+      "id": "qfrc58845",
+      "txHash": "0x92fa...899474",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:09:49.508Z"
+    },
+    {
+      "id": "tsws6uqya",
+      "txHash": "0x13fa...515559",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:07:22.585Z"
+    },
+    {
+      "id": "s2xerb2xi",
+      "txHash": "0x83fa...689042",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:06:39.463Z"
+    },
+    {
+      "id": "halt4nrjz",
+      "txHash": "0x62fa...552998",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:06:21.423Z"
+    },
+    {
+      "id": "yi3970ibf",
+      "txHash": "0x19fa...894648",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:03:28.586Z"
+    },
+    {
+      "id": "owxe291ya",
+      "txHash": "0x83fa...919277",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:02:30.877Z"
+    },
+    {
+      "id": "qtcqt96qj",
+      "txHash": "0x33fa...427555",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:02:21.381Z"
+    },
+    {
+      "id": "y1oind417",
+      "txHash": "0x71fa...460188",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T13:02:10.118Z"
+    },
+    {
+      "id": "xilzlpfaa",
+      "txHash": "0x30fa...184309",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:57:57.090Z"
+    },
+    {
+      "id": "71pc0n054",
+      "txHash": "0x28fa...150705",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:57:33.910Z"
+    },
+    {
+      "id": "j6adns08o",
+      "txHash": "0x88fa...321596",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:57:21.796Z"
+    },
+    {
+      "id": "dqf6yux3j",
+      "txHash": "0x14fa...410709",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:57:08.766Z"
+    },
+    {
+      "id": "tlvb56acj",
+      "txHash": "0x36fa...671776",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:56:56.833Z"
+    },
+    {
+      "id": "z8g752u9d",
+      "txHash": "0x95fa...446313",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:56:44.838Z"
+    },
+    {
+      "id": "i34na4sd1",
+      "txHash": "0x33fa...972235",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:50:24.289Z"
+    },
+    {
+      "id": "ggwwpvtqy",
+      "txHash": "0x80fa...205871",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:49:53.430Z"
+    },
+    {
+      "id": "hgzlohlh2",
+      "txHash": "0x26fa...864509",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:49:45.812Z"
+    },
+    {
+      "id": "8dcvtp5ih",
+      "txHash": "0x14fa...547953",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:49:36.621Z"
+    },
+    {
+      "id": "4dpu2y7kh",
+      "txHash": "0x54fa...690353",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:49:18.535Z"
+    },
+    {
+      "id": "qw6lrbcdf",
+      "txHash": "0x19fa...426928",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:49:05.218Z"
+    },
+    {
+      "id": "2z9cbs6yo",
+      "txHash": "0x48ce...eB743",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:48:46.400Z"
+    },
+    {
+      "id": "3nz274kfd",
+      "txHash": "0x37fa...635461",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:48:46.360Z"
+    },
+    {
+      "id": "pwdb24szh",
+      "txHash": "0x17fa...192677",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:48:35.626Z"
+    },
+    {
+      "id": "tmirp7sr2",
+      "txHash": "0x79fa...881206",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:48:28.448Z"
+    },
+    {
+      "id": "loue9xrvo",
+      "txHash": "0x62fa...500294",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:48:21.278Z"
+    },
+    {
+      "id": "w9pkfc0nj",
+      "txHash": "0x19fa...472499",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:48:14.150Z"
+    },
+    {
+      "id": "182ax865u",
+      "txHash": "0x29fa...246523",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:48:06.120Z"
+    },
+    {
+      "id": "gpq6eawbo",
+      "txHash": "0x97fa...182442",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:48:00.293Z"
+    },
+    {
+      "id": "xngkmd9y5",
+      "txHash": "0x98fa...858172",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:47:54.747Z"
+    },
+    {
+      "id": "pbeytxgle",
+      "txHash": "0x65fa...874665",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:47:45.744Z"
+    },
+    {
+      "id": "wirex95iz",
+      "txHash": "0x83fa...276573",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:47:32.080Z"
+    },
+    {
+      "id": "0x06sng4f",
+      "txHash": "0x63fa...612331",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:46:15.934Z"
+    },
+    {
+      "id": "v3aswx4kv",
+      "txHash": "0x19fa...236060",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:43:29.736Z"
+    },
+    {
+      "id": "rtdl5jpaq",
+      "txHash": "0x68fa...637176",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:42:25.323Z"
+    },
+    {
+      "id": "avqzxqmli",
+      "txHash": "0x57fa...875060",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:42:14.689Z"
+    },
+    {
+      "id": "j0178k3k3",
+      "txHash": "0x63fa...337733",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:42:07.084Z"
+    },
+    {
+      "id": "at4jtf16v",
+      "txHash": "0x87fa...479501",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:41:57.218Z"
+    },
+    {
+      "id": "4bbt06myr",
+      "txHash": "0x30fa...311837",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:41:44.249Z"
+    },
+    {
+      "id": "anvona39u",
+      "txHash": "0x23fa...806866",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:41:19.878Z"
+    },
+    {
+      "id": "mf1ztq77w",
+      "txHash": "0x92fa...791560",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:40:52.778Z"
+    },
+    {
+      "id": "9k331q0um",
+      "txHash": "0x74fa...513456",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:40:09.472Z"
+    },
+    {
+      "id": "h9l3yxc16",
+      "txHash": "0x30fa...928045",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:39:35.574Z"
+    },
+    {
+      "id": "acdq6lqw9",
+      "txHash": "0x17fa...393689",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:39:17.655Z"
+    },
+    {
+      "id": "u738rawhu",
+      "txHash": "0x94fa...333516",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:30:45.720Z"
+    },
+    {
+      "id": "t8rd643fk",
+      "txHash": "0x48ce...eB777",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:30:43.206Z"
+    },
+    {
+      "id": "q86oxudcc",
+      "txHash": "0x47fa...335609",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:30:41.683Z"
+    },
+    {
+      "id": "xo3770atk",
+      "txHash": "0x80fa...721444",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:30:39.147Z"
+    },
+    {
+      "id": "oi02flhrr",
+      "txHash": "0x12fa...131783",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:30:36.610Z"
+    },
+    {
+      "id": "htnosan9f",
+      "txHash": "0x94fa...732640",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:30:34.065Z"
+    },
+    {
+      "id": "8tcf6myiw",
+      "txHash": "0x31fa...424517",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:30:31.519Z"
+    },
+    {
+      "id": "14u42abq9",
+      "txHash": "0x36fa...879175",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:30:28.982Z"
+    },
+    {
+      "id": "q1t1vvofv",
+      "txHash": "0x48ce...eB744",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:30:26.469Z"
+    },
+    {
+      "id": "f198dc3b8",
+      "txHash": "0x21fa...486322",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:30:24.958Z"
+    },
+    {
+      "id": "iymsh3ss4",
+      "txHash": "0x60fa...469268",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:30:22.438Z"
+    },
+    {
+      "id": "x9tlmw40q",
+      "txHash": "0x57fa...817551",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:30:19.929Z"
+    },
+    {
+      "id": "61vuup0r4",
+      "txHash": "0x95fa...918815",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:30:17.419Z"
+    },
+    {
+      "id": "hqpy4csdp",
+      "txHash": "0x27fa...739349",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:30:14.892Z"
+    },
+    {
+      "id": "j03lgqia0",
+      "txHash": "0x94fa...662837",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:30:12.380Z"
+    },
+    {
+      "id": "l0h1kx7xr",
+      "txHash": "0x48ce...eB756",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:30:09.844Z"
+    },
+    {
+      "id": "ewjglscdm",
+      "txHash": "0x34fa...255059",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:30:08.310Z"
+    },
+    {
+      "id": "vjn7or70n",
+      "txHash": "0x25fa...860977",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:30:05.798Z"
+    },
+    {
+      "id": "6d2fj53du",
+      "txHash": "0x41fa...454021",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:30:03.268Z"
+    },
+    {
+      "id": "nlr94oji0",
+      "txHash": "0x77fa...426482",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:30:00.757Z"
+    },
+    {
+      "id": "ynxdat7yd",
+      "txHash": "0x13fa...966849",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:58.230Z"
+    },
+    {
+      "id": "9tg6h1w2m",
+      "txHash": "0x74fa...747807",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:55.718Z"
+    },
+    {
+      "id": "f18lpfxud",
+      "txHash": "0x48ce...eB761",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:53.181Z"
+    },
+    {
+      "id": "1uuiji1ml",
+      "txHash": "0x35fa...994598",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:51.668Z"
+    },
+    {
+      "id": "nmo4z28vb",
+      "txHash": "0x20fa...266910",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:49.146Z"
+    },
+    {
+      "id": "i8aa7ofzv",
+      "txHash": "0x85fa...594613",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:46.611Z"
+    },
+    {
+      "id": "urcwsg8bt",
+      "txHash": "0x31fa...820989",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:44.077Z"
+    },
+    {
+      "id": "tm7czxy5a",
+      "txHash": "0x60fa...361224",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:41.561Z"
+    },
+    {
+      "id": "mr53f7dsg",
+      "txHash": "0x36fa...849715",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:39.030Z"
+    },
+    {
+      "id": "260d7jr68",
+      "txHash": "0x48ce...eB792",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:36.499Z"
+    },
+    {
+      "id": "vsi3hkab0",
+      "txHash": "0x40fa...125318",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:34.971Z"
+    },
+    {
+      "id": "1kg2nkbw2",
+      "txHash": "0x32fa...189749",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:32.447Z"
+    },
+    {
+      "id": "9osolgt9e",
+      "txHash": "0x47fa...578980",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:29.915Z"
+    },
+    {
+      "id": "yli1wr0sw",
+      "txHash": "0x71fa...765802",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:27.382Z"
+    },
+    {
+      "id": "g5jt2uxkw",
+      "txHash": "0x65fa...873753",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:24.870Z"
+    },
+    {
+      "id": "3sxqoqmjq",
+      "txHash": "0x82fa...570788",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:22.335Z"
+    },
+    {
+      "id": "elmtnqazy",
+      "txHash": "0x48ce...eB786",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:19.804Z"
+    },
+    {
+      "id": "vks10f7qu",
+      "txHash": "0x98fa...586906",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:18.268Z"
+    },
+    {
+      "id": "5j5ux3ffr",
+      "txHash": "0x98fa...843307",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:15.741Z"
+    },
+    {
+      "id": "12dofq8ue",
+      "txHash": "0x46fa...323292",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:13.214Z"
+    },
+    {
+      "id": "uxrhecshl",
+      "txHash": "0x10fa...278713",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:10.688Z"
+    },
+    {
+      "id": "gmtmg5fp0",
+      "txHash": "0x80fa...165625",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:08.178Z"
+    },
+    {
+      "id": "b40896fus",
+      "txHash": "0x56fa...636960",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:05.646Z"
+    },
+    {
+      "id": "k96j7jdqs",
+      "txHash": "0x48ce...eB744",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:03.109Z"
+    },
+    {
+      "id": "3qdpwajse",
+      "txHash": "0x26fa...288298",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:29:01.596Z"
+    },
+    {
+      "id": "75yscyky0",
+      "txHash": "0x79fa...908411",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:59.079Z"
+    },
+    {
+      "id": "hzxkw1ogb",
+      "txHash": "0x81fa...410367",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:56.550Z"
+    },
+    {
+      "id": "5ktjyx7e7",
+      "txHash": "0x21fa...456164",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:54.037Z"
+    },
+    {
+      "id": "ntl1hz20v",
+      "txHash": "0x64fa...829923",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:51.504Z"
+    },
+    {
+      "id": "kijx1vvoj",
+      "txHash": "0x90fa...383460",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:48.993Z"
+    },
+    {
+      "id": "k5wbatta3",
+      "txHash": "0x48ce...eB798",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:46.464Z"
+    },
+    {
+      "id": "fi2g29036",
+      "txHash": "0x91fa...300719",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:44.932Z"
+    },
+    {
+      "id": "ssl6pa8r5",
+      "txHash": "0x48fa...169679",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:42.416Z"
+    },
+    {
+      "id": "7gegucccf",
+      "txHash": "0x48fa...748151",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:39.901Z"
+    },
+    {
+      "id": "jt35it1c3",
+      "txHash": "0x70fa...127184",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:37.388Z"
+    },
+    {
+      "id": "7mor98j8e",
+      "txHash": "0x72fa...771724",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:34.878Z"
+    },
+    {
+      "id": "bl4on326l",
+      "txHash": "0x81fa...880329",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:32.355Z"
+    },
+    {
+      "id": "tvqekfds9",
+      "txHash": "0x48ce...eB798",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:29.836Z"
+    },
+    {
+      "id": "1khqpes71",
+      "txHash": "0x78fa...390235",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:28.315Z"
+    },
+    {
+      "id": "fvgz6xdwk",
+      "txHash": "0x19fa...334330",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:25.785Z"
+    },
+    {
+      "id": "vfgd7b4g8",
+      "txHash": "0x45fa...801104",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:23.274Z"
+    },
+    {
+      "id": "wp05s33e0",
+      "txHash": "0x78fa...844159",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:20.749Z"
+    },
+    {
+      "id": "nt20ozmdm",
+      "txHash": "0x46fa...946920",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:18.237Z"
+    },
+    {
+      "id": "ula4x60cj",
+      "txHash": "0x52fa...928359",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:15.726Z"
+    },
+    {
+      "id": "zm1j1qggr",
+      "txHash": "0x48ce...eB772",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:13.191Z"
+    },
+    {
+      "id": "mf5gnyqq9",
+      "txHash": "0x44fa...959788",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:11.679Z"
+    },
+    {
+      "id": "4t4gdiu6r",
+      "txHash": "0x13fa...115340",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:09.148Z"
+    },
+    {
+      "id": "lfl4b1qr0",
+      "txHash": "0x62fa...880345",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:06.625Z"
+    },
+    {
+      "id": "6j4yt0an7",
+      "txHash": "0x60fa...227158",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:04.114Z"
+    },
+    {
+      "id": "zti8nz5og",
+      "txHash": "0x79fa...432456",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:28:01.594Z"
+    },
+    {
+      "id": "oeu8dzkpg",
+      "txHash": "0x91fa...472989",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:59.072Z"
+    },
+    {
+      "id": "lrcuif3o3",
+      "txHash": "0x48ce...eB729",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:56.548Z"
+    },
+    {
+      "id": "wczbh1u61",
+      "txHash": "0x73fa...183275",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:55.038Z"
+    },
+    {
+      "id": "7bzfgre1s",
+      "txHash": "0x95fa...497867",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:52.505Z"
+    },
+    {
+      "id": "4ue6gipp1",
+      "txHash": "0x19fa...100300",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:49.990Z"
+    },
+    {
+      "id": "vi367vfi6",
+      "txHash": "0x64fa...614204",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:47.465Z"
+    },
+    {
+      "id": "gchtiniiu",
+      "txHash": "0x18fa...154022",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:44.936Z"
+    },
+    {
+      "id": "wigq68sxm",
+      "txHash": "0x26fa...161184",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:42.425Z"
+    },
+    {
+      "id": "xl856vasl",
+      "txHash": "0x48ce...eB710",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:39.900Z"
+    },
+    {
+      "id": "c2hmq5dko",
+      "txHash": "0x32fa...760798",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:38.389Z"
+    },
+    {
+      "id": "lxuc9a9sn",
+      "txHash": "0x75fa...406810",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:35.879Z"
+    },
+    {
+      "id": "tsi7yu2th",
+      "txHash": "0x71fa...104251",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:33.369Z"
+    },
+    {
+      "id": "tpy7b6d3n",
+      "txHash": "0x90fa...273141",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:30.833Z"
+    },
+    {
+      "id": "9yo5ce7zg",
+      "txHash": "0x59fa...310134",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:28.318Z"
+    },
+    {
+      "id": "8q9kbi2ga",
+      "txHash": "0x84fa...461012",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:25.798Z"
+    },
+    {
+      "id": "66k8mth60",
+      "txHash": "0x48ce...eB718",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:23.285Z"
+    },
+    {
+      "id": "nmzoybmul",
+      "txHash": "0x22fa...325309",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:21.752Z"
+    },
+    {
+      "id": "1awh20usv",
+      "txHash": "0x38fa...686170",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:19.228Z"
+    },
+    {
+      "id": "jwj3t5wq8",
+      "txHash": "0x70fa...745043",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:16.692Z"
+    },
+    {
+      "id": "z2qxq1ut9",
+      "txHash": "0x20fa...501385",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:14.160Z"
+    },
+    {
+      "id": "zjpveqxdb",
+      "txHash": "0x97fa...981162",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:11.636Z"
+    },
+    {
+      "id": "d3ymhr1oc",
+      "txHash": "0x39fa...265074",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:09.101Z"
+    },
+    {
+      "id": "o2arzq31w",
+      "txHash": "0x48ce...eB774",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:06.572Z"
+    },
+    {
+      "id": "wgzsf58sw",
+      "txHash": "0x17fa...482993",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:05.034Z"
+    },
+    {
+      "id": "6u01fh3mh",
+      "txHash": "0x29fa...444409",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:02.515Z"
+    },
+    {
+      "id": "k1bouxcr9",
+      "txHash": "0x54fa...649580",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:27:00.001Z"
+    },
+    {
+      "id": "jed8zy6lo",
+      "txHash": "0x98fa...405239",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:26:57.473Z"
+    },
+    {
+      "id": "e06nnm4yq",
+      "txHash": "0x47fa...747038",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:26:54.960Z"
+    },
+    {
+      "id": "7e3vzreep",
+      "txHash": "0x64fa...460769",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:26:52.426Z"
+    },
+    {
+      "id": "16lci6nug",
+      "txHash": "0x48ce...eB731",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:26:49.902Z"
+    },
+    {
+      "id": "5r0q40q32",
+      "txHash": "0x97fa...270554",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:26:48.369Z"
+    },
+    {
+      "id": "3o455p3n4",
+      "txHash": "0x85fa...208403",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:26:45.857Z"
+    },
+    {
+      "id": "ps36w7b6t",
+      "txHash": "0x73fa...979805",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:26:43.335Z"
+    },
+    {
+      "id": "lhn6zpxgx",
+      "txHash": "0x31fa...817879",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:26:40.803Z"
+    },
+    {
+      "id": "a5b9ljh5x",
+      "txHash": "0x19fa...971733",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:26:38.288Z"
+    },
+    {
+      "id": "hkl3njixi",
+      "txHash": "0x93fa...247815",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:26:35.775Z"
+    },
+    {
+      "id": "7vpo50mdp",
+      "txHash": "0x48ce...eB779",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:26:33.249Z"
+    },
+    {
+      "id": "noqw3ra9k",
+      "txHash": "0x90fa...256248",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:26:31.719Z"
+    },
+    {
+      "id": "p9zujwl9w",
+      "txHash": "0x99fa...518928",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:26:29.187Z"
+    },
+    {
+      "id": "0e2ichi7k",
+      "txHash": "0x52fa...227497",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:26:26.668Z"
+    },
+    {
+      "id": "deonoduws",
+      "txHash": "0x61fa...305563",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:26:24.147Z"
+    },
+    {
+      "id": "q9jwl5olr",
+      "txHash": "0x10fa...858205",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:26:21.623Z"
+    },
+    {
+      "id": "gvx6fl2y9",
+      "txHash": "0x51fa...981984",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:26:19.098Z"
+    },
+    {
+      "id": "z4glics8s",
+      "txHash": "0x48ce...eB741",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:26:16.577Z"
+    },
+    {
+      "id": "kw929ofgl",
+      "txHash": "0x61fa...518865",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:26:15.057Z"
+    },
+    {
+      "id": "dycmo1xxa",
+      "txHash": "0x41fa...310758",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:26:12.526Z"
+    },
+    {
+      "id": "kbhleg3ea",
+      "txHash": "0x29fa...922315",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:26:10.001Z"
+    },
+    {
+      "id": "5c1jbloke",
+      "txHash": "0x95fa...710466",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:26:07.489Z"
+    },
+    {
+      "id": "e5ikrn51d",
+      "txHash": "0x29fa...814405",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:26:04.962Z"
+    },
+    {
+      "id": "ajrc3fz7p",
+      "txHash": "0x20fa...873060",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:26:02.430Z"
+    },
+    {
+      "id": "ubym1za42",
+      "txHash": "0x48ce...eB770",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:59.918Z"
+    },
+    {
+      "id": "eq93nef56",
+      "txHash": "0x32fa...206267",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:58.383Z"
+    },
+    {
+      "id": "85tkxjsh1",
+      "txHash": "0x48fa...391465",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:55.873Z"
+    },
+    {
+      "id": "i3sq7as14",
+      "txHash": "0x38fa...348657",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:53.342Z"
+    },
+    {
+      "id": "iaqop22et",
+      "txHash": "0x59fa...170787",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:50.833Z"
+    },
+    {
+      "id": "9iojavman",
+      "txHash": "0x60fa...761400",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:48.322Z"
+    },
+    {
+      "id": "7xrd2j6kb",
+      "txHash": "0x64fa...489405",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:45.790Z"
+    },
+    {
+      "id": "id51rwpyi",
+      "txHash": "0x48ce...eB743",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:43.262Z"
+    },
+    {
+      "id": "foiokjle4",
+      "txHash": "0x58fa...591403",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:41.729Z"
+    },
+    {
+      "id": "8dvwmttp3",
+      "txHash": "0x51fa...322785",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:39.218Z"
+    },
+    {
+      "id": "npsmu0fef",
+      "txHash": "0x73fa...257664",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:36.685Z"
+    },
+    {
+      "id": "cm4ikppho",
+      "txHash": "0x49fa...691961",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:34.174Z"
+    },
+    {
+      "id": "w3sux7x8b",
+      "txHash": "0x98fa...798945",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:31.648Z"
+    },
+    {
+      "id": "f5oz3k6fw",
+      "txHash": "0x70fa...370220",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:29.123Z"
+    },
+    {
+      "id": "sc5gib8pt",
+      "txHash": "0x48ce...eB759",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:26.610Z"
+    },
+    {
+      "id": "kw5c0nrkm",
+      "txHash": "0x47fa...935186",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:25.080Z"
+    },
+    {
+      "id": "rizznfbzc",
+      "txHash": "0x11fa...441781",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:22.556Z"
+    },
+    {
+      "id": "qyc4u4vm7",
+      "txHash": "0x48fa...402747",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:20.047Z"
+    },
+    {
+      "id": "3fb7lb44y",
+      "txHash": "0x10fa...117182",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:17.520Z"
+    },
+    {
+      "id": "xwwuqbf6c",
+      "txHash": "0x68fa...612491",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:15.010Z"
+    },
+    {
+      "id": "be6xx1q4i",
+      "txHash": "0x85fa...589884",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:12.489Z"
+    },
+    {
+      "id": "te2t42zwe",
+      "txHash": "0x48ce...eB748",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:09.956Z"
+    },
+    {
+      "id": "4y0wjdess",
+      "txHash": "0x74fa...906368",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:08.436Z"
+    },
+    {
+      "id": "iuot63dd1",
+      "txHash": "0x34fa...461697",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:05.899Z"
+    },
+    {
+      "id": "7dvrkagjf",
+      "txHash": "0x92fa...476661",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:03.385Z"
+    },
+    {
+      "id": "8rp0hfry5",
+      "txHash": "0x41fa...150413",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:25:00.854Z"
+    },
+    {
+      "id": "mcddq0gup",
+      "txHash": "0x63fa...210804",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:58.331Z"
+    },
+    {
+      "id": "qy49xh3wn",
+      "txHash": "0x22fa...575356",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:55.802Z"
+    },
+    {
+      "id": "mbs1kbjb5",
+      "txHash": "0x48ce...eB710",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:53.270Z"
+    },
+    {
+      "id": "a1dr5podr",
+      "txHash": "0x31fa...660113",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:51.758Z"
+    },
+    {
+      "id": "kryinhh35",
+      "txHash": "0x60fa...194127",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:49.234Z"
+    },
+    {
+      "id": "906b0pwlc",
+      "txHash": "0x86fa...385559",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:46.708Z"
+    },
+    {
+      "id": "dp4524m4s",
+      "txHash": "0x20fa...491019",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:44.187Z"
+    },
+    {
+      "id": "xuna4hn1b",
+      "txHash": "0x49fa...171763",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:41.654Z"
+    },
+    {
+      "id": "owp73redp",
+      "txHash": "0x11fa...142999",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:39.129Z"
+    },
+    {
+      "id": "q33gbw9d4",
+      "txHash": "0x48ce...eB797",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:36.595Z"
+    },
+    {
+      "id": "u1yla3l4y",
+      "txHash": "0x77fa...169887",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:35.084Z"
+    },
+    {
+      "id": "b37a834hs",
+      "txHash": "0x90fa...511927",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:32.575Z"
+    },
+    {
+      "id": "5kd526yw2",
+      "txHash": "0x38fa...214430",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:30.052Z"
+    },
+    {
+      "id": "34so3n4v1",
+      "txHash": "0x50fa...925090",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:27.542Z"
+    },
+    {
+      "id": "ujucuuakf",
+      "txHash": "0x46fa...156547",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:25.010Z"
+    },
+    {
+      "id": "teme70pr8",
+      "txHash": "0x96fa...455185",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:22.479Z"
+    },
+    {
+      "id": "w2sgqq8e2",
+      "txHash": "0x48ce...eB798",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:19.966Z"
+    },
+    {
+      "id": "uboh42sut",
+      "txHash": "0x98fa...584394",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:18.444Z"
+    },
+    {
+      "id": "xwbgnzyfs",
+      "txHash": "0x64fa...554620",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:15.930Z"
+    },
+    {
+      "id": "yzrq19own",
+      "txHash": "0x73fa...425439",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:13.417Z"
+    },
+    {
+      "id": "hy5z2a6dl",
+      "txHash": "0x35fa...582843",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:10.904Z"
+    },
+    {
+      "id": "fuzl8qvjj",
+      "txHash": "0x62fa...700113",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:08.387Z"
+    },
+    {
+      "id": "puu9xwngo",
+      "txHash": "0x19fa...158151",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:05.876Z"
+    },
+    {
+      "id": "u9974yjp8",
+      "txHash": "0x48ce...eB769",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:03.364Z"
+    },
+    {
+      "id": "wee44vvho",
+      "txHash": "0x62fa...599037",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:24:01.840Z"
+    },
+    {
+      "id": "inbu13wks",
+      "txHash": "0x16fa...731376",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:59.313Z"
+    },
+    {
+      "id": "jv7it9kh9",
+      "txHash": "0x29fa...205717",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:56.785Z"
+    },
+    {
+      "id": "oky8e0aq7",
+      "txHash": "0x76fa...483126",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:54.274Z"
+    },
+    {
+      "id": "yx0qnf60x",
+      "txHash": "0x32fa...116219",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:51.764Z"
+    },
+    {
+      "id": "fyfxen9c3",
+      "txHash": "0x67fa...921781",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:49.242Z"
+    },
+    {
+      "id": "o1im10qiu",
+      "txHash": "0x48ce...eB765",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:46.716Z"
+    },
+    {
+      "id": "gx8lssdc0",
+      "txHash": "0x19fa...744303",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:45.181Z"
+    },
+    {
+      "id": "p0ppjq5ln",
+      "txHash": "0x87fa...940873",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:42.652Z"
+    },
+    {
+      "id": "i29rnqeh7",
+      "txHash": "0x88fa...216964",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:40.139Z"
+    },
+    {
+      "id": "k6qjuxuc1",
+      "txHash": "0x98fa...585417",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:37.616Z"
+    },
+    {
+      "id": "qp4rsqrn9",
+      "txHash": "0x13fa...464267",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:35.105Z"
+    },
+    {
+      "id": "wjw18c5vb",
+      "txHash": "0x87fa...365083",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:32.582Z"
+    },
+    {
+      "id": "6zt2f4gz6",
+      "txHash": "0x48ce...eB784",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:30.048Z"
+    },
+    {
+      "id": "x0wn32tsc",
+      "txHash": "0x35fa...466754",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:28.524Z"
+    },
+    {
+      "id": "dq1dx4cq5",
+      "txHash": "0x65fa...350372",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:26.002Z"
+    },
+    {
+      "id": "ns21ydgbj",
+      "txHash": "0x84fa...456885",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:23.480Z"
+    },
+    {
+      "id": "2iyv3f6i0",
+      "txHash": "0x19fa...751443",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:20.955Z"
+    },
+    {
+      "id": "ka2j0a3d3",
+      "txHash": "0x39fa...373677",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:18.434Z"
+    },
+    {
+      "id": "4epdfh2tw",
+      "txHash": "0x64fa...709821",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:15.904Z"
+    },
+    {
+      "id": "q0jgt4f5m",
+      "txHash": "0x48ce...eB757",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:13.378Z"
+    },
+    {
+      "id": "lym9playe",
+      "txHash": "0x39fa...883103",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:11.845Z"
+    },
+    {
+      "id": "2dwu9ewtu",
+      "txHash": "0x87fa...457948",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:09.331Z"
+    },
+    {
+      "id": "pvua3cyka",
+      "txHash": "0x55fa...262056",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:06.819Z"
+    },
+    {
+      "id": "t51198aew",
+      "txHash": "0x74fa...560715",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:04.307Z"
+    },
+    {
+      "id": "jzhr8zpyf",
+      "txHash": "0x66fa...152490",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:23:01.773Z"
+    },
+    {
+      "id": "25qjbbolp",
+      "txHash": "0x75fa...793533",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:59.249Z"
+    },
+    {
+      "id": "8effqqkpe",
+      "txHash": "0x48ce...eB737",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:56.739Z"
+    },
+    {
+      "id": "dev399356",
+      "txHash": "0x19fa...459707",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:55.226Z"
+    },
+    {
+      "id": "8817x1vyk",
+      "txHash": "0x86fa...809053",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:52.702Z"
+    },
+    {
+      "id": "ba1mdqf6o",
+      "txHash": "0x93fa...854909",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:50.175Z"
+    },
+    {
+      "id": "l5kbc5t8h",
+      "txHash": "0x62fa...890505",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:47.640Z"
+    },
+    {
+      "id": "ih2f27oyu",
+      "txHash": "0x94fa...696714",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:45.110Z"
+    },
+    {
+      "id": "n7bx0g4dq",
+      "txHash": "0x37fa...817060",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:42.577Z"
+    },
+    {
+      "id": "ptakf702m",
+      "txHash": "0x48ce...eB777",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:40.062Z"
+    },
+    {
+      "id": "zz2p542rh",
+      "txHash": "0x89fa...641592",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:38.540Z"
+    },
+    {
+      "id": "gffbe0if3",
+      "txHash": "0x20fa...281911",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:36.003Z"
+    },
+    {
+      "id": "y92877iwn",
+      "txHash": "0x36fa...259323",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:33.482Z"
+    },
+    {
+      "id": "x08lov7un",
+      "txHash": "0x30fa...595838",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:30.965Z"
+    },
+    {
+      "id": "wjsl3icgn",
+      "txHash": "0x79fa...988614",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:28.439Z"
+    },
+    {
+      "id": "12qk84vlq",
+      "txHash": "0x56fa...213034",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:25.878Z"
+    },
+    {
+      "id": "mzg63jnhk",
+      "txHash": "0x48ce...eB768",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:23.353Z"
+    },
+    {
+      "id": "nffq6k38u",
+      "txHash": "0x69fa...937762",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:21.840Z"
+    },
+    {
+      "id": "y89gje6ek",
+      "txHash": "0x23fa...195300",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:19.330Z"
+    },
+    {
+      "id": "v5q486zs4",
+      "txHash": "0x73fa...725224",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:16.820Z"
+    },
+    {
+      "id": "nnu26gqjf",
+      "txHash": "0x50fa...817448",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:14.286Z"
+    },
+    {
+      "id": "oausadxqz",
+      "txHash": "0x90fa...614093",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:11.771Z"
+    },
+    {
+      "id": "4kmmqrm2s",
+      "txHash": "0x80fa...655391",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:09.244Z"
+    },
+    {
+      "id": "66uhec122",
+      "txHash": "0x48ce...eB769",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:06.733Z"
+    },
+    {
+      "id": "xsx2cnwy8",
+      "txHash": "0x10fa...658843",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:05.222Z"
+    },
+    {
+      "id": "ky76sqx8h",
+      "txHash": "0x50fa...515941",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:02.708Z"
+    },
+    {
+      "id": "uf5lvax8e",
+      "txHash": "0x23fa...381685",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:22:00.197Z"
+    },
+    {
+      "id": "m5ybi1k0o",
+      "txHash": "0x91fa...546281",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:57.672Z"
+    },
+    {
+      "id": "h9hmgvjkd",
+      "txHash": "0x34fa...186182",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:55.140Z"
+    },
+    {
+      "id": "eyfd0lequ",
+      "txHash": "0x41fa...313059",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:52.605Z"
+    },
+    {
+      "id": "1emg8nlds",
+      "txHash": "0x48ce...eB742",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:50.086Z"
+    },
+    {
+      "id": "jd9ilqv0y",
+      "txHash": "0x95fa...871962",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:48.573Z"
+    },
+    {
+      "id": "plmzhyqp9",
+      "txHash": "0x90fa...290337",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:46.063Z"
+    },
+    {
+      "id": "sb3c16c3x",
+      "txHash": "0x65fa...133213",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:43.553Z"
+    },
+    {
+      "id": "xlw2n54dx",
+      "txHash": "0x72fa...479544",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:41.030Z"
+    },
+    {
+      "id": "v43mt2y6a",
+      "txHash": "0x58fa...865227",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:38.519Z"
+    },
+    {
+      "id": "qr935ogdf",
+      "txHash": "0x92fa...838382",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:36.008Z"
+    },
+    {
+      "id": "zhmf9cbws",
+      "txHash": "0x48ce...eB778",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:33.495Z"
+    },
+    {
+      "id": "z8too1i5i",
+      "txHash": "0x69fa...292066",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:31.959Z"
+    },
+    {
+      "id": "m2w1qr1f2",
+      "txHash": "0x72fa...969705",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:29.446Z"
+    },
+    {
+      "id": "kt5k2w72f",
+      "txHash": "0x78fa...964928",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:26.935Z"
+    },
+    {
+      "id": "637n0f3sb",
+      "txHash": "0x75fa...839623",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:24.423Z"
+    },
+    {
+      "id": "mpgf6j755",
+      "txHash": "0x71fa...852382",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:21.889Z"
+    },
+    {
+      "id": "dij9asdiq",
+      "txHash": "0x40fa...529106",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:19.359Z"
+    },
+    {
+      "id": "nqs5g27ao",
+      "txHash": "0x48ce...eB792",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:16.834Z"
+    },
+    {
+      "id": "da2ee41dd",
+      "txHash": "0x50fa...391154",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:15.302Z"
+    },
+    {
+      "id": "3mwatwncf",
+      "txHash": "0x94fa...737897",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:12.780Z"
+    },
+    {
+      "id": "po9b8qxlo",
+      "txHash": "0x66fa...985609",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:10.258Z"
+    },
+    {
+      "id": "uc0bu8ro4",
+      "txHash": "0x99fa...493052",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:07.724Z"
+    },
+    {
+      "id": "9cp9onn93",
+      "txHash": "0x27fa...512292",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:05.192Z"
+    },
+    {
+      "id": "jyojn87fh",
+      "txHash": "0x78fa...159735",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:02.664Z"
+    },
+    {
+      "id": "ceys9oe07",
+      "txHash": "0x48ce...eB784",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:21:00.136Z"
+    },
+    {
+      "id": "gq221zvy5",
+      "txHash": "0x73fa...439846",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:58.603Z"
+    },
+    {
+      "id": "jz8pzidzt",
+      "txHash": "0x84fa...618588",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:56.093Z"
+    },
+    {
+      "id": "yn5c1j2zs",
+      "txHash": "0x35fa...789083",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:53.562Z"
+    },
+    {
+      "id": "a06llj1l3",
+      "txHash": "0x83fa...392387",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:51.035Z"
+    },
+    {
+      "id": "xztomvqd3",
+      "txHash": "0x89fa...153965",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:48.526Z"
+    },
+    {
+      "id": "8irch6l84",
+      "txHash": "0x24fa...536650",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:45.997Z"
+    },
+    {
+      "id": "e06r6yrgp",
+      "txHash": "0x48ce...eB724",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:43.473Z"
+    },
+    {
+      "id": "8kcn2ss8n",
+      "txHash": "0x67fa...866910",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:41.943Z"
+    },
+    {
+      "id": "bz2yvd9nq",
+      "txHash": "0x28fa...863349",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:39.409Z"
+    },
+    {
+      "id": "o3xqq3sc7",
+      "txHash": "0x45fa...480910",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:36.887Z"
+    },
+    {
+      "id": "9op5ikhc1",
+      "txHash": "0x88fa...870655",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:34.352Z"
+    },
+    {
+      "id": "r6w9ud0d2",
+      "txHash": "0x75fa...331605",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:31.819Z"
+    },
+    {
+      "id": "kyv2qg0eu",
+      "txHash": "0x15fa...417449",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:29.306Z"
+    },
+    {
+      "id": "im2wrr75u",
+      "txHash": "0x48ce...eB771",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:26.783Z"
+    },
+    {
+      "id": "ped45t06t",
+      "txHash": "0x67fa...970221",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:25.248Z"
+    },
+    {
+      "id": "achxolfu5",
+      "txHash": "0x46fa...419594",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:22.719Z"
+    },
+    {
+      "id": "yno6x7szm",
+      "txHash": "0x34fa...983917",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:20.185Z"
+    },
+    {
+      "id": "afa399mxj",
+      "txHash": "0x90fa...203431",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:17.656Z"
+    },
+    {
+      "id": "fmgqpmou5",
+      "txHash": "0x39fa...944553",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:15.125Z"
+    },
+    {
+      "id": "cp692ngw8",
+      "txHash": "0x37fa...229705",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:12.606Z"
+    },
+    {
+      "id": "u40ww27vt",
+      "txHash": "0x48ce...eB734",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:10.075Z"
+    },
+    {
+      "id": "lid9750vk",
+      "txHash": "0x61fa...355118",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:08.560Z"
+    },
+    {
+      "id": "zoux4u6tv",
+      "txHash": "0x27fa...726628",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:06.037Z"
+    },
+    {
+      "id": "1qrf4codf",
+      "txHash": "0x61fa...651586",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:03.505Z"
+    },
+    {
+      "id": "wp53nywba",
+      "txHash": "0x44fa...207120",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:20:00.972Z"
+    },
+    {
+      "id": "0a6swqglw",
+      "txHash": "0x79fa...746872",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:58.450Z"
+    },
+    {
+      "id": "xm3jmpklj",
+      "txHash": "0x56fa...803773",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:55.918Z"
+    },
+    {
+      "id": "z1rfp6r2h",
+      "txHash": "0x48ce...eB765",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:53.392Z"
+    },
+    {
+      "id": "x97rxa13y",
+      "txHash": "0x20fa...867420",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:51.879Z"
+    },
+    {
+      "id": "oigvogjut",
+      "txHash": "0x46fa...876059",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:49.354Z"
+    },
+    {
+      "id": "uv4eskmd0",
+      "txHash": "0x92fa...922287",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:46.826Z"
+    },
+    {
+      "id": "sgbbdhyyl",
+      "txHash": "0x52fa...974376",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:44.300Z"
+    },
+    {
+      "id": "89ypqivcf",
+      "txHash": "0x29fa...520858",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:41.776Z"
+    },
+    {
+      "id": "gu5e22huq",
+      "txHash": "0x45fa...417790",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:39.245Z"
+    },
+    {
+      "id": "phxmi0vwv",
+      "txHash": "0x48ce...eB727",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:36.722Z"
+    },
+    {
+      "id": "u58nktgeo",
+      "txHash": "0x95fa...941463",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:35.210Z"
+    },
+    {
+      "id": "ch64hga3x",
+      "txHash": "0x75fa...408239",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:32.682Z"
+    },
+    {
+      "id": "t4hbhqe74",
+      "txHash": "0x74fa...676780",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:30.153Z"
+    },
+    {
+      "id": "1z2391cjk",
+      "txHash": "0x91fa...697073",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:27.625Z"
+    },
+    {
+      "id": "qhocr7xs2",
+      "txHash": "0x87fa...846622",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:25.103Z"
+    },
+    {
+      "id": "ch5y56dje",
+      "txHash": "0x23fa...771034",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:22.577Z"
+    },
+    {
+      "id": "cb5lm8p9j",
+      "txHash": "0x48ce...eB795",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:20.050Z"
+    },
+    {
+      "id": "vonbo4any",
+      "txHash": "0x58fa...101787",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:18.540Z"
+    },
+    {
+      "id": "k72zmti0o",
+      "txHash": "0x54fa...897545",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:16.013Z"
+    },
+    {
+      "id": "oegoi15dj",
+      "txHash": "0x60fa...423203",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:13.479Z"
+    },
+    {
+      "id": "28ic57br8",
+      "txHash": "0x15fa...665957",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:10.945Z"
+    },
+    {
+      "id": "igekl97pu",
+      "txHash": "0x87fa...571603",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:08.413Z"
+    },
+    {
+      "id": "ravnvfosi",
+      "txHash": "0x32fa...709971",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:05.899Z"
+    },
+    {
+      "id": "b4lrz43vn",
+      "txHash": "0x48ce...eB790",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:03.371Z"
+    },
+    {
+      "id": "by95hd53b",
+      "txHash": "0x78fa...985684",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:19:01.858Z"
+    },
+    {
+      "id": "w2td0vuu5",
+      "txHash": "0x43fa...985166",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:18:59.343Z"
+    },
+    {
+      "id": "efalqnutg",
+      "txHash": "0x57fa...506313",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:18:56.820Z"
+    },
+    {
+      "id": "hymfhd83v",
+      "txHash": "0x46fa...363016",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:18:54.292Z"
+    },
+    {
+      "id": "9lxsfut5f",
+      "txHash": "0x88fa...444611",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:18:51.766Z"
+    },
+    {
+      "id": "9awhjqsgd",
+      "txHash": "0x91fa...298072",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:18:49.252Z"
+    },
+    {
+      "id": "uohs5navn",
+      "txHash": "0x42fa...238812",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:13:00.771Z"
+    },
+    {
+      "id": "laevk0jh6",
+      "txHash": "0x63fa...541573",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:12:58.247Z"
+    },
+    {
+      "id": "50q69bz21",
+      "txHash": "0x55fa...683663",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:12:55.731Z"
+    },
+    {
+      "id": "w1enryfdo",
+      "txHash": "0x87fa...553878",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:12:53.217Z"
+    },
+    {
+      "id": "ocgayy33v",
+      "txHash": "0x48ce...eB795",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:12:50.698Z"
+    },
+    {
+      "id": "9l04p8zjj",
+      "txHash": "0x71fa...316415",
+      "protocol": "MantleSwap",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:12:49.146Z"
+    },
+    {
+      "id": "rqx0dptnb",
+      "txHash": "0x16fa...801355",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:12:46.631Z"
+    },
+    {
+      "id": "htomqnliv",
+      "txHash": "0x15fa...354119",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:12:44.115Z"
+    },
+    {
+      "id": "l50peak6g",
+      "txHash": "0x23fa...145912",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:12:41.601Z"
+    },
+    {
+      "id": "7ce0pir10",
+      "txHash": "0x58fa...845784",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:12:39.069Z"
+    },
+    {
+      "id": "bzvphatd2",
+      "txHash": "0x47fa...993586",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:12:36.529Z"
+    },
+    {
+      "id": "c87nkc3gj",
+      "txHash": "0x48ce...eB774",
+      "protocol": "TargetVault",
+      "type": "Reentrancy Mitigated",
+      "gasSaved": "1,420.5 mETH",
+      "status": "MITIGATED",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:12:33.995Z"
+    },
+    {
+      "id": "y86zriy0c",
+      "txHash": "0x57fa...544537",
+      "protocol": "LiquidMNT",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:12:32.473Z"
+    },
+    {
+      "id": "tkzcfhz8q",
+      "txHash": "0x83fa...658015",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:12:29.940Z"
+    },
+    {
+      "id": "1aiu3iz0u",
+      "txHash": "0x47fa...490666",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:12:27.395Z"
+    },
+    {
+      "id": "b6w0dlkog",
+      "txHash": "0x68fa...581563",
+      "protocol": "MantleBridge",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:12:24.846Z"
+    },
+    {
+      "id": "6xfc2cza2",
+      "txHash": "0x27fa...923412",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:12:22.308Z"
+    },
+    {
+      "id": "6hza4odv6",
+      "txHash": "0x31fa...624275",
+      "protocol": "ApexVaults",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "Just now",
+      "createdAt": "2026-06-06T12:12:19.789Z"
+    },
+    {
+      "id": "1",
+      "txHash": "0x8f2a...9aac",
+      "protocol": "MantleSwap",
+      "type": "Reentrancy Attempt",
+      "gasSaved": "1.45 mETH",
+      "status": "MITIGATED",
+      "timestamp": "2 mins ago",
+      "createdAt": "2026-06-06T12:10:19.776Z"
+    },
+    {
+      "id": "2",
+      "txHash": "0x1b4d...2ccf",
+      "protocol": "LendX Protocol",
+      "type": "Normal Transfer",
+      "gasSaved": "0 mETH",
+      "status": "SAFE",
+      "timestamp": "5 mins ago",
+      "createdAt": "2026-06-06T12:07:19.776Z"
+    },
+    {
+      "id": "3",
+      "txHash": "0x48ce...eB7a",
+      "protocol": "YieldFlow",
+      "type": "Oracle Manipulation",
+      "gasSaved": "3.20 mETH",
+      "status": "MITIGATED",
+      "timestamp": "12 mins ago",
+      "createdAt": "2026-06-06T12:00:19.776Z"
+    }
+  ]
+}
