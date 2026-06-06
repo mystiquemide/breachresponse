@@ -1,0 +1,15 @@
+
+node_modules/
+.next/
+dist/
+build/
+coverage/
+.env
+.env.local
+.env.*.local
+venv/
+__pycache__/
+*.pyc
+contracts/artifacts/
+contracts/cache/
+contracts/typechain-types/
