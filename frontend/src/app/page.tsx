@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Shield, Target, Zap, ArrowRight, Lock, Activity, Hexagon, Component, CheckCircle2, Power, AlertTriangle, Terminal, Layers } from 'lucide-react';
+import { Shield, Target, Zap, ArrowRight, Lock, Activity, Hexagon, Component, CheckCircle2, Power, AlertTriangle, Terminal, Layers, Cpu, ShieldCheck } from 'lucide-react';
 import { useAccount, useConnect, useSwitchChain, useDisconnect } from 'wagmi';
 import { injected } from 'wagmi/connectors';
 import { mantleSepoliaTestnet } from 'wagmi/chains';
