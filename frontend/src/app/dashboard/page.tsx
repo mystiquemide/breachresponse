@@ -316,13 +316,18 @@ export default function Dashboard() {
             <HelpCircle className="w-5 h-5" />
           </button>
           {isConnected && isCorrectNetwork ? (
-            <button 
-              onClick={() => disconnect()} 
-              className="flex items-center gap-2 bg-[#18181B] border border-gray-800 px-4 py-2 rounded hover:bg-gray-800 transition-colors text-xs"
-            >
-              <Power className="w-3.5 h-3.5 text-red-500" />
-              {address?.slice(0, 6)}...{address?.slice(-4)}
-            </button>
+            <div className="flex items-center gap-2">
+              <div className="hidden sm:flex items-center gap-2 bg-[#18181B] border border-gray-800 px-3 py-2 rounded text-xs text-gray-400">
+                <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
+                {address?.slice(0, 6)}...{address?.slice(-4)}
+              </div>
+              <button 
+                onClick={() => disconnect()} 
+                className="flex items-center gap-2 bg-red-500/10 text-red-500 border border-red-500/20 px-4 py-2 rounded hover:bg-red-500/20 transition-colors text-xs font-bold uppercase tracking-widest"
+              >
+                <Power className="w-3.5 h-3.5" /> Disconnect
+              </button>
+            </div>
           ) : isConnected && !isCorrectNetwork ? (
             <button 
               onClick={() => switchChain && switchChain({ chainId: mantleSepoliaTestnet.id })} 
@@ -366,6 +371,10 @@ export default function Dashboard() {
                 <AlertTriangle className="w-4 h-4" /> Switch to Mantle Sepolia
               </button>
             )}
+            
+            <Link href="/" className="mt-4 block w-full py-3 text-center text-sm text-gray-500 hover:text-white transition-colors border border-gray-800 rounded">
+              Return to Homepage
+            </Link>
           </div>
         </div>
       )}
