@@ -3,7 +3,7 @@ import "./globals.css";
 import { Web3Provider } from "./Web3Provider";
 
 export const metadata: Metadata = {
-  title: "BreachResponse Command Center",
+  title: "Breach Response Command Center",
   description: "Active Defense Node for Mantle Smart Contracts",
 };
 

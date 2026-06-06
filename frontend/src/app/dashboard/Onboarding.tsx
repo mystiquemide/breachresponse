@@ -31,7 +31,7 @@ const ONBOARDING_STEPS = [
   {
     title: "System Initialization",
     icon: <Radio className="w-8 h-8 text-[#10B981] animate-pulse" />,
-    description: "Welcome to the BreachResponse Command Center. This is your active defense matrix for monitoring and securing smart contracts on the Mantle network in real-time.",
+    description: "Welcome to the Breach Response Command Center This is your active defense matrix for monitoring and securing smart contracts on the Mantle network in real-time.",
     color: "from-[#10B981]/20 to-transparent",
     border: "border-[#10B981]/50",
     targetId: null,
