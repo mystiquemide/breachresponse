@@ -23,7 +23,7 @@ interface Asset {
 
 export default function Dashboard() {
   const { address, isConnected, chainId } = useAccount();
-  const { connect } = useConnect();
+  const { connect, error: connectError, isPending: isConnectPending } = useConnect();
   const { disconnect } = useDisconnect();
   const { switchChain } = useSwitchChain();
   const { writeContract, isPending, isSuccess } = useWriteContract();
@@ -51,10 +51,10 @@ export default function Dashboard() {
   const [isAttackModalOpen, setIsAttackModalOpen] = useState(false);
 
   useEffect(() => {
-    // Check if user has already seen onboarding
-    const hasOnboarded = localStorage.getItem('breachresponse_onboarded');
-    if (!hasOnboarded) {
-      // Use setTimeout to avoid synchronous state update in effect
+    // Keep the product visible by default for demos and screenshots.
+    // The tour can still be opened from the help button or with /dashboard?tour=1.
+    const shouldOpenTour = new URLSearchParams(window.location.search).get('tour') === '1';
+    if (shouldOpenTour) {
       setTimeout(() => setShowOnboarding(true), 0);
     }
   }, []);
@@ -342,7 +342,7 @@ export default function Dashboard() {
               className="flex items-center gap-2 bg-[#10B981] text-black font-bold py-2 px-5 rounded hover:bg-green-400 transition-all text-xs shadow-[0_0_15px_rgba(16,185,129,0.3)]"
             >
               <Power className="w-3.5 h-3.5" />
-              Connect Wallet
+              {isConnectPending ? 'Connecting...' : 'Connect Wallet'}
             </button>
           )}
         </div>
@@ -351,9 +351,8 @@ export default function Dashboard() {
 
       {/* Stats Strip Bar */}
       <motion.section 
-        initial={{ opacity: 0, y: 20 }}
+        initial={false}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
         className="relative grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
       >
         <div className="sci-fi-panel p-4 flex flex-col justify-between relative overflow-hidden">
@@ -402,9 +401,8 @@ export default function Dashboard() {
         
         {/* Left Layout (Forms & Registry) */}
         <motion.div 
-          initial={{ opacity: 0, x: -20 }}
+          initial={false}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2 }}
           className="lg:col-span-1 space-y-8"
         >
           
@@ -433,6 +431,11 @@ export default function Dashboard() {
             </button>
             {isSuccess && <p className="text-[#10B981] mt-3 text-[10px] text-center">Protocol registered on Mantle Sepolia!</p>}
             {!isConnected && <p className="text-red-500 mt-3 text-[10px] text-center font-sans">Connect wallet to initialize guards</p>}
+            {!isConnected && connectError && (
+              <p className="text-yellow-400 mt-2 text-[10px] text-center font-sans">
+                No injected wallet detected. Install MetaMask or open this app in a wallet browser.
+              </p>
+            )}
           </div>
 
           {/* System Telemetry Oscilloscope (Inspired by ui panel.png) */}
@@ -505,9 +508,8 @@ export default function Dashboard() {
 
         {/* Right Layout (Command Console & Terminal) */}
         <motion.div 
-          initial={{ opacity: 0, x: 20 }}
+          initial={false}
           animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3 }}
           className="lg:col-span-2 space-y-8"
         >
           <div id="ob-terminal" className="sci-fi-panel flex flex-col relative overflow-hidden h-full min-h-[580px] transition-all duration-500">

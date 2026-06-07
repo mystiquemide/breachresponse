@@ -27,10 +27,18 @@ Smart contract teams usually learn about an exploit after funds move. BreachResp
 
 - Mantle sentinel registry for protocol onboarding and agent permissions.
 - Next.js Command Center for incident triage, defense approval, and live telemetry.
-- Python monitoring agent for Mantle RPC scanning and alert forwarding.
+- Python monitoring agent for Mantle RPC scanning, LLM-assisted incident analysis, and alert forwarding.
 - Solidity simulation contracts that prove the vulnerable path and the paused defense path.
 - Safe environment templates with no committed keys or production secrets.
 - CI checks covering frontend, contracts, agent syntax, and dependency audits.
+
+## AI incident analysis
+
+BreachResponse uses an LLM-assisted analysis layer to convert suspicious Mantle activity into structured incident reports and response proposals. The model classifies the likely exploit, assigns confidence, recommends scoped calldata, and passes the result into the operator approval path.
+
+The LLM does not get unchecked execution authority. Human approval is the default response mode, and autonomous policies should only be enabled for allowlisted contracts, capped actions, emergency selectors, and monitored thresholds.
+
+See [AI Incident Analysis](./docs/AI_INCIDENT_ANALYSIS.md) for the model input/output shape and safety model.
 
 ## Mantle Sepolia deployment
 
@@ -57,10 +65,10 @@ The current SentinelRegistry deployment used by the frontend is:
 Mantle RPC / protocol telemetry
           |
           v
-Python sentinel agent -> exploit classifier -> proposed defense payload
-          |                                      |
-          v                                      v
-Next.js Command Center <------------------ operator approval
+Python sentinel agent -> LLM incident analysis -> response proposal
+          |                         |                  |
+          v                         v                  v
+Next.js Command Center <------ safety checks <---- operator approval
           |
           v
 Mantle registry + protected protocol contracts

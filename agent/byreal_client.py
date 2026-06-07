@@ -7,13 +7,15 @@ class ByrealClient:
     def __init__(self, api_key: str | None = None):
         # Prefer the explicit key, then fall back to OPENAI_API_KEY.
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
+        self.model = os.getenv("LLM_MODEL", "gpt-4o-mini")
+        self.base_url = os.getenv("OPENAI_BASE_URL")
         
         if not self.api_key:
             print("[BYREAL] Warning: OPENAI_API_KEY not found in environment. Using fallback mock mode.")
             self.client = None
         else:
-            self.client = OpenAI(api_key=self.api_key)
-            print(f"[BYREAL] Initialized OpenAI GPT-5.5 Client")
+            self.client = OpenAI(api_key=self.api_key, base_url=self.base_url) if self.base_url else OpenAI(api_key=self.api_key)
+            print(f"[BYREAL] Initialized OpenAI analysis client with model: {self.model}")
             
         self.last_analysis = {}
 
@@ -52,9 +54,9 @@ Respond strictly in JSON format matching this schema:
 """
 
         try:
-            print("[BYREAL-LLM] Requesting exploit analysis from GPT-5.5...")
+            print(f"[BYREAL-LLM] Requesting exploit analysis from {self.model}...")
             response = self.client.chat.completions.create(
-                model="gpt-5.5",
+                model=self.model,
                 messages=[
                     {"role": "system", "content": "You are a smart contract active-defense AI."},
                     {"role": "user", "content": prompt}
@@ -63,9 +65,10 @@ Respond strictly in JSON format matching this schema:
                 temperature=0.0
             )
             
-            result = json.loads(response.choices[0].message.content)
+            response_content = response.choices[0].message.content or "{}"
+            result = json.loads(response_content)
             self.last_analysis = result
-            print(f"[BYREAL-LLM] GPT-5.5 Analysis Response:\n{json.dumps(result, indent=2)}")
+            print(f"[BYREAL-LLM] Analysis response:\n{json.dumps(result, indent=2)}")
             return float(result.get("confidence_score", 0.0))
             
         except Exception as e:
@@ -83,7 +86,7 @@ Respond strictly in JSON format matching this schema:
         pause_calldata = self.last_analysis.get("recommended_calldata", "0x8456cb59")
         
         print(f"[BYREAL-AGENT] Mitigation payload generated: {pause_calldata}")
-        print(f"[BYREAL-AGENT] Recommended Action: Send pause transaction immediately.")
+        print(f"[BYREAL-AGENT] Recommended Action: Propose pause transaction for approval.")
         
         return {
             "to": target_address,

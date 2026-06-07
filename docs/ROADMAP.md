@@ -10,6 +10,7 @@
 ## Phase 2: Production pilot
 
 - Verified Mantle registry deployment.
+- LLM-assisted incident analysis with structured response proposals.
 - Multisig routing for response approvals.
 - Policy engine for allowlisted emergency pause actions.
 - Redundant RPC providers and health checks.
