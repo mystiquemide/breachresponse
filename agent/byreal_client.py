@@ -4,10 +4,9 @@ import time
 from openai import OpenAI
 
 class ByrealClient:
-    def __init__(self, api_key: str = None):
-        # We assume the user passes the API key or sets OPENAI_API_KEY
-        # Since main.py passes BYREAL_API_KEY initially, we'll check OPENAI_API_KEY
-        self.api_key = os.getenv("OPENAI_API_KEY")
+    def __init__(self, api_key: str | None = None):
+        # Prefer the explicit key, then fall back to OPENAI_API_KEY.
+        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
         
         if not self.api_key:
             print("[BYREAL] Warning: OPENAI_API_KEY not found in environment. Using fallback mock mode.")

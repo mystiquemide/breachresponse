@@ -1,16 +1,21 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [0.1.0] - 2026-06-07
+## 0.2.0
 
 ### Added
-- Initial public hackathon release.
-- Next.js Command Center with sci-fi telemetry UI.
-- Python Sentinel Agent integrating Web3.py and OpenAI GPT-5.5.
-- Hardhat deployment for `SentinelRegistry.sol` and Mock Vaults on Mantle Sepolia.
-- CI/CD GitHub Actions for automated type-checking, linting, and CodeQL.
-- Extensive documentation, architecture plans, and security policies.
+
+- Product-ready Command Center positioning for Mantle incident response.
+- CI coverage for frontend, contracts, agent syntax, and dependency audits.
+- Threat model, operator runbook, roadmap, Mantle integration notes, and verification docs.
+
+### Changed
+
+- Reframed response modes around human approval and scoped autonomous policies.
+- Removed internal planning language from public-facing docs.
+- Hardened environment examples and dependency posture.
+
+## 0.1.0
+
+### Added
+
+- Initial Mantle sentinel registry, response dashboard, Python monitoring agent, and exploit simulation contracts.

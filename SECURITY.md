@@ -1,16 +1,46 @@
 # Security Policy
 
-## Supported Versions
+BreachResponse is security infrastructure, so the default posture is conservative.
 
-We only support the latest main branch (`v0.1.x`) for this hackathon release.
+## Supported versions
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 0.1.x   | :white_check_mark: |
-| < 0.1   | :x:                |
+| Version | Supported |
+| --- | --- |
+| Latest `main` | Yes |
+| Older commits | No |
 
-## Reporting a Vulnerability
+## Reporting a vulnerability
 
-If you discover a security vulnerability within BreachResponse, please do not disclose it publicly. Instead, send an email to the repository owner or open a confidential security advisory on GitHub.
+Do not disclose exploitable issues publicly. Use GitHub private vulnerability reporting if it is available for this repository, or contact the repository owner directly.
 
-We will acknowledge receipt of your vulnerability report and strive to send you regular updates about our progress.
+Please include:
+
+- affected component: frontend, agent, contracts, CI, docs, or deployment
+- clear reproduction steps
+- impact assessment
+- suggested fix if known
+- whether any secret, wallet, or private key exposure is involved
+
+## Secret handling
+
+- No real API keys, wallet seeds, private keys, or production RPC credentials belong in the repository.
+- `.env.example` must only contain placeholders and public testnet values.
+- Testnet keys must be dedicated low-balance keys.
+- Production signing should go through a multisig, hardware wallet, or policy engine.
+
+## Autonomous response safety
+
+Human approval is the default mode. Autonomous execution must be scoped with:
+
+- allowlisted contracts
+- allowlisted function selectors
+- maximum action value caps
+- emergency pause and quarantine actions before fund movement actions
+- logging and alerting on every attempted action
+- manual override and kill-switch support
+
+## Known risk areas
+
+- The simulation contracts intentionally include a vulnerable target vault to prove the defense path in tests.
+- The monitoring agent is only as reliable as its RPC provider and configured policies.
+- AI-generated payloads must be validated against allowlists before execution.

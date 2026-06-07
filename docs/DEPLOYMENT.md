@@ -1,52 +1,99 @@
-# Deployment Guide
+# Deployment
 
-This guide covers deploying the Next.js frontend to Vercel and running the Python Sentinel agent in production.
+This guide covers local verification, frontend deployment, agent deployment, and post-deploy checks.
 
 ## Prerequisites
-- Node.js v20+
+
+- Node.js 22+
+- npm 10+
 - Python 3.11+
-- Vercel CLI (optional)
-- RPC access to Mantle Sepolia
+- Mantle Sepolia RPC access
+- WalletConnect project ID for wallet UX
+- Dedicated low-balance testnet key for agent testing
 
-## Required Environment Variables
-Ensure the following variables are set in your production environment (Vercel Dashboard / Server ENV):
-- `MANTLE_RPC_URL`
-- `NEXT_PUBLIC_WALLETCONNECT_ID`
-- `OPENAI_API_KEY`
-- `PRIVATE_KEY`
+## Environment
 
-## Deploying the Frontend to Vercel
-The frontend is pre-configured for Vercel deployment.
+Copy the template and fill in local values:
 
-1. Install the Vercel CLI:
-   ```bash
-   npm i -g vercel
-   ```
-2. Link your project:
-   ```bash
-   vercel link
-   ```
-3. Deploy to production:
-   ```bash
-   vercel deploy --prod
-   ```
+```bash
+cp .env.example .env
+```
 
-## Deploying the Sentinel Agent
-The Python agent should run on a highly available server (e.g., AWS EC2, DigitalOcean Droplet, or Railway).
+Do not use production keys during development. Production signing should use a multisig, hardware wallet, or scoped policy signer.
 
-1. Clone the repository on your remote server.
-2. Setup the Python environment:
-   ```bash
-   python -m venv venv
-   source venv/bin/activate
-   pip install -r requirements.txt
-   ```
-3. Create the `.env` file with your production API keys and RPC URL.
-4. Run the agent using `systemd` or `pm2` for process management:
-   ```bash
-   pm2 start main.py --name "sentinel-agent" --interpreter python
-   ```
+## Frontend
 
-## Post-Deploy Verification
-- Check the Vercel dashboard to ensure the build succeeded.
-- Verify the Agent logs to ensure it has successfully connected to the Mantle RPC node.
+```bash
+cd frontend
+npm ci
+npm run lint -- --max-warnings=0
+npx tsc --noEmit
+npm run build
+npm run dev
+```
+
+For Vercel or similar hosting:
+
+1. Set the public frontend environment variables.
+2. Build from the `frontend` directory.
+3. Use `npm run build` as the build command.
+4. Use `.next` as the output managed by Next.js.
+
+## Contracts
+
+```bash
+cd contracts
+npm ci
+npm run compile
+npm test
+```
+
+Deployments should be recorded with:
+
+- network name
+- contract address
+- transaction hash
+- deployer address
+- source commit
+- verification status
+
+## Agent
+
+```bash
+cd agent
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python -m compileall -q .
+python main.py
+```
+
+Production agents should run under systemd or another supervised process manager.
+
+Example systemd shape:
+
+```ini
+[Unit]
+Description=BreachResponse Sentinel Agent
+After=network-online.target
+
+[Service]
+WorkingDirectory=/opt/breachresponse/agent
+ExecStart=/opt/breachresponse/agent/.venv/bin/python main.py
+Restart=always
+RestartSec=5
+EnvironmentFile=/opt/breachresponse/.env
+
+[Install]
+WantedBy=multi-user.target
+```
+
+## Post-deploy checks
+
+- Frontend build succeeds.
+- Command Center loads without console errors.
+- Wallet connection handles disconnected, wrong-network, and connected states.
+- Agent connects to Mantle RPC.
+- Registry address matches the configured network.
+- Incident simulation displays the expected mitigation path.
+- Logs do not expose secrets.
