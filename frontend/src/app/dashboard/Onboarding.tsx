@@ -69,7 +69,7 @@ const ONBOARDING_STEPS = [
   }
 ];
 
-const HIGHLIGHT_CLASSES = ['relative', 'z-[101]', 'ring-2', 'ring-[#10B981]', 'shadow-[0_0_50px_rgba(16,185,129,0.3)]', 'scale-[1.02]', 'scroll-mt-28'];
+const HIGHLIGHT_CLASSES = ['onboarding-active'];
 
 export default function Onboarding({ isOpen, onClose }: OnboardingProps) {
   const [currentStep, setCurrentStep] = useState(0);
@@ -93,8 +93,10 @@ export default function Onboarding({ isOpen, onClose }: OnboardingProps) {
     if (step.targetId) {
       const el = document.getElementById(step.targetId);
       if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: currentStep === 2 ? 'center' : 'nearest', inline: 'nearest' });
         el.classList.add(...HIGHLIGHT_CLASSES);
+        window.requestAnimationFrame(() => {
+          el.scrollIntoView({ behavior: 'auto', block: 'center', inline: 'nearest' });
+        });
       }
     }
 

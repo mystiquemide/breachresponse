@@ -101,6 +101,10 @@ export default function Dashboard() {
     router.replace('/');
   };
 
+  const handleBackToLanding = () => {
+    window.location.assign('/');
+  };
+
   useEffect(() => {
     const loadStoredSigner = window.setTimeout(() => {
       setGenLayerAccount(getStoredGenLayerAccount());
@@ -115,10 +119,16 @@ export default function Dashboard() {
   }, [router]);
 
   const refreshConsensusIncidents = useCallback(async () => {
+    if (!GENLAYER_CONSENSUS_GUARD_ADDRESS) return;
+    if (!genLayerAccount) {
+      setConsensusStatus('Prepare the app-managed GenLayer guard signer before reading consensus records');
+      return;
+    }
+
     if (!consensusClientRef.current) {
       consensusClientRef.current = new IncidentConsensusGuardClient(createGenLayerClient(genLayerAccount));
     }
-    if (!consensusClientRef.current || !GENLAYER_CONSENSUS_GUARD_ADDRESS) return;
+    if (!consensusClientRef.current) return;
 
     try {
       const incidents = await consensusClientRef.current.listIncidents();
@@ -174,7 +184,10 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    refreshConsensusIncidents();
+    const refreshTimer = window.setTimeout(() => {
+      refreshConsensusIncidents();
+    }, 0);
+    return () => window.clearTimeout(refreshTimer);
   }, [refreshConsensusIncidents]);
 
   useEffect(() => {
@@ -436,9 +449,9 @@ export default function Dashboard() {
       <header className="relative flex justify-between items-center mb-8 border-b border-gray-800/60 pb-4">
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-3">
-            <Link href="/" className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mr-2 border border-gray-800 rounded px-3 py-1">
+            <button onClick={handleBackToLanding} className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors mr-2 border border-gray-800 rounded px-3 py-1">
               <span className="text-xs font-bold uppercase tracking-widest">← Back</span>
-            </Link>
+            </button>
             <Radio className="w-5 h-5 animate-pulse text-[#10B981] hidden sm:block" />
             <h1 className="text-lg md:text-xl font-bold tracking-widest uppercase">Command Center</h1>
           </div>
