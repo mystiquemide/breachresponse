@@ -127,7 +127,7 @@ export default function ThreatHistory() {
       </header>
 
       <motion.div 
-        initial={{ opacity: 0, y: 20 }}
+        initial={false}
         animate={{ opacity: 1, y: 0 }}
         className="relative z-10 max-w-7xl mx-auto space-y-6"
       >
@@ -160,8 +160,52 @@ export default function ThreatHistory() {
           />
         </div>
 
-        {/* Ledger Table */}
-        <div className="sci-fi-panel rounded-xl overflow-hidden border-glow">
+        {/* Mobile Ledger Cards */}
+        <div className="md:hidden space-y-4">
+          {isLoading ? (
+            <div className="sci-fi-panel rounded-xl p-6 text-center text-gray-500 border-glow">Loading immutable ledger</div>
+          ) : filteredLogs.length === 0 ? (
+            <div className="sci-fi-panel rounded-xl p-6 text-center text-gray-500 border-glow">No records found</div>
+          ) : (
+            filteredLogs.map(log => (
+              <article key={log.id} className="sci-fi-panel rounded-xl p-4 border-glow space-y-4">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">{new Date(log.timestamp).toLocaleString()}</div>
+                    <h2 className="text-sm font-bold text-white">{log.protocol}</h2>
+                  </div>
+                  <span className={`shrink-0 px-2.5 py-1 rounded text-[10px] font-bold ${log.status === 'MITIGATED' ? 'bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/20' : 'bg-white/5 text-gray-400 border border-white/10'}`}>
+                    {log.status === 'MITIGATED' ? 'Mitigated' : 'Safe'}
+                  </span>
+                </div>
+
+                <div className="rounded-lg bg-black/40 border border-gray-800/60 p-3">
+                  <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Transaction</div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-xs text-gray-300 font-bold break-all">{log.txHash.slice(0, 10)}...{log.txHash.slice(-8)}</span>
+                    <a href={`https://sepolia.mantlescan.xyz/tx/${log.txHash}`} target="_blank" rel="noopener noreferrer" className="shrink-0 text-[#10B981] hover:underline text-[10px]">Explorer ↗</a>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Threat</div>
+                    <span className={`inline-flex px-2.5 py-1 rounded font-medium ${log.type.includes('Reentrancy') || log.type.includes('Manipulation') ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-[#18181B] text-gray-300'}`}>
+                      {log.type}
+                    </span>
+                  </div>
+                  <div>
+                    <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Action</div>
+                    <div className="text-gray-300 font-bold">{log.status === 'MITIGATED' ? `${log.gasSaved} saved` : 'Allowed'}</div>
+                  </div>
+                </div>
+              </article>
+            ))
+          )}
+        </div>
+
+        {/* Desktop Ledger Table */}
+        <div className="hidden md:block sci-fi-panel rounded-xl overflow-hidden border-glow">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-collapse text-xs">
               <thead>

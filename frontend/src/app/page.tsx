@@ -216,7 +216,7 @@ export default function LandingPage() {
         <div className="absolute inset-0 z-0 bg-gradient-to-b from-[#09090B] via-transparent to-[#09090B] pointer-events-none" />
         <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.12)_0%,rgba(9,9,11,1)_85%)] pointer-events-none" />
 
-        <div className="relative z-10 w-full max-w-5xl px-8 mt-20 mb-32 flex flex-col items-center">
+        <div className="relative z-10 w-full max-w-5xl px-8 mt-20 mb-20 flex flex-col items-center">
           <motion.div initial="initial" animate="animate" variants={fadeInUp} className="text-center mb-16">
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight tracking-tight text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]">
               Breach Response
@@ -320,7 +320,7 @@ export default function LandingPage() {
         <div className="absolute bottom-0 left-0 right-0 h-40 z-30 bg-gradient-to-t from-[#050507] to-transparent pointer-events-none" />
       </div>
 
-      <section className="py-8 border-y border-gray-900 bg-black/10 overflow-hidden flex whitespace-nowrap items-center relative z-40">
+      <section className="py-6 border-y border-gray-900 bg-black/10 overflow-hidden flex whitespace-nowrap items-center relative z-40">
         <div className="max-w-7xl mx-auto px-8 md:px-16 flex justify-between items-center w-full text-gray-500 font-bold tracking-widest text-sm uppercase">
           <span className="flex items-center gap-2"><Hexagon className="w-4 h-4" /> Mantle Network</span>
           <span className="flex items-center gap-2"><Layers className="w-4 h-4" /> DeFi Protocols</span>
@@ -329,7 +329,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="py-24 px-8 md:px-16 max-w-6xl mx-auto relative z-40 bg-black/10 backdrop-blur-[1px] border-t border-gray-900/30">
+      <section className="py-20 px-8 md:px-16 max-w-6xl mx-auto relative z-40 bg-black/10 backdrop-blur-[1px] border-t border-gray-900/30">
         <div className="container mx-auto px-6 relative z-10 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Pipeline Execution</h2>
           <p className="text-gray-400 font-sans max-w-2xl mx-auto mb-16">
@@ -395,14 +395,14 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="features" className="py-32 px-8 md:px-16 max-w-6xl mx-auto relative z-40 bg-transparent">
-        <motion.div initial="initial" whileInView="animate" viewport={{ once: true, margin: "-100px" }} variants={fadeInUp} className="container mx-auto px-6 relative z-10">
+      <section id="features" className="py-20 px-8 md:px-16 max-w-6xl mx-auto relative z-40 bg-transparent">
+        <motion.div initial={false} animate="animate" variants={fadeInUp} className="container mx-auto px-6 relative z-10">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Built for scale</h2>
           <p className="text-xl text-gray-400 mb-16 max-w-2xl font-sans text-sm">
             Traditional security platforms rely on alerting you after the funds are stolen, we formulate the counter transaction before the attacker&apos;s block is confirmed
           </p>
         </motion.div>
-        <motion.div variants={staggerContainer} initial="initial" whileInView="animate" viewport={{ once: true, margin: "-50px" }} className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <motion.div variants={staggerContainer} initial={false} animate="animate" className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <motion.div variants={fadeInUp}>
             <div className="p-8 rounded-2xl bg-[#09090B] border border-gray-800 relative group hover:border-[#10B981]/50 transition-colors">
               <div className="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center mb-6 border border-gray-800 text-[#10B981]">
@@ -452,7 +452,7 @@ export default function LandingPage() {
       </section>
 
       {/* Interactive Integration Code Terminal */}
-      <section className="py-24 px-8 md:px-16 max-w-6xl mx-auto relative z-40 bg-transparent">
+      <section className="py-20 px-8 md:px-16 max-w-6xl mx-auto relative z-40 bg-transparent">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Developer first</h2>
@@ -536,7 +536,7 @@ export default function LandingPage() {
       </section>
 
       {/* Live Simulated Threat Ledger */}
-      <section className="py-24 px-8 md:px-16 max-w-6xl mx-auto relative z-40 bg-black/10 backdrop-blur-[1px] border-t border-gray-900/30">
+      <section className="py-20 px-8 md:px-16 max-w-6xl mx-auto relative z-40 bg-black/10 backdrop-blur-[1px] border-t border-gray-900/30">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#101014]/60 border border-gray-800/80 mb-4 text-xs font-bold text-[#10B981]">
             <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
@@ -606,7 +606,7 @@ export default function LandingPage() {
       </section>
 
       {/* High-Impact Bottom CTA Banner */}
-      <section className="py-24 px-8 md:px-16 max-w-6xl mx-auto relative z-40 bg-transparent border-t border-gray-900/30">
+      <section className="py-20 px-8 md:px-16 max-w-6xl mx-auto relative z-40 bg-transparent border-t border-gray-900/30">
         <div className="relative py-16 px-8 md:px-16 flex flex-col items-center text-center">
           <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 tracking-tight">
             Neutralize threats before block finality
