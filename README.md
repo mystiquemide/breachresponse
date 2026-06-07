@@ -60,10 +60,20 @@ genvm-lint check contracts/genlayer/IncidentConsensusGuard.py --json
 python -m pytest tests/direct/test_incident_consensus_guard.py -q
 ```
 
-To enable live frontend escalation after deployment, set:
+The StudioNet deployment used by the frontend is:
+
+| Field | Value |
+| --- | --- |
+| Network | GenLayer StudioNet |
+| Consensus guard contract address | `0x86369EC44fbB5EB682729368557176858aBe0c73` |
+| Deployment transaction | `0xec4e0f05378f1f9ebd0d3d47fc1b6ee815ff3b0a4cd271988f0c1d5ab3b9970a` |
+| Deployer | `0x65567Bf52e47A20C10793748C36597fAC2E3056D` |
+| Verification | `genlayer schema` and `genlayer call get_stats` succeeded on StudioNet |
+
+To enable live frontend escalation, set:
 
 ```bash
-NEXT_PUBLIC_GENLAYER_CONSENSUS_GUARD_ADDRESS=<deployed GenLayer contract address>
+NEXT_PUBLIC_GENLAYER_CONSENSUS_GUARD_ADDRESS=0x86369EC44fbB5EB682729368557176858aBe0c73
 NEXT_PUBLIC_GENLAYER_STUDIO_URL=https://studio.genlayer.com/api
 ```
 
