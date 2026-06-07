@@ -661,7 +661,7 @@ export default function LandingPage() {
             <h4 className="text-white font-bold mb-6 tracking-widest uppercase text-xs">Networks</h4>
             <ul className="space-y-4 flex flex-col">
               <a href="https://www.mantle.xyz/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#10B981] transition-colors text-sm font-sans">Mantle Network</a>
-              <a href="https://explorer.sepolia.mantle.xyz/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#10B981] transition-colors text-sm font-sans">Mantle Sepolia</a>
+              <a href="https://sepolia.mantlescan.xyz/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#10B981] transition-colors text-sm font-sans">Mantle Sepolia</a>
               <a href="https://faucet.sepolia.mantle.xyz/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#10B981] transition-colors text-sm font-sans">Mantle Faucet</a>
             </ul>
           </div>
