@@ -10,7 +10,7 @@ import Counter from './Counter';
 import Onboarding from './Onboarding';
 import AttackModal from './AttackModal';
 import { REGISTRY_ADDRESS, REGISTRY_ABI } from '../constants';
-import { DASHBOARD_PATH, HISTORY_PATH, LANDING_PATH, leaveCommandCenter, navigateToAppPath, replaceWithAppPath } from '../../lib/navigation';
+import { DASHBOARD_PATH, HISTORY_PATH, LANDING_PATH, clearCommandCenterNavigationState, leaveCommandCenter, navigateToAppPath, replaceWithAppPath } from '../../lib/navigation';
 import {
   GENLAYER_CONSENSUS_GUARD_ADDRESS,
   type GenLayerAccount,
@@ -105,6 +105,7 @@ export default function Dashboard() {
   };
 
   const handleBackToLanding = () => {
+    clearCommandCenterNavigationState(window.sessionStorage);
     replaceWithAppPath(window.location, LANDING_PATH);
   };
 

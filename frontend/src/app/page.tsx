@@ -9,7 +9,13 @@ import { Shield, Target, Activity, Hexagon, Component, CheckCircle2, Power, Aler
 import { useAccount, useConnect, useSwitchChain, useDisconnect } from 'wagmi';
 import { mantleSepoliaTestnet } from 'wagmi/chains';
 import { createPublicClient, http, type Transaction as ViemTransaction } from 'viem';
-import { clearCommandCenterNavigationState } from '../lib/navigation';
+import {
+  DASHBOARD_PATH,
+  PIPELINE_EXECUTION_ANCHOR,
+  PIPELINE_EXECUTION_PATH,
+  clearCommandCenterNavigationState,
+  navigateToAppPath,
+} from '../lib/navigation';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -107,18 +113,30 @@ export default function LandingPage() {
   }, []);
 
   useEffect(() => {
-    const wasDisconnected = new URLSearchParams(window.location.search).get('wallet') === 'disconnected';
-    if (wasDisconnected) {
+    const resetLandingLaunchState = () => {
+      setIsLaunchingCommandCenter(false);
       clearCommandCenterNavigationState(window.sessionStorage);
-      window.setTimeout(() => setIsLaunchingCommandCenter(false), 0);
+    };
+
+    const wasDisconnected = new URLSearchParams(window.location.search).get('wallet') === 'disconnected';
+    if (wasDisconnected || window.location.pathname === '/') {
+      window.setTimeout(resetLandingLaunchState, 0);
     }
+
+    window.addEventListener('pageshow', resetLandingLaunchState);
+    window.addEventListener('popstate', resetLandingLaunchState);
+
+    return () => {
+      window.removeEventListener('pageshow', resetLandingLaunchState);
+      window.removeEventListener('popstate', resetLandingLaunchState);
+    };
   }, []);
 
   useEffect(() => {
     if (isLaunchingCommandCenter && isConnected && isCorrectNetwork) {
-      router.push('/dashboard');
+      navigateToAppPath(window.location, DASHBOARD_PATH);
     }
-  }, [isLaunchingCommandCenter, isConnected, isCorrectNetwork, router]);
+  }, [isLaunchingCommandCenter, isConnected, isCorrectNetwork]);
 
   const handleWalletAccess = () => {
     if (!isConnected) {
@@ -141,11 +159,12 @@ export default function LandingPage() {
       switchChain({ chainId: mantleSepoliaTestnet.id });
       return;
     }
-    router.push('/dashboard');
+    navigateToAppPath(window.location, DASHBOARD_PATH);
   };
 
   const handleDisconnect = () => {
     setIsLaunchingCommandCenter(false);
+    clearCommandCenterNavigationState(window.sessionStorage);
     disconnect();
   };
 
@@ -218,7 +237,7 @@ export default function LandingPage() {
           <span className="text-lg font-bold tracking-widest text-white drop-shadow-md">BREACH RESPONSE</span>
         </div>
         <div className="hidden md:flex gap-8 text-xs tracking-widest uppercase font-bold text-gray-300 drop-shadow-md">
-          <Link href="#features" className="hover:text-white transition-colors">Features</Link>
+          <Link href={PIPELINE_EXECUTION_PATH} className="hover:text-white transition-colors">Features</Link>
           <a href="https://docs.mantle.xyz" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Documentation</a>
         </div>
         <div>
@@ -418,7 +437,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="features" className="scroll-mt-24 py-20 px-8 md:px-16 max-w-6xl mx-auto relative z-40 bg-black/10 backdrop-blur-[1px] border-t border-gray-900/30">
+      <section id={PIPELINE_EXECUTION_ANCHOR} className="scroll-mt-24 py-20 px-8 md:px-16 max-w-6xl mx-auto relative z-40 bg-black/10 backdrop-blur-[1px] border-t border-gray-900/30">
         <div className="container mx-auto px-6 relative z-10 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Pipeline Execution</h2>
           <p className="text-gray-400 font-sans max-w-2xl mx-auto mb-16">
