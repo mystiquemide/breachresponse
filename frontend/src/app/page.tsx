@@ -9,6 +9,7 @@ import { Shield, Target, Activity, Hexagon, Component, CheckCircle2, Power, Aler
 import { useAccount, useConnect, useSwitchChain, useDisconnect } from 'wagmi';
 import { mantleSepoliaTestnet } from 'wagmi/chains';
 import { createPublicClient, http, type Transaction as ViemTransaction } from 'viem';
+import { clearCommandCenterNavigationState } from '../lib/navigation';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -106,6 +107,14 @@ export default function LandingPage() {
   }, []);
 
   useEffect(() => {
+    const wasDisconnected = new URLSearchParams(window.location.search).get('wallet') === 'disconnected';
+    if (wasDisconnected) {
+      clearCommandCenterNavigationState(window.sessionStorage);
+      window.setTimeout(() => setIsLaunchingCommandCenter(false), 0);
+    }
+  }, []);
+
+  useEffect(() => {
     if (isLaunchingCommandCenter && isConnected && isCorrectNetwork) {
       router.push('/dashboard');
     }
@@ -122,6 +131,7 @@ export default function LandingPage() {
 
   const handleCommandCenterAccess = () => {
     setIsLaunchingCommandCenter(true);
+    window.sessionStorage.setItem('breachresponse_launching_command_center', 'true');
     if (!isConnected) {
       if (!injectedConnector) return;
       connect({ connector: injectedConnector });

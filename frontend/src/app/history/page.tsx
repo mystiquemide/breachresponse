@@ -1,13 +1,13 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
 import { mantleSepoliaTestnet } from 'wagmi/chains';
 import { createPublicClient, http, type Transaction as ViemTransaction } from 'viem';
 import { Shield, ArrowLeft, Activity, ShieldCheck, Power, AlertTriangle, History, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { DASHBOARD_PATH, leaveCommandCenter, navigateToAppPath } from '../../lib/navigation';
 
 interface TransactionLog {
   id: string;
@@ -64,16 +64,15 @@ export default function ThreatHistory() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleDisconnect = () => {
-    disconnect();
-    const target = '/?wallet=disconnected';
-    window.setTimeout(() => {
-      window.location.replace(target);
-    }, 0);
-    window.setTimeout(() => {
-      if (window.location.pathname !== '/') {
-        window.location.href = target;
-      }
-    }, 350);
+    leaveCommandCenter({
+      disconnect,
+      location: window.location,
+      storage: window.sessionStorage,
+    });
+  };
+
+  const handleBackToDashboard = () => {
+    navigateToAppPath(window.location, DASHBOARD_PATH);
   };
 
   useEffect(() => {
@@ -154,9 +153,9 @@ export default function ThreatHistory() {
       <header className="relative z-10 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-8 border-b border-gray-800/60 pb-4">
         <div className="flex items-center gap-4 min-w-0">
           <div className="flex items-center gap-3 min-w-0">
-            <Link href="/dashboard" className="text-gray-500 hover:text-white transition-colors mr-1 shrink-0">
+            <button type="button" onClick={handleBackToDashboard} className="text-gray-500 hover:text-white transition-colors mr-1 shrink-0">
               <ArrowLeft className="w-5 h-5" />
-            </Link>
+            </button>
             <History className="w-5 h-5 text-[#10B981] shrink-0" />
             <h1 className="text-base md:text-xl font-bold tracking-widest uppercase leading-tight">Threat History Ledger</h1>
           </div>

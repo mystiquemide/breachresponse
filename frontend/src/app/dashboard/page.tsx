@@ -5,12 +5,12 @@ import { useRouter } from 'next/navigation';
 import { useAccount, useConnect, useDisconnect, useWriteContract, useSwitchChain } from 'wagmi';
 import { mantleSepoliaTestnet } from 'wagmi/chains';
 import { ShieldAlert, Radio, Activity, ShieldCheck, Power, Cpu, AlertTriangle, HelpCircle } from 'lucide-react';
-import Link from 'next/link';
 import { motion } from 'framer-motion';
 import Counter from './Counter';
 import Onboarding from './Onboarding';
 import AttackModal from './AttackModal';
 import { REGISTRY_ADDRESS, REGISTRY_ABI } from '../constants';
+import { DASHBOARD_PATH, HISTORY_PATH, LANDING_PATH, leaveCommandCenter, navigateToAppPath, replaceWithAppPath } from '../../lib/navigation';
 import {
   GENLAYER_CONSENSUS_GUARD_ADDRESS,
   type GenLayerAccount,
@@ -96,25 +96,24 @@ export default function Dashboard() {
   const [showBootSequence, setShowBootSequence] = useState(true);
   const consensusClientRef = useRef<IncidentConsensusGuardClient | null>(null);
 
-  const forceLanding = () => {
-    const target = '/?wallet=disconnected';
-    window.setTimeout(() => {
-      window.location.replace(target);
-    }, 0);
-    window.setTimeout(() => {
-      if (window.location.pathname !== '/') {
-        window.location.href = target;
-      }
-    }, 350);
-  };
-
   const handleDisconnect = () => {
-    disconnect();
-    forceLanding();
+    leaveCommandCenter({
+      disconnect,
+      location: window.location,
+      storage: window.sessionStorage,
+    });
   };
 
   const handleBackToLanding = () => {
-    window.location.assign('/');
+    replaceWithAppPath(window.location, LANDING_PATH);
+  };
+
+  const handleOpenDashboard = () => {
+    navigateToAppPath(window.location, DASHBOARD_PATH);
+  };
+
+  const handleOpenHistory = () => {
+    navigateToAppPath(window.location, HISTORY_PATH);
   };
 
   useEffect(() => {
@@ -463,8 +462,8 @@ export default function Dashboard() {
           </div>
           
           <div className="hidden md:flex items-center gap-6 text-xs font-bold tracking-widest uppercase text-gray-400">
-            <Link href="/dashboard" className="text-white">Dashboard</Link>
-            <Link href="/history" className="hover:text-white transition-colors">Threat History</Link>
+            <button type="button" onClick={handleOpenDashboard} className="text-white">Dashboard</button>
+            <button type="button" onClick={handleOpenHistory} className="hover:text-white transition-colors">Threat History</button>
           </div>
         </div>
         
@@ -510,12 +509,12 @@ export default function Dashboard() {
       </header>
 
       <nav className="relative z-10 grid grid-cols-2 gap-3 mb-6 md:hidden text-xs font-bold tracking-widest uppercase">
-        <Link href="/dashboard" className="rounded border border-[#10B981]/40 bg-[#10B981]/10 px-4 py-3 text-center text-[#10B981]">
+        <button type="button" onClick={handleOpenDashboard} className="rounded border border-[#10B981]/40 bg-[#10B981]/10 px-4 py-3 text-center text-[#10B981]">
           Dashboard
-        </Link>
-        <Link href="/history" className="rounded border border-gray-800 bg-[#18181B]/80 px-4 py-3 text-center text-gray-300 hover:text-white">
+        </button>
+        <button type="button" onClick={handleOpenHistory} className="rounded border border-gray-800 bg-[#18181B]/80 px-4 py-3 text-center text-gray-300 hover:text-white">
           Threat History
-        </Link>
+        </button>
       </nav>
 
       <div className="fixed top-1/3 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#10B981]/5 rounded-full blur-[150px] pointer-events-none z-0" />
