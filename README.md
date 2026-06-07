@@ -100,11 +100,88 @@ The current SentinelRegistry deployment used by the frontend is:
 
 ## Architecture
 
-![BreachResponse architecture](./docs/assets/architecture.svg)
+BreachResponse documents its architecture as Mermaid code so judges, reviewers, and maintainers can inspect the system directly in GitHub markdown. Mantle remains the execution network for registry state, monitored assets, wallet actions, and approved response transactions. GenLayer validates ambiguous AI/security decisions before the operator acts.
 
-BreachResponse protects Mantle contracts and escalates uncertain incident decisions to GenLayer for validator consensus. Mantle remains the execution network for registry state, monitored assets, wallet actions, and approved response transactions. GenLayer validates risky AI/security decisions before the operator acts.
+### System architecture
 
-See [Architecture](./docs/ARCHITECTURE.md) for the full system design.
+```mermaid
+flowchart LR
+  user[Operator / Web2 User] --> frontend[Next.js Command Center]
+
+  frontend --> wallet[Injected Wallet<br/>OKX / MetaMask]
+  wallet --> mantle[Mantle Sepolia]
+
+  frontend --> api[Next.js API Routes]
+  api --> agent[Python Sentinel Agent]
+
+  agent --> mantleRpc[Mantle RPC + Telemetry]
+  mantleRpc --> registry[Mantle Sentinel Registry]
+
+  agent --> llm[LLM Incident Analysis]
+  llm --> decision{Confidence high?}
+
+  decision -->|Yes| approval[Human Approval Gate]
+  decision -->|No / Ambiguous| genlayer[GenLayer Consensus Guard<br/>StudioNet]
+
+  genlayer --> consensus[Validator Consensus Result]
+  consensus --> approval
+
+  approval --> action[Approved Emergency Action]
+  action --> mantle
+
+  subgraph Mantle_Execution_Network[Mantle Execution Network]
+    mantle
+    mantleRpc
+    registry
+    action
+  end
+
+  subgraph GenLayer_Validation_Layer[GenLayer Validation Layer]
+    genlayer
+    consensus
+  end
+
+  subgraph App_Layer[BreachResponse App Layer]
+    frontend
+    api
+    agent
+    llm
+    approval
+  end
+```
+
+### Incident validation flow
+
+```mermaid
+sequenceDiagram
+  actor Operator
+  participant UI as Command Center
+  participant Agent as Python Sentinel Agent
+  participant Mantle as Mantle Sepolia
+  participant LLM as LLM Incident Analysis
+  participant GenLayer as GenLayer Consensus Guard
+  participant Approval as Human Approval Gate
+
+  Operator->>UI: Connect wallet
+  UI->>Mantle: Read protected protocols and wallet state
+  Agent->>Mantle: Monitor RPC telemetry and sentinel registry
+  Agent->>LLM: Submit incident evidence
+  LLM-->>Agent: Threat class, confidence, proposed action
+
+  alt High-confidence incident
+    Agent->>Approval: Request operator approval
+  else Ambiguous incident
+    Agent->>GenLayer: Submit Mantle incident context
+    GenLayer-->>Agent: Consensus decision
+    Agent->>Approval: Present consensus-backed action
+  end
+
+  Operator->>Approval: Approve or reject
+  Approval->>Mantle: Execute approved response action
+  Mantle-->>UI: Updated protocol and sentinel status
+```
+
+See [Architecture](./docs/ARCHITECTURE.md) for the full system design and trust boundary.
 
 ## Quick start
 
