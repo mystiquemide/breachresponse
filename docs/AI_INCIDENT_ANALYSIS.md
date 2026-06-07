@@ -55,7 +55,7 @@ Production execution should keep `SENTINEL_RESPONSE_MODE=manual` unless the prot
 ## Environment
 
 ```bash
-OPENAI_API_KEY=your_openai_api_key_here
+OPENAI_API_KEY=replace_with_openai_api_key
 OPENAI_BASE_URL=
 LLM_MODEL=gpt-4o-mini
 SENTINEL_RESPONSE_MODE=manual

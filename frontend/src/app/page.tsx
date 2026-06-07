@@ -253,7 +253,7 @@ export default function LandingPage() {
               Breach Response
             </h1>
             <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] font-sans">
-              The active immune system for mantle network smart contracts
+              AI-assisted incident response for Mantle smart contracts
             </p>
           </motion.div>
 
@@ -337,7 +337,7 @@ export default function LandingPage() {
                   <div>
                     <h3 className="text-white font-bold mb-4 flex items-center gap-2 text-lg"><Shield className="w-5 h-5 text-[#10B981]" /> Defense Matrix</h3>
                     <p className="text-sm text-gray-400 mb-8 leading-relaxed font-sans">
-                      Byreal Skills AI models standing by for counter-payload formulation. Instant threat mitigation enabled
+                      LLM analysis, operator approval, and GenLayer consensus checks are wired for scoped emergency response.
                     </p>
                   </div>
                   <Link href="/dashboard" className="w-full py-4 rounded-lg bg-[#10B981] text-black text-center font-bold text-sm shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_40px_rgba(16,185,129,0.6)] hover:bg-white transition-all transform hover:-translate-y-0.5">
@@ -403,7 +403,7 @@ export default function LandingPage() {
             <span className="text-xs text-[#10B981] font-bold tracking-widest mb-2 block uppercase">02 / Formulate</span>
             <h3 className="text-lg font-bold text-white mb-3">AI Formulation</h3>
             <p className="text-xs text-gray-400 font-sans leading-relaxed">
-              If an exploit pattern is identified, our Byreal Skills AI dynamically models a custom rescue transaction
+              If an exploit pattern is identified, the sentinel agent produces a scoped response proposal for operator review
             </p>
           </div>
           <div className="flex flex-col items-center text-center px-4 relative">
@@ -420,7 +420,7 @@ export default function LandingPage() {
             <span className="text-xs text-[#10B981] font-bold tracking-widest mb-2 block uppercase">03 / Intercept</span>
             <h3 className="text-lg font-bold text-white mb-3">Payload Dispatch</h3>
             <p className="text-xs text-gray-400 font-sans leading-relaxed">
-              The mitigation payload is routed directly to your protocol rescue keys, securing funds instantly
+              The mitigation proposal is routed to a wallet, multisig, or approved policy path before execution
             </p>
           </div>
         </div>
@@ -430,7 +430,7 @@ export default function LandingPage() {
         <motion.div initial={false} animate="animate" variants={fadeInUp} className="container mx-auto px-6 relative z-10">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Built for scale</h2>
           <p className="text-xl text-gray-400 mb-16 max-w-2xl font-sans text-sm">
-            Traditional security platforms rely on alerting you after the funds are stolen, we formulate the counter transaction before the attacker&apos;s block is confirmed
+            Most tools stop at alerting. BreachResponse turns suspicious activity into a scoped response proposal while operators still have time to act.
           </p>
         </motion.div>
         <motion.div variants={staggerContainer} initial={false} animate="animate" className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -443,8 +443,8 @@ export default function LandingPage() {
               <p className="text-sm text-gray-400 leading-relaxed font-sans">Deep inspection of unconfirmed transactions on the Mantle Sepolia network using strictly defined Web3.py filters</p>
             </div>
             <div className="mt-8 pt-6 border-t border-gray-800/60 font-mono text-[10px] space-y-2 text-gray-500">
-              <div className="flex justify-between"><span>SCAN_RATE</span> <span className="text-gray-400">1,200 tx/sec</span></div>
-              <div className="flex justify-between"><span>LATENCY</span> <span className="text-[#10B981]">{"< 8ms"}</span></div>
+              <div className="flex justify-between"><span>SCAN_RATE</span> <span className="text-gray-400">Mantle RPC</span></div>
+              <div className="flex justify-between"><span>APPROVAL</span> <span className="text-[#10B981]">Operator gated</span></div>
             </div>
           </motion.div>
           <motion.div variants={fadeInUp}>
@@ -456,8 +456,8 @@ export default function LandingPage() {
               <p className="text-sm text-gray-400 leading-relaxed font-sans">Dynamically formulates complex pause and rescue transaction payloads the moment an anomaly crosses the threshold</p>
             </div>
             <div className="mt-8 pt-6 border-t border-gray-800/60 font-mono text-[10px] space-y-2 text-gray-500">
-              <div className="flex justify-between"><span>MODEL</span> <span className="text-gray-400">byreal-core-v1</span></div>
-              <div className="flex justify-between"><span>ACCURACY</span> <span className="text-[#10B981]">99.98%</span></div>
+              <div className="flex justify-between"><span>MODEL</span> <span className="text-gray-400">OpenAI-compatible</span></div>
+              <div className="flex justify-between"><span>ACCURACY</span> <span className="text-[#10B981]">GenLayer fallback</span></div>
             </div>
           </motion.div>
           <motion.div variants={fadeInUp}>
@@ -465,8 +465,8 @@ export default function LandingPage() {
               <div className="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center mb-6 border border-gray-800 text-[#10B981]">
                 <ShieldCheck className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-bold text-white mb-3">Instant Execution</h3>
-              <p className="text-sm text-gray-400 leading-relaxed font-sans">Our Command Center routes the rescue payload directly to your multisig for instant localized execution</p>
+              <h3 className="text-xl font-bold text-white mb-3">Controlled Execution</h3>
+              <p className="text-sm text-gray-400 leading-relaxed font-sans">The Command Center routes approved actions to multisig or policy-controlled execution, with manual mode as the default</p>
             </div>
             <div className="mt-8 pt-6 border-t border-gray-800/60 font-mono text-[10px] space-y-2 text-gray-500">
               <div className="flex justify-between">
@@ -488,7 +488,7 @@ export default function LandingPage() {
           <div>
             <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Developer first</h2>
             <p className="text-gray-400 mb-8 font-sans leading-relaxed text-sm">
-              Deploying Breach Response is straightforward Install the package, hook up your contract sentinel, and let the AI guard system secure your transaction state No complex infrastructure necessary
+              Run the local agent, connect a Mantle Sepolia wallet, register a protocol, and review response proposals from the Command Center. The public repo includes the contracts, frontend, agent, and deployment notes.
             </p>
             <div className="space-y-4">
               <div className="flex items-center gap-3">
@@ -501,7 +501,7 @@ export default function LandingPage() {
               </div>
               <div className="flex items-center gap-3">
                 <CheckCircle2 className="w-5 h-5 text-[#10B981] shrink-0" />
-                <span className="text-sm text-gray-300 font-sans">Direct integration with multisig and emergency pause guards</span>
+                <span className="text-sm text-gray-300 font-sans">Manual-first approval path for multisig and emergency pause guards</span>
               </div>
             </div>
           </div>
@@ -523,42 +523,31 @@ export default function LandingPage() {
                   sentinel.ts
                 </button>
               </div>
-              <span className="text-[10px] text-gray-500 tracking-widest font-bold uppercase">SDK v1.2.0</span>
+              <span className="text-[10px] text-gray-500 tracking-widest font-bold uppercase">REPO QUICK START</span>
             </div>
 
             {/* Terminal Window Code Content */}
             <div className="p-6 overflow-x-auto text-xs font-mono min-h-[240px] leading-relaxed text-gray-300">
               {codeTab === 'python' ? (
                 <pre className="space-y-1">
-                  <div><span className="text-gray-500">{"# Import the BreachResponse engine"}</span></div>
-                  <div><span className="text-[#10B981]">{"from"}</span>{" breachresponse "}<span className="text-[#10B981]">{"import"}</span>{" Shield"}</div>
-                  <div><span className="text-[#10B981]">{"from"}</span>{" breachresponse.guards "}<span className="text-[#10B981]">{"import"}</span>{" ReentrancyGuard"}</div>
+                  <div><span className="text-gray-500">{"# Start the local sentinel agent"}</span></div>
+                  <div>{"cd agent"}</div>
+                  <div>{"python -m venv .venv"}</div>
+                  <div>{"source .venv/bin/activate"}</div>
+                  <div>{"pip install -r requirements.txt"}</div>
+                  <div>{"python main.py"}</div>
                   <br />
-                  <div><span className="text-gray-500">{"# Configure provider credentials"}</span></div>
-                  <div>{"sentinel = Shield("}</div>
-                  <div>{"    provider_uri="}<span className="text-[#10B981]">{'"https://rpc.sepolia.mantle.xyz"'}</span>{","}</div>
-                  <div>{"    private_key="}<span className="text-[#10B981]">{'"0x..."'}</span></div>
-                  <div>{")"}</div>
-                  <br />
-                  <div><span className="text-gray-500">{"# Attach reentrancy alert sentinel"}</span></div>
-                  <div>{"sentinel.attach(ReentrancyGuard(target="}<span className="text-[#10B981]">{'"0x..."'}</span>{"))"}</div>
-                  <div>{"sentinel.start()"}</div>
+                  <div><span className="text-gray-500">{"# The agent scans Mantle RPC and streams structured incident events"}</span></div>
                 </pre>
               ) : (
                 <pre className="space-y-1">
-                  <div><span className="text-gray-500">{"// Import the BreachResponse engine"}</span></div>
-                  <div><span className="text-[#10B981]">{"import"}</span>{" { BreachShield } "}<span className="text-[#10B981]">{"from"}</span>{" "}<span className="text-[#10B981]">{'"@breachresponse/sdk"'}</span>{";"}</div>
-                  <div><span className="text-[#10B981]">{"import"}</span>{" { ReentrancyGuard } "}<span className="text-[#10B981]">{"from"}</span>{" "}<span className="text-[#10B981]">{'"@breachresponse/sdk/guards"'}</span>{";"}</div>
+                  <div><span className="text-gray-500">{"// Build and run the Command Center"}</span></div>
+                  <div>{"cd frontend"}</div>
+                  <div>{"npm ci"}</div>
+                  <div>{"npm run build"}</div>
+                  <div>{"npm run dev"}</div>
                   <br />
-                  <div><span className="text-gray-500">{"// Configure provider credentials"}</span></div>
-                  <div><span className="text-[#10B981]">{"const"}</span>{" shield = "}<span className="text-[#10B981]">{"new"}</span>{" BreachShield({"}</div>
-                  <div>{"  rpcUrl: "}<span className="text-[#10B981]">{'"https://rpc.sepolia.mantle.xyz"'}</span>{","}</div>
-                  <div>{"  privateKey: "}<span className="text-[#10B981]">{'"0x..."'}</span></div>
-                  <div>{"});"}</div>
-                  <br />
-                  <div><span className="text-gray-500">{"// Attach reentrancy alert sentinel"}</span></div>
-                  <div>{"shield.attach("}<span className="text-[#10B981]">{"new"}</span>{" ReentrancyGuard("}<span className="text-[#10B981]">{'"0x..."'}</span>{"));"}</div>
-                  <div><span className="text-[#10B981]">{"await"}</span>{" shield.start();"}</div>
+                  <div><span className="text-gray-500">{"// Open /dashboard to register guards and run incident review"}</span></div>
                 </pre>
               )}
             </div>
@@ -571,11 +560,11 @@ export default function LandingPage() {
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#101014]/60 border border-gray-800/80 mb-4 text-xs font-bold text-[#10B981]">
             <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
-            LIVE SCAN MONITORING
+            LIVE + SIMULATION MONITORING
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Defense Matrix Ledger</h2>
           <p className="text-gray-400 max-w-xl mx-auto font-sans text-sm">
-            Real-time block scanning log demonstrating proactive threat mitigation on Mantle Network.
+            Live Mantle block samples plus controlled simulation records for incident-response review.
           </p>
         </div>
 
@@ -595,7 +584,7 @@ export default function LandingPage() {
                   <th className="px-6 py-4">Target Protocol</th>
                   <th className="px-6 py-4">Verification Type</th>
                   <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4 text-right">Metrics Saved</th>
+                  <th className="px-6 py-4 text-right">Response Metric</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-800/40">
@@ -682,7 +671,7 @@ export default function LandingPage() {
               <span className="text-lg font-bold tracking-widest text-white">BREACH RESPONSE</span>
             </div>
             <p className="text-gray-500 text-sm leading-relaxed font-sans max-w-xs">
-              The active immune system for mantle network smart contracts
+              AI-assisted incident response for Mantle smart contracts
             </p>
           </div>
           
@@ -700,7 +689,7 @@ export default function LandingPage() {
           <div className="flex flex-col items-center md:items-start text-center md:text-left">
             <h4 className="text-white font-bold mb-6 tracking-widest uppercase text-xs">Agents</h4>
             <ul className="space-y-4 flex flex-col">
-              <a href="https://github.com/byreal/byreal-skills" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#10B981] transition-colors text-sm font-sans">Byreal SDK</a>
+              <a href="https://platform.openai.com/docs" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#10B981] transition-colors text-sm font-sans">OpenAI-compatible LLMs</a>
               <a href="https://web3py.readthedocs.io/" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#10B981] transition-colors text-sm font-sans">Web3.py</a>
             </ul>
           </div>

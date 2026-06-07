@@ -42,7 +42,7 @@ See [AI Incident Analysis](./docs/AI_INCIDENT_ANALYSIS.md) for the model input/o
 
 ## GenLayer consensus fallback
 
-BreachResponse includes a GenLayer intelligent contract fallback for cases where the fast LLM path is unavailable, malformed, low-confidence, conflicting, or recommends a risky emergency action. Judges and reviewers can inspect it directly here:
+BreachResponse includes a GenLayer intelligent contract fallback for cases where the fast LLM path is unavailable, malformed, low-confidence, conflicting, or recommends a risky emergency action. Operators, reviewers, and protocol teams can inspect it directly here:
 
 | File | Purpose |
 | --- | --- |
@@ -51,7 +51,7 @@ BreachResponse includes a GenLayer intelligent contract fallback for cases where
 | [`frontend/src/lib/genlayerConsensus.ts`](./frontend/src/lib/genlayerConsensus.ts) | Real `genlayer-js` read/write integration used by the Command Center fallback panel. |
 | [`frontend/src/app/dashboard/page.tsx`](./frontend/src/app/dashboard/page.tsx) | Operator UI panel for preparing the local GenLayer signer, reading consensus records, and escalating incidents once a deployed guard address is configured. |
 
-The contract uses GenLayer nondeterminism and validator consensus through `gl.nondet.exec_prompt(...)` and `gl.vm.run_nondet_unsafe(...)`. It is not a getter/setter demo. It only approves scoped emergency actions such as `pause_protocol`, `quarantine_address`, `recommend_multisig`, `reject_incident`, and `require_human_approval`.
+The contract uses GenLayer nondeterminism and validator consensus through `gl.nondet.exec_prompt(...)` and `gl.vm.run_nondet_unsafe(...)`. It is not a getter/setter demo. It only approves scoped emergency actions such as `pause_protocol`, `quarantine_address`, `monitor_only`, `alert`, and `multisig_proposal`.
 
 Validate it with:
 
