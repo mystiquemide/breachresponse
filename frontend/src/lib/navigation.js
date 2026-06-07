@@ -2,6 +2,8 @@ export const LANDING_PATH = '/';
 export const LANDING_DISCONNECTED_PATH = '/?wallet=disconnected';
 export const DASHBOARD_PATH = '/dashboard';
 export const HISTORY_PATH = '/history';
+export const PIPELINE_EXECUTION_ANCHOR = 'pipeline-execution';
+export const PIPELINE_EXECUTION_PATH = `#${PIPELINE_EXECUTION_ANCHOR}`;
 
 const COMMAND_CENTER_NAV_KEYS = [
   'breachresponse_launching_command_center',
