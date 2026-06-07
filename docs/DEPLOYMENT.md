@@ -78,6 +78,16 @@ Current Mantle Sepolia registry:
 | Deployer | `0x9f758be3ae3d985713964339e2f0bd783fc6015c` |
 | Source verification | Verified on Mantlescan and Sourcify |
 
+Current GenLayer StudioNet consensus guard:
+
+| Field | Value |
+| --- | --- |
+| Network | GenLayer StudioNet |
+| Consensus guard contract address | `0x86369EC44fbB5EB682729368557176858aBe0c73` |
+| Deployment transaction | `0xec4e0f05378f1f9ebd0d3d47fc1b6ee815ff3b0a4cd271988f0c1d5ab3b9970a` |
+| Deployer | `0x65567Bf52e47A20C10793748C36597fAC2E3056D` |
+| Verification | `genlayer schema` and `genlayer call get_stats` succeeded on StudioNet |
+
 ## Agent
 
 The agent uses Mantle RPC plus an LLM-assisted analysis client. Keep `SENTINEL_RESPONSE_MODE=manual` for normal demos and production pilots unless an explicit policy signer setup has been reviewed.
