@@ -24,6 +24,7 @@ load_dotenv(dotenv_path="../.env")
 MANTLE_RPC_URL = os.getenv("MANTLE_RPC_URL", "https://rpc.sepolia.mantle.xyz")
 BYREAL_API_KEY = os.getenv("BYREAL_API_KEY")
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
+SENTINEL_RESPONSE_MODE = os.getenv("SENTINEL_RESPONSE_MODE", "manual").lower()
 
 # Initialize Byreal client
 byreal = ByrealClient(api_key=BYREAL_API_KEY)
@@ -209,11 +210,24 @@ def run_sentinel_loop():
                                             print(f"[BYREAL-LLM] Exploit confidence score: {confidence * 100}%")
                                             
                                             if confidence > 0.9:
-                                                print(f"[SENTINEL] Threat verified. Broadcasting emergency pause transaction...")
+                                                print(f"[SENTINEL] Threat verified. Preparing emergency response proposal...")
                                                 
                                                 # Use LLM formulation for the mitigation
                                                 rescue_tx = byreal.formulate_rescue_transaction(vault_addr, byreal.last_analysis.get("exploit_type", "Reentrancy"))
                                                 
+                                                if SENTINEL_RESPONSE_MODE != "autonomous":
+                                                    print(f"[SENTINEL] Manual approval mode active. Proposed action: send {rescue_tx['data']} to {vault_addr}.")
+                                                    post_log_to_frontend(
+                                                        tx_hash=tx_hash,
+                                                        protocol="TargetVault",
+                                                        exploit_type="On-Chain Reentrancy Proposal",
+                                                        gas_saved="pending operator approval",
+                                                        status="PROPOSED"
+                                                    )
+                                                    print("="*60 + "\n")
+                                                    continue
+
+                                                print(f"[SENTINEL] Autonomous mode enabled. Broadcasting emergency pause transaction...")
                                                 pause_tx_hash = pause_target_vault(vault_addr, rescue_tx["data"])
                                                 
                                                 if pause_tx_hash:
