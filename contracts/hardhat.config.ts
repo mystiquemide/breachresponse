@@ -14,7 +14,12 @@ export default defineConfig({
     hardhatMocha,
     hardhatTypechain,
   ],
-  solidity: "0.8.24",
+  solidity: {
+    version: "0.8.24",
+    settings: {
+      evmVersion: "paris",
+    },
+  },
   networks: {
     hardhat: {
       type: "edr-simulated",

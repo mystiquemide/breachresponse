@@ -40,10 +40,10 @@ The current SentinelRegistry deployment used by the frontend is:
 | --- | --- |
 | Network | Mantle Sepolia |
 | Registry contract address | `0xea3C039795B5b04105B795c8B0cB85e0a42Cc85C` |
-| Explorer | https://explorer.sepolia.mantle.xyz/address/0xea3C039795B5b04105B795c8B0cB85e0a42Cc85C |
-| Deployment transaction | https://explorer.sepolia.mantle.xyz/tx/0x0dac721b1ed137bf93132222348aab39bae48ed3a6e8b8e6ed0d0ee9d91f2b07 |
+| Explorer | https://sepolia.mantlescan.xyz/address/0xea3C039795B5b04105B795c8B0cB85e0a42Cc85C#code |
+| Deployment transaction | https://sepolia.mantlescan.xyz/tx/0x0dac721b1ed137bf93132222348aab39bae48ed3a6e8b8e6ed0d0ee9d91f2b07 |
 | Deployer | `0x9f758be3ae3d985713964339e2f0bd783fc6015c` |
-| Source verification | Pending on Mantlescan |
+| Source verification | Verified on Mantlescan and Sourcify |
 
 ## Product screens
 
