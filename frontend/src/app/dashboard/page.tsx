@@ -1,8 +1,8 @@
 'use client'
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAccount, useConnect, useDisconnect, useWriteContract, useSwitchChain } from 'wagmi';
-import { injected } from 'wagmi/connectors';
 import { mantleSepoliaTestnet } from 'wagmi/chains';
 import { ShieldAlert, Radio, Activity, ShieldCheck, Power, Cpu, AlertTriangle, HelpCircle } from 'lucide-react';
 import Link from 'next/link';
@@ -11,6 +11,14 @@ import Counter from './Counter';
 import Onboarding from './Onboarding';
 import AttackModal from './AttackModal';
 import { REGISTRY_ADDRESS, REGISTRY_ABI } from '../constants';
+import {
+  GENLAYER_CONSENSUS_GUARD_ADDRESS,
+  type GenLayerAccount,
+  IncidentConsensusGuardClient,
+  createGenLayerClient,
+  generateGenLayerAccount,
+  getStoredGenLayerAccount,
+} from '../../lib/genlayerConsensus';
 
 interface Asset {
   id: string;
@@ -21,14 +29,18 @@ interface Asset {
   events: number;
 }
 
+const capTerminal = (lines: string[]) => lines.slice(-120);
+
 export default function Dashboard() {
+  const router = useRouter();
   const { address, isConnected, chainId } = useAccount();
-  const { connect, error: connectError, isPending: isConnectPending } = useConnect();
+  const { connect, connectors, error: connectError, isPending: isConnectPending } = useConnect();
   const { disconnect } = useDisconnect();
   const { switchChain } = useSwitchChain();
   const { writeContract, isPending, isSuccess } = useWriteContract();
   
   const isCorrectNetwork = chainId === mantleSepoliaTestnet.id;
+  const injectedConnector = connectors.find(connector => connector.id === 'injected') ?? connectors[0];
   
   const [protocolAddress, setProtocolAddress] = useState('');
   const [customAssets, setCustomAssets] = useState<Asset[]>([]);
@@ -49,12 +61,84 @@ export default function Dashboard() {
 
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isAttackModalOpen, setIsAttackModalOpen] = useState(false);
+  const [genLayerAccount, setGenLayerAccount] = useState<GenLayerAccount | null>(() => getStoredGenLayerAccount());
+  const [consensusStatus, setConsensusStatus] = useState('GenLayer consensus fallback is standing by');
+  const [consensusIncidents, setConsensusIncidents] = useState<unknown[]>([]);
+  const [isConsensusBusy, setIsConsensusBusy] = useState(false);
+  const consensusClientRef = useRef<IncidentConsensusGuardClient | null>(null);
 
   useEffect(() => {
-    // Keep the product visible by default for demos and screenshots.
-    // The tour can still be opened from the help button or with /dashboard?tour=1.
+    router.prefetch('/');
+    router.prefetch('/history');
+  }, [router]);
+
+  const refreshConsensusIncidents = useCallback(async () => {
+    if (!consensusClientRef.current) {
+      consensusClientRef.current = new IncidentConsensusGuardClient(createGenLayerClient(genLayerAccount));
+    }
+    if (!consensusClientRef.current || !GENLAYER_CONSENSUS_GUARD_ADDRESS) return;
+
+    try {
+      const incidents = await consensusClientRef.current.listIncidents();
+      setConsensusIncidents(Array.isArray(incidents) ? incidents : []);
+      setConsensusStatus('Consensus guard read complete');
+    } catch (err) {
+      console.error('Failed to read GenLayer incidents', err);
+      setConsensusStatus('Consensus read failed. Check StudioNet and contract address');
+    }
+  }, [genLayerAccount]);
+
+  const connectGenLayerFallback = () => {
+    const account = generateGenLayerAccount();
+    setGenLayerAccount(account);
+    consensusClientRef.current = new IncidentConsensusGuardClient(createGenLayerClient(account));
+    setConsensusStatus(`GenLayer local signer ready ${account.address.slice(0, 6)}...${account.address.slice(-4)}`);
+  };
+
+  const escalateDemoIncident = async () => {
+    if (!consensusClientRef.current || !GENLAYER_CONSENSUS_GUARD_ADDRESS) {
+      setConsensusStatus('Set NEXT_PUBLIC_GENLAYER_CONSENSUS_GUARD_ADDRESS after deployment');
+      return;
+    }
+
+    setIsConsensusBusy(true);
+    const incidentId = `mantle-${Date.now()}`;
+    try {
+      setConsensusStatus('Submitting incident to GenLayer consensus guard');
+      await consensusClientRef.current.submitIncident({
+        incidentId,
+        protocol: 'MantleSwap',
+        txHash: '0x8f2a9aac22df9917c90a54dbd04f4716d98fe78d76400400cc091bf46dabe9aac',
+        threatType: 'Reentrancy',
+        proposedAction: 'pause_protocol',
+        llmReasoning: 'Primary LLM confidence dropped during a suspicious repeated external-call pattern',
+        confidence: '0.52',
+      });
+      setConsensusStatus('Incident submitted. Running GenLayer validator consensus');
+      await consensusClientRef.current.evaluateIncident(incidentId);
+      setConsensusStatus(`GenLayer finalized consensus for ${incidentId}`);
+      await refreshConsensusIncidents();
+      setTerminalLines((prev) => capTerminal([
+        ...prev,
+        `[SYS] GenLayer fallback finalized validator consensus for ${incidentId}`,
+      ]));
+    } catch (err) {
+      console.error('GenLayer consensus escalation failed', err);
+      setConsensusStatus('GenLayer escalation failed. Check deployed contract, signer balance, and StudioNet');
+    } finally {
+      setIsConsensusBusy(false);
+    }
+  };
+
+  useEffect(() => {
+    refreshConsensusIncidents();
+  }, [refreshConsensusIncidents]);
+
+  useEffect(() => {
+    // Show the setup tour on first visit, and always allow forcing it with /dashboard?tour=1.
+    const hasOnboarded = localStorage.getItem('breachresponse_onboarded');
     const shouldOpenTour = new URLSearchParams(window.location.search).get('tour') === '1';
-    if (shouldOpenTour) {
+    if (!hasOnboarded || shouldOpenTour) {
       setTimeout(() => setShowOnboarding(true), 0);
     }
   }, []);
@@ -72,7 +156,7 @@ export default function Dashboard() {
       try {
         const payload = JSON.parse(event.data);
         if (payload.type === 'CONNECTED') {
-          setTerminalLines(prev => [...prev, `[SYS] ${payload.message}`]);
+          setTerminalLines(prev => capTerminal([...prev, `[SYS] ${payload.message}`]));
         } else if (payload.type === 'LOG') {
           // It's a raw python agent log
           let color = "[LOG]";
@@ -82,11 +166,11 @@ export default function Dashboard() {
           if (payload.data.text.includes("[BYREAL-LLM]")) color = "[SYS]";
           if (payload.data.text.includes("[SENTINEL]")) color = "[SYS]";
           
-          setTerminalLines(prev => [...prev, `${color} ${payload.data.text}`]);
+          setTerminalLines(prev => capTerminal([...prev, `${color} ${payload.data.text}`]));
         } else if (payload.type === 'ALERT') {
           // It's a mitigated alert
           const log = payload.data;
-          setTerminalLines(prev => [...prev, `[ALERT] Mitigated threat on ${log.protocol}! Type: ${log.type} Rescued ${log.gasSaved}`]);
+          setTerminalLines(prev => capTerminal([...prev, `[ALERT] Mitigated threat on ${log.protocol}! Type: ${log.type} Rescued ${log.gasSaved}`]));
         }
       } catch (err) {
         console.error("SSE Parse Error", err);
@@ -175,10 +259,10 @@ export default function Dashboard() {
           if (res.ok) {
             const newNode = await res.json();
             setCustomAssets((prev) => [newNode, ...prev]);
-            setTerminalLines((prev) => [
+            setTerminalLines((prev) => capTerminal([
               ...prev,
               `[SYS] Successfully registered sentinel node at ${protocolAddress}`
-            ]);
+            ]));
             setProtocolAddress('');
           }
         } catch (err) {
@@ -195,37 +279,37 @@ export default function Dashboard() {
     const cmd = commandInput.trim().toLowerCase();
     if (!cmd) return;
 
-    setTerminalLines((prev) => [...prev, `> ${commandInput}`]);
+    setTerminalLines((prev) => capTerminal([...prev, `> ${commandInput}`]));
     setCommandInput('');
 
     setTimeout(() => {
       switch (cmd) {
         case 'simulate hack':
-          setTerminalLines((prev) => [
+          setTerminalLines((prev) => capTerminal([
             ...prev,
             "[ALERT] INITIALIZING INCIDENT SIMULATION SEQUENCE...",
             "[SYS] INJECTING MALICIOUS PAYLOAD INTO MEMPOOL..."
-          ]);
+          ]));
           setTimeout(() => setIsAttackModalOpen(true), 1500);
           break;
         case 'help':
-          setTerminalLines((prev) => [
+          setTerminalLines((prev) => capTerminal([
             ...prev,
             "Available commands:",
             "  help        - Display command options",
             "  status      - Display connection telemetry details",
             "  sentinels   - List all active security sentinels",
             "  clear       - Clear the console outputs"
-          ]);
+          ]));
           break;
         case 'status':
-          setTerminalLines((prev) => [
+          setTerminalLines((prev) => capTerminal([
             ...prev,
             `[SYS] RPC Endpoint: https://rpc.sepolia.mantle.xyz`,
             `[SYS] Registry Contract: ${REGISTRY_ADDRESS}`,
             `[SYS] Active guards: REENTRANCY, ORACLE_MANIPULATION`,
             `[SYS] Connection state: CONNECTED (Latency: 7.2ms)`
-          ]);
+          ]));
           break;
         case 'sentinels':
           setTerminalLines((prev) => {
@@ -237,17 +321,17 @@ export default function Dashboard() {
             customAssets.forEach((asset, i) => {
               list.push(`  [${asset.status}] ID: ${10 + i} | Name: ${asset.name} | Target: ${asset.address}`);
             });
-            return [...prev, ...list];
+            return capTerminal([...prev, ...list]);
           });
           break;
         case 'clear':
           setTerminalLines([]);
           break;
         default:
-          setTerminalLines((prev) => [
+          setTerminalLines((prev) => capTerminal([
             ...prev,
             `[ERR] Command not recognized: '${cmd}' Type 'help' for instructions`
-          ]);
+          ]));
       }
     }, 100);
   };
@@ -264,10 +348,10 @@ export default function Dashboard() {
         setCustomAssets((prev) =>
           prev.map((asset) => (asset.id === id ? { ...asset, status: updatedNode.status } : asset))
         );
-        setTerminalLines((logs) => [
+        setTerminalLines((logs) => capTerminal([
           ...logs,
           `[SYS] Sentinel status for ${name} toggled to ${updatedNode.status}`
-        ]);
+        ]));
       }
     } catch (err) {
       console.error("Failed to toggle status in database", err);
@@ -338,7 +422,7 @@ export default function Dashboard() {
             </button>
           ) : (
             <button 
-              onClick={() => connect({ connector: injected() })} 
+              onClick={() => injectedConnector && connect({ connector: injectedConnector })} 
               className="flex items-center gap-2 bg-[#10B981] text-black font-bold py-2 px-5 rounded hover:bg-green-400 transition-all text-xs shadow-[0_0_15px_rgba(16,185,129,0.3)]"
             >
               <Power className="w-3.5 h-3.5" />
@@ -436,6 +520,60 @@ export default function Dashboard() {
                 No injected wallet detected. Install MetaMask or open this app in a wallet browser.
               </p>
             )}
+          </div>
+
+          {/* GenLayer Consensus Fallback */}
+          <div id="ob-genlayer" className="sci-fi-panel p-6 relative overflow-hidden transition-all duration-500 border border-[#10B981]/20">
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <div>
+                <h2 className="text-base font-bold mb-2 flex items-center gap-2">
+                  <ShieldAlert className="w-4 h-4 text-[#10B981]" />
+                  GenLayer Consensus Fallback
+                </h2>
+                <p className="text-gray-400 text-xs leading-relaxed font-sans">
+                  Escalates low-confidence LLM incidents to a GenLayer intelligent contract for validator consensus before emergency action.
+                </p>
+              </div>
+              <span className="text-[9px] uppercase tracking-widest text-[#10B981] bg-[#10B981]/10 border border-[#10B981]/20 rounded px-2 py-1">
+                {GENLAYER_CONSENSUS_GUARD_ADDRESS ? 'Contract linked' : 'Deploy pending'}
+              </span>
+            </div>
+
+            <div className="space-y-3 text-[10px] text-gray-400 mb-4">
+              <div className="flex justify-between gap-4 border-b border-gray-800/60 pb-2">
+                <span>StudioNet Guard</span>
+                <span className="text-gray-300 break-all text-right">
+                  {GENLAYER_CONSENSUS_GUARD_ADDRESS || 'NEXT_PUBLIC_GENLAYER_CONSENSUS_GUARD_ADDRESS required'}
+                </span>
+              </div>
+              <div className="flex justify-between gap-4 border-b border-gray-800/60 pb-2">
+                <span>Local signer</span>
+                <span className="text-gray-300">
+                  {genLayerAccount ? `${genLayerAccount.address.slice(0, 6)}...${genLayerAccount.address.slice(-4)}` : 'Not generated'}
+                </span>
+              </div>
+              <div className="flex justify-between gap-4">
+                <span>Consensus records</span>
+                <span className="text-gray-300">{consensusIncidents.length}</span>
+              </div>
+            </div>
+
+            <p className="min-h-8 text-[10px] text-gray-500 font-sans mb-4">{consensusStatus}</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <button
+                onClick={connectGenLayerFallback}
+                className="bg-[#18181B] border border-gray-800 text-white font-bold py-3 rounded text-[10px] hover:border-[#10B981]/50 transition-colors uppercase tracking-widest"
+              >
+                Prepare GenLayer signer
+              </button>
+              <button
+                onClick={escalateDemoIncident}
+                disabled={isConsensusBusy || !genLayerAccount || !GENLAYER_CONSENSUS_GUARD_ADDRESS}
+                className={`bg-[#10B981] text-black font-bold py-3 rounded text-[10px] transition-all uppercase tracking-widest ${isConsensusBusy || !genLayerAccount || !GENLAYER_CONSENSUS_GUARD_ADDRESS ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-400 hover:shadow-[0_0_15px_rgba(16,185,129,0.3)]'}`}
+              >
+                {isConsensusBusy ? 'Consensus running...' : 'Escalate incident'}
+              </button>
+            </div>
           </div>
 
           {/* System Telemetry Oscilloscope (Inspired by ui panel.png) */}
@@ -573,11 +711,11 @@ export default function Dashboard() {
         onClose={() => setIsAttackModalOpen(false)} 
         onSuccess={() => {
           setIsAttackModalOpen(false);
-          setTerminalLines((prev) => [
+          setTerminalLines((prev) => capTerminal([
             ...prev,
             "[SYS] 0-VALUE TRANSACTION CONFIRMED.",
             "[ALERT] Threat neutralised. Contract paused successfully. Funds secured."
-          ]);
+          ]));
         }}
       />
     </main>
