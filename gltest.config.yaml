@@ -1,0 +1,7 @@
+networks:
+  default: localnet
+  localnet:
+    leader_only: true
+paths:
+  contracts: contracts
+  artifacts: artifacts

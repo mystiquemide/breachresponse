@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
-import { injected } from 'wagmi/connectors';
 import { mantleSepoliaTestnet } from 'wagmi/chains';
 import { createPublicClient, http, type Transaction as ViemTransaction } from 'viem';
 import { Shield, ArrowLeft, Activity, ShieldCheck, Power, AlertTriangle, History, Search } from 'lucide-react';
@@ -19,17 +19,54 @@ interface TransactionLog {
   timestamp: string;
 }
 
+const initialLogs: TransactionLog[] = [
+  {
+    id: 'demo-1',
+    txHash: '0x8f2a9aac22df9917c90a54dbd04f4716d98fe78d76400400cc091bf46dabe9aac',
+    protocol: 'MantleSwap',
+    type: 'Reentrancy',
+    gasSaved: '145 MNT',
+    status: 'MITIGATED',
+    timestamp: new Date(Date.now() - 120000).toISOString(),
+  },
+  {
+    id: 'demo-2',
+    txHash: '0x1b4d3bcf34a23ca729de9b19c0efb0102e0e334d9176fb7642821be043cc2ccf',
+    protocol: 'LendX Protocol',
+    type: 'Normal Transfer',
+    gasSaved: '-',
+    status: 'SAFE',
+    timestamp: new Date(Date.now() - 300000).toISOString(),
+  },
+  {
+    id: 'demo-3',
+    txHash: '0x48ce12ca0f943d803f414e12dbe66701e2b7721d4edb6134ef4e7e112aeceb7a',
+    protocol: 'YieldFlow',
+    type: 'Oracle Manipulation',
+    gasSaved: '320 MNT',
+    status: 'MITIGATED',
+    timestamp: new Date(Date.now() - 720000).toISOString(),
+  },
+];
+
 export default function ThreatHistory() {
+  const router = useRouter();
   const { address, isConnected, chainId } = useAccount();
-  const { connect } = useConnect();
+  const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
   const { switchChain } = useSwitchChain();
   
   const isCorrectNetwork = chainId === mantleSepoliaTestnet.id;
+  const injectedConnector = connectors.find(connector => connector.id === 'injected') ?? connectors[0];
   
-  const [logs, setLogs] = useState<TransactionLog[]>([]);
+  const [logs, setLogs] = useState<TransactionLog[]>(initialLogs);
   const [search, setSearch] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    router.prefetch('/dashboard');
+    router.prefetch('/');
+  }, [router]);
 
   useEffect(() => {
     const publicClient = createPublicClient({
@@ -39,38 +76,53 @@ export default function ThreatHistory() {
 
     const protocols = ['MantleSwap', 'LendX Protocol', 'YieldFlow', 'ApexVaults', 'LiquidMNT', 'MantleBridge'];
     const threatTypes = ['Reentrancy', 'Oracle Manipulation', 'Flash Loan Attack'];
+    let cancelled = false;
+
+    const runWhenIdle = (callback: () => void) => {
+      const idleWindow = window as Window & { requestIdleCallback?: (cb: IdleRequestCallback, opts?: IdleRequestOptions) => number };
+      if (idleWindow.requestIdleCallback) {
+        idleWindow.requestIdleCallback(callback, { timeout: 1500 });
+      } else {
+        setTimeout(callback, 250);
+      }
+    };
 
     const fetchLogs = async () => {
       try {
-        const block = await publicClient.getBlock({ includeTransactions: true });
-        if (block && block.transactions && block.transactions.length > 0) {
-          const liveTxs: TransactionLog[] = block.transactions.slice(0, 25).map((tx: ViemTransaction) => {
-            const hashInt = parseInt(tx.hash.slice(2, 10), 16);
-            const isThreat = hashInt % 15 === 0; 
-            
-            return {
-              id: tx.hash,
-              txHash: tx.hash,
-              protocol: protocols[hashInt % protocols.length],
-              type: isThreat ? threatTypes[hashInt % threatTypes.length] : 'Normal Transfer',
-              gasSaved: isThreat ? `${(hashInt % 500) + 50} MNT` : '-',
-              status: isThreat ? 'MITIGATED' : 'SAFE',
-              timestamp: new Date(Number(block.timestamp) * 1000).toISOString()
-            };
-          });
-          setLogs(liveTxs);
-        }
+        const block = await Promise.race([
+          publicClient.getBlock({ includeTransactions: true }),
+          new Promise<null>((resolve) => setTimeout(() => resolve(null), 2200)),
+        ]);
+        if (cancelled || !block || !block.transactions || block.transactions.length === 0) return;
+
+        const liveTxs: TransactionLog[] = block.transactions.slice(0, 25).map((tx: ViemTransaction) => {
+          const hashInt = parseInt(tx.hash.slice(2, 10), 16);
+          const isThreat = hashInt % 15 === 0;
+
+          return {
+            id: tx.hash,
+            txHash: tx.hash,
+            protocol: protocols[hashInt % protocols.length],
+            type: isThreat ? threatTypes[hashInt % threatTypes.length] : 'Normal Transfer',
+            gasSaved: isThreat ? `${(hashInt % 500) + 50} MNT` : '-',
+            status: isThreat ? 'MITIGATED' : 'SAFE',
+            timestamp: new Date(Number(block.timestamp) * 1000).toISOString()
+          };
+        });
+        setLogs(liveTxs);
       } catch (err) {
         console.error("Failed to fetch logs", err);
       } finally {
-        setIsLoading(false);
+        if (!cancelled) setIsLoading(false);
       }
     };
-    fetchLogs();
-    
-    // Auto refresh every 4 seconds
-    const interval = setInterval(fetchLogs, 4000);
-    return () => clearInterval(interval);
+
+    runWhenIdle(fetchLogs);
+    const interval = setInterval(() => runWhenIdle(fetchLogs), 30000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
   }, []);
 
   const filteredLogs = logs.filter(log => 
@@ -116,7 +168,7 @@ export default function ThreatHistory() {
             </button>
           ) : (
             <button 
-              onClick={() => connect({ connector: injected() })} 
+              onClick={() => injectedConnector && connect({ connector: injectedConnector })} 
               className="flex items-center gap-2 bg-[#10B981] text-black font-bold py-2 px-5 rounded hover:bg-green-400 transition-all text-xs shadow-[0_0_15px_rgba(16,185,129,0.3)]"
             >
               <Power className="w-3.5 h-3.5" />
