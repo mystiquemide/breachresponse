@@ -16,7 +16,7 @@ contract SentinelRegistry {
     // Mapping from Protocol Contract Address => Protocol Details
     mapping(address => Protocol) public registeredProtocols;
     
-    // Global Sentinel Agent Address (controlled by Byreal Skills CLI)
+    // Global Sentinel Agent Address controlled by the protocol's approved operator path.
     address public sentinelAgent;
     address public owner;
 

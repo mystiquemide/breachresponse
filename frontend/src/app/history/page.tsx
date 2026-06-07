@@ -195,8 +195,8 @@ export default function ThreatHistory() {
             <div className="text-3xl font-bold text-white">{logs.length}</div>
           </div>
           <div className="sci-fi-panel rounded-xl p-6 border-glow">
-            <div className="text-gray-500 text-xs mb-2 flex items-center gap-2"><ShieldCheck className="w-4 h-4" /> ACTIVE GUARDS</div>
-            <div className="text-3xl font-bold text-blue-400">99.98%</div>
+            <div className="text-gray-500 text-xs mb-2 flex items-center gap-2"><ShieldCheck className="w-4 h-4" /> APPROVAL MODE</div>
+            <div className="text-3xl font-bold text-blue-400">Manual</div>
           </div>
         </div>
 
