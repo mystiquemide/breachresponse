@@ -1,76 +1,155 @@
-# BreachResponse (Sentinel.ax)
+# BreachResponse
 
-> Proactive smart contract immune system powered by Web3.py and OpenAI GPT-5.5.
+Autonomous incident response infrastructure for Mantle smart contracts.
 
 ![Mantle Sepolia](https://img.shields.io/badge/Mantle-Sepolia_Testnet-10B981?style=flat-square&logo=ethereum)
 ![Next.js](https://img.shields.io/badge/Next.js-16.2-black?style=flat-square&logo=next.js)
 ![Python](https://img.shields.io/badge/Python-3.11-3776AB?style=flat-square&logo=python)
-![OpenAI](https://img.shields.io/badge/AI-GPT--5.5-412991?style=flat-square&logo=openai)
+![Solidity](https://img.shields.io/badge/Solidity-0.8.24-363636?style=flat-square&logo=solidity)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)
 
-BreachResponse is an active-defense system built for the Mantle ecosystem. Instead of simply alerting you after your funds are stolen, BreachResponse scans the mempool, detects malicious transactions using OpenAI GPT-5.5, and automatically formulates and executes an emergency pause transaction to your smart contract before the attacker's block is confirmed.
+BreachResponse helps protocol operators detect exploit patterns, simulate blast radius, and route emergency defense actions before damage spreads. The platform combines a Mantle-aware monitoring agent, Solidity defense contracts, and a Command Center UI for human-approved or policy-approved response.
 
-## Features
+![BreachResponse Command Center](./docs/assets/hero.png)
 
-- **Mempool Scanning**: Deep inspection of unconfirmed transactions on the Mantle Sepolia network.
-- **AI Payload Formulation**: Uses GPT-5.5 to dynamically analyze exploit signatures and formulate rescue payload calldata.
-- **1-Click Defense**: A premium Command Center UI that allows you to review the AI's analysis and execute a defensive transaction directly to your multisig or admin wallet using Wagmi.
-- **God Mode**: Fully autonomous execution for sub-second defense without human-in-the-loop delay.
-- **Mantle Registry**: Operates as a multi-tenant platform via `SentinelRegistry.sol` deployed on Mantle Sepolia.
+## Why it matters
 
-## Tech Stack
+Smart contract teams usually learn about an exploit after funds move. BreachResponse is built around the opposite operating model:
 
-- **Frontend**: Next.js (App Router), TailwindCSS, Framer Motion, Wagmi, Viem.
-- **Backend / Agent**: Python, Web3.py, OpenAI SDK.
-- **Smart Contracts**: Solidity, Hardhat.
+1. Monitor Mantle activity and sentinel telemetry.
+2. Detect suspicious transaction patterns and protocol anomalies.
+3. Explain the incident in operator language.
+4. Prepare a pause, quarantine, or rescue transaction.
+5. Route the action to a wallet, multisig, or approved autonomous policy.
+6. Record the response for post-incident review.
 
-## Quick Start
+## Core capabilities
 
-### 1. Clone & Install
+- Mantle sentinel registry for protocol onboarding and agent permissions.
+- Next.js Command Center for incident triage, defense approval, and live telemetry.
+- Python monitoring agent for Mantle RPC scanning and alert forwarding.
+- Solidity simulation contracts that prove the vulnerable path and the paused defense path.
+- Safe environment templates with no committed keys or production secrets.
+- CI checks covering frontend, contracts, agent syntax, and dependency audits.
+
+## Product screens
+
+| Command Center | Mobile overview |
+| --- | --- |
+| ![Dashboard](./docs/assets/product-screen-dashboard.png) | ![Mobile overview](./docs/assets/product-screen-mobile.png) |
+
+## Architecture
+
+```text
+Mantle RPC / protocol telemetry
+          |
+          v
+Python sentinel agent -> exploit classifier -> proposed defense payload
+          |                                      |
+          v                                      v
+Next.js Command Center <------------------ operator approval
+          |
+          v
+Mantle registry + protected protocol contracts
+```
+
+See [Architecture](./docs/ARCHITECTURE.md) for the full system design.
+
+## Quick start
+
+### Prerequisites
+
+- Node.js 22+
+- Python 3.11+
+- npm 10+
+- Mantle Sepolia RPC access
+
+### Clone
+
 ```bash
 git clone https://github.com/mystiquemide/breachresponse.git
 cd breachresponse
+cp .env.example .env
 ```
 
-### 2. Frontend Setup
+Fill `.env` with your own local or testnet values. Never use production private keys while testing.
+
+### Frontend
+
 ```bash
 cd frontend
-npm install
+npm ci
+npm run lint -- --max-warnings=0
+npx tsc --noEmit
+npm run build
 npm run dev
 ```
 
-### 3. Agent Setup
+Open http://localhost:3000.
+
+### Contracts
+
+```bash
+cd contracts
+npm ci
+npm run compile
+npm test
+```
+
+The contract tests cover both sides of the incident model:
+
+- the vulnerable vault path can be drained when unprotected
+- the same attack reverts when the sentinel pauses the vault
+
+### Agent
+
 ```bash
 cd agent
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
-```
-
-### 4. Environment Variables
-Copy `.env.example` to `.env` in the root directory and fill in your keys:
-```bash
-cp .env.example .env
-```
-Ensure you have your `OPENAI_API_KEY`, `PRIVATE_KEY`, and `NEXT_PUBLIC_WALLETCONNECT_ID` set.
-
-### 5. Run the Sentinel
-```bash
-cd agent
+python -m compileall -q .
 python main.py
 ```
 
-## Repository Layout
-- `/frontend`: The Next.js Command Center dashboard.
-- `/agent`: The Python Sentinel logic for mempool scanning and AI evaluation.
-- `/contracts`: The Solidity registry and mock target vaults for simulation.
-- `/docs`: Architecture, deployment, and product specs.
+## Verification commands
 
-## Documentation
-- [Deployment Guide](./docs/DEPLOYMENT.md)
-- [Architecture & Design](./docs/ARCHITECTURE.md)
-- [Security Policy](./SECURITY.md)
-- [Contributing](./CONTRIBUTING.md)
+Run these before opening a PR:
+
+```bash
+cd frontend
+npm ci
+npm run lint -- --max-warnings=0
+npx tsc --noEmit
+npm run build
+npm audit --audit-level=moderate
+
+cd ../contracts
+npm ci
+npm run compile
+npm test
+npm audit --audit-level=moderate
+
+cd ../agent
+python -m compileall -q .
+```
+
+## Repository layout
+
+```text
+agent/       Python monitoring and payload formulation agent
+contracts/   Solidity registry, target vault, attacker simulation, tests
+frontend/    Next.js Command Center and API routes
+docs/        Architecture, threat model, deployment, runbooks, roadmap
+.github/     CI, CodeQL, Dependabot, issue templates, PR template
+```
+
+## Production posture
+
+BreachResponse is designed for controlled deployment. Human approval is the default response mode. Autonomous execution should only be enabled for scoped contracts, capped actions, allowlisted payloads, emergency pause functions, and monitored policy thresholds.
+
+See [Threat Model](./docs/THREAT_MODEL.md), [Operator Runbook](./docs/OPERATOR_RUNBOOK.md), and [Deployment](./docs/DEPLOYMENT.md).
 
 ## License
-MIT License. See `LICENSE` for details.
+
+MIT. See [LICENSE](./LICENSE).

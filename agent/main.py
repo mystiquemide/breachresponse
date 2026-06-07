@@ -22,7 +22,7 @@ builtins.print = custom_print
 load_dotenv(dotenv_path="../.env")
 
 MANTLE_RPC_URL = os.getenv("MANTLE_RPC_URL", "https://rpc.sepolia.mantle.xyz")
-BYREAL_API_KEY = os.getenv("BYREAL_API_KEY", "byreal_sec_token_99x")
+BYREAL_API_KEY = os.getenv("BYREAL_API_KEY")
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
 
 # Initialize Byreal client
@@ -80,7 +80,7 @@ def get_registered_protocols():
         req = urllib.request.Request(url, method='GET')
         with urllib.request.urlopen(req, timeout=3) as res:
             data = json.loads(res.read().decode('utf-8'))
-            # Return lowercase addresses for easy comparison + hardcoded live vault for demo
+            # Return lowercase addresses for easy comparison plus the local simulation vault.
             db_addrs = [node['address'].lower() for node in data if 'address' in node]
             return db_addrs + ["0x596Ff2Ca0f781a2CED29EC685cD1ba038378dE02".lower()]
     except Exception as e:

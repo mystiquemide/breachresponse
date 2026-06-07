@@ -7,7 +7,7 @@ export async function GET() {
       orderBy: { registeredAt: 'desc' }
     });
     return NextResponse.json(nodes);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to fetch sentinel nodes' }, { status: 500 });
   }
 }
@@ -29,9 +29,9 @@ export async function POST(request: Request) {
       }
     });
     return NextResponse.json(node);
-  } catch (error: any) {
-    // Prisma unique constraint violation code is P2002
-    if (error.code === 'P2002') {
+  } catch (error: unknown) {
+    const code = error instanceof Error && 'code' in error ? (error as { code?: string }).code : undefined;
+    if (code === 'P2002') {
       return NextResponse.json({ error: 'Sentinel already registered for this address' }, { status: 400 });
     }
     return NextResponse.json({ error: 'Failed to register sentinel node' }, { status: 500 });
@@ -60,7 +60,7 @@ export async function PUT(request: Request) {
       }
     });
     return NextResponse.json(updated);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to toggle sentinel status' }, { status: 500 });
   }
 }

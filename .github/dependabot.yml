@@ -4,15 +4,37 @@ updates:
     directory: /frontend
     schedule:
       interval: weekly
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
+    groups:
+      frontend-runtime:
+        patterns:
+          - next
+          - react
+          - react-dom
+          - ethers
+          - wagmi
+          - viem
+
+  - package-ecosystem: npm
+    directory: /contracts
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      contracts-tooling:
+        patterns:
+          - hardhat
+          - '@nomicfoundation/*'
+          - ethers
 
   - package-ecosystem: pip
     directory: /agent
     schedule:
       interval: weekly
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
 
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+    open-pull-requests-limit: 5

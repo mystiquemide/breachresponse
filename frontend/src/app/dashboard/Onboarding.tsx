@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Activity, Terminal, ShieldCheck, ChevronRight, X, Radio } from 'lucide-react';
+import { Activity, Terminal, ShieldCheck, ChevronRight, X, Radio } from 'lucide-react';
 
 interface OnboardingProps {
   isOpen: boolean;
@@ -14,14 +14,17 @@ const TypewriterText = ({ text }: { text: string }) => {
   const [displayedText, setDisplayedText] = useState('');
 
   useEffect(() => {
-    setDisplayedText('');
+    const resetText = window.setTimeout(() => setDisplayedText(''), 0);
     let i = 0;
     const interval = setInterval(() => {
       setDisplayedText(text.slice(0, i + 1));
       i++;
       if (i >= text.length) clearInterval(interval);
     }, 15); // Adjust speed here (ms per character)
-    return () => clearInterval(interval);
+    return () => {
+      window.clearTimeout(resetText);
+      clearInterval(interval);
+    };
   }, [text]);
 
   return <span className="after:content-['█'] after:animate-pulse after:ml-1">{displayedText}</span>;

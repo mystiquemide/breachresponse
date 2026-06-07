@@ -12,29 +12,26 @@ interface AttackModalProps {
   onSuccess: () => void;
 }
 
+const payloadLines = [
+  "> Analyzing attack vector...",
+  "> Signature Match: REENTRANCY_0x89A",
+  "> Target: MantleSwap Vault (0x5e8c...1a2f)",
+  "> Estimated Loss: 1,420 mETH",
+  "> Formulating Byreal CLI Rescue Payload...",
+  "> function pause() external;",
+  "> Injecting top-of-block priority fee...",
+  "> Payload ready for human signature."
+];
+
 export default function AttackModal({ isOpen, onClose, onSuccess }: AttackModalProps) {
   const { sendTransaction, isPending, isSuccess, isError } = useSendTransaction();
   const [payloadText, setPayloadText] = useState('');
-  
-  const payloadLines = [
-    "> Analyzing attack vector...",
-    "> Signature Match: REENTRANCY_0x89A",
-    "> Target: MantleSwap Vault (0x5e8c...1a2f)",
-    "> Estimated Loss: 1,420 mETH",
-    "> Formulating Byreal CLI Rescue Payload...",
-    "> function pause() external;",
-    "> Injecting top-of-block priority fee...",
-    "> Payload ready for Human Signature."
-  ];
 
   useEffect(() => {
-    if (!isOpen) {
-      setPayloadText('');
-      return;
-    }
+    if (!isOpen) return;
 
     let i = 0;
-    setPayloadText('');
+    const resetPayload = window.setTimeout(() => setPayloadText(''), 0);
     
     const interval = setInterval(() => {
       if (i < payloadLines.length) {
@@ -45,7 +42,10 @@ export default function AttackModal({ isOpen, onClose, onSuccess }: AttackModalP
       }
     }, 400);
 
-    return () => clearInterval(interval);
+    return () => {
+      window.clearTimeout(resetPayload);
+      clearInterval(interval);
+    };
   }, [isOpen]);
 
   useEffect(() => {
