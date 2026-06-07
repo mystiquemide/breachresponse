@@ -44,7 +44,7 @@ export default function Dashboard() {
   
   const [protocolAddress, setProtocolAddress] = useState('');
   const [customAssets, setCustomAssets] = useState<Asset[]>([]);
-  const [blocksScanned, setBlocksScanned] = useState(42912);
+  const [blocksScanned, setBlocksScanned] = useState(0);
   const [commandInput, setCommandInput] = useState('');
   const [waveform, setWaveform] = useState<number[]>([15, 30, 10, 45, 25, 60, 35, 20, 50, 40, 30, 20, 45, 65, 40, 25, 55, 30, 15, 40]);
   
@@ -61,11 +61,19 @@ export default function Dashboard() {
 
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isAttackModalOpen, setIsAttackModalOpen] = useState(false);
-  const [genLayerAccount, setGenLayerAccount] = useState<GenLayerAccount | null>(() => getStoredGenLayerAccount());
+  const [genLayerAccount, setGenLayerAccount] = useState<GenLayerAccount | null>(null);
   const [consensusStatus, setConsensusStatus] = useState('GenLayer consensus fallback is standing by');
   const [consensusIncidents, setConsensusIncidents] = useState<unknown[]>([]);
   const [isConsensusBusy, setIsConsensusBusy] = useState(false);
   const consensusClientRef = useRef<IncidentConsensusGuardClient | null>(null);
+
+  useEffect(() => {
+    const loadStoredSigner = window.setTimeout(() => {
+      setGenLayerAccount(getStoredGenLayerAccount());
+    }, 0);
+
+    return () => window.clearTimeout(loadStoredSigner);
+  }, []);
 
   useEffect(() => {
     router.prefetch('/');
@@ -83,7 +91,7 @@ export default function Dashboard() {
       setConsensusIncidents(Array.isArray(incidents) ? incidents : []);
       setConsensusStatus('Consensus guard read complete');
     } catch (err) {
-      console.error('Failed to read GenLayer incidents', err);
+      console.warn('Failed to read GenLayer incidents', err);
       setConsensusStatus('Consensus read failed. Check StudioNet and contract address');
     }
   }, [genLayerAccount]);
@@ -123,7 +131,7 @@ export default function Dashboard() {
         `[SYS] GenLayer fallback finalized validator consensus for ${incidentId}`,
       ]));
     } catch (err) {
-      console.error('GenLayer consensus escalation failed', err);
+      console.warn('GenLayer consensus escalation failed', err);
       setConsensusStatus('GenLayer escalation failed. Check deployed contract, signer balance, and StudioNet');
     } finally {
       setIsConsensusBusy(false);
@@ -173,12 +181,12 @@ export default function Dashboard() {
           setTerminalLines(prev => capTerminal([...prev, `[ALERT] Mitigated threat on ${log.protocol}! Type: ${log.type} Rescued ${log.gasSaved}`]));
         }
       } catch (err) {
-        console.error("SSE Parse Error", err);
+        console.warn("SSE Parse Error", err);
       }
     };
 
     sse.onerror = (err) => {
-      console.error("SSE Error:", err);
+      console.warn("SSE Error:", err);
       sse.close();
     };
 
@@ -202,7 +210,7 @@ export default function Dashboard() {
           setCustomAssets(data);
         }
       } catch (err) {
-        console.error("Failed to load sentinels from database", err);
+        console.warn("Failed to load sentinels from database", err);
       }
     };
     fetchSentinels();
@@ -266,7 +274,7 @@ export default function Dashboard() {
             setProtocolAddress('');
           }
         } catch (err) {
-          console.error("Failed to save sentinel to DB", err);
+          console.warn("Failed to save sentinel to DB", err);
         }
       };
       saveSentinel();
@@ -284,7 +292,7 @@ export default function Dashboard() {
 
     setTimeout(() => {
       switch (cmd) {
-        case 'simulate hack':
+        case 'simulate incident':
           setTerminalLines((prev) => capTerminal([
             ...prev,
             "[ALERT] INITIALIZING INCIDENT SIMULATION SEQUENCE...",
@@ -354,7 +362,7 @@ export default function Dashboard() {
         ]));
       }
     } catch (err) {
-      console.error("Failed to toggle status in database", err);
+      console.warn("Failed to toggle status in database", err);
     }
   };
 
@@ -455,17 +463,17 @@ export default function Dashboard() {
             <ShieldCheck className="w-4 h-4 text-blue-400" />
           </div>
           <div className="text-2xl md:text-3xl font-black text-white font-mono tracking-tighter">
-            <Counter value={4} />
+            <Counter value={allAssets.length} />
           </div>
         </div>
 
         <div className="sci-fi-panel p-4 flex flex-col justify-between relative overflow-hidden">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-gray-400 text-xs font-bold tracking-widest">Value Secured</h3>
-            <span className="text-[#10B981] text-xs font-bold">+12%</span>
+            <span className="text-[#10B981] text-xs font-bold">DEMO</span>
           </div>
           <div className="text-2xl md:text-3xl font-black text-white font-mono tracking-tighter">
-            <Counter value={1420.5} suffix=" mETH" />
+            <Counter value={1420.5} suffix=" mETH simulated" />
           </div>
         </div>
 
@@ -475,7 +483,7 @@ export default function Dashboard() {
             <ShieldAlert className="w-4 h-4 text-red-500" />
           </div>
           <div className="text-2xl md:text-3xl font-black text-white font-mono tracking-tighter">
-            <Counter value={terminalLines.length > 0 ? terminalLines.length : 12} />
+            <Counter value={consensusIncidents.length} />
           </div>
         </div>
       </motion.section>
@@ -593,7 +601,7 @@ export default function Dashboard() {
                 <line x1="0" y1="40" x2="200" y2="40" stroke="#10B981" strokeWidth="0.5" strokeDasharray="3 6" className="opacity-30" />
               </svg>
               <div className="absolute top-2 right-3 font-mono text-[7px] text-gray-500 uppercase tracking-widest">
-                Cycloramic Camera Induction
+                Consensus signal monitor
               </div>
             </div>
           </div>
@@ -714,7 +722,7 @@ export default function Dashboard() {
           setTerminalLines((prev) => capTerminal([
             ...prev,
             "[SYS] 0-VALUE TRANSACTION CONFIRMED.",
-            "[ALERT] Threat neutralised. Contract paused successfully. Funds secured."
+            "[ALERT] Incident simulation complete. Contract pause path confirmed."
           ]));
         }}
       />

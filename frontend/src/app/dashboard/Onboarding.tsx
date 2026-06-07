@@ -61,7 +61,7 @@ const ONBOARDING_STEPS = [
   {
     title: "Live Threat Feed",
     icon: <Terminal className="w-8 h-8 text-red-500" />,
-    description: "Our autonomous agents log their findings directly to the Event Stream terminal. If a critical vulnerability like a Reentrancy attack is detected, the agent will instantly pause your contract to secure funds.",
+    description: "The sentinel agent logs findings directly to the Event Stream terminal. Critical incidents create scoped response proposals that stay operator-gated by default.",
     color: "from-red-500/20 to-transparent",
     border: "border-red-500/50",
     targetId: "ob-terminal",

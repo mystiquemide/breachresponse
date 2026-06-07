@@ -17,7 +17,7 @@ const payloadLines = [
   "> Signature Match: REENTRANCY_0x89A",
   "> Target: MantleSwap Vault (0x5e8c...1a2f)",
   "> Estimated Loss: 1,420 mETH",
-  "> Formulating Byreal CLI Rescue Payload...",
+  "> Formulating scoped response proposal...",
   "> function pause() external;",
   "> Injecting top-of-block priority fee...",
   "> Payload ready for human signature."
@@ -115,7 +115,7 @@ export default function AttackModal({ isOpen, onClose, onSuccess }: AttackModalP
               <div className="bg-black rounded-lg border border-gray-800 p-4 relative overflow-hidden h-48">
                 <div className="flex items-center gap-2 mb-3 pb-3 border-b border-gray-800/60">
                   <Terminal className="w-4 h-4 text-[#10B981]" />
-                  <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Byreal Agent Formulation</span>
+                  <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Sentinel Agent Formulation</span>
                 </div>
                 <pre className="font-mono text-xs text-gray-300 whitespace-pre-wrap leading-relaxed">
                   {payloadText}
