@@ -40,18 +40,20 @@ The LLM does not get unchecked execution authority. Human approval is the defaul
 
 See [AI Incident Analysis](./docs/AI_INCIDENT_ANALYSIS.md) for the model input/output shape and safety model.
 
-## GenLayer consensus fallback
+## GenLayer consensus guard
 
-BreachResponse includes a GenLayer intelligent contract fallback for cases where the fast LLM path is unavailable, malformed, low-confidence, conflicting, or recommends a risky emergency action. Operators, reviewers, and protocol teams can inspect it directly here:
+BreachResponse includes a GenLayer intelligent contract guard for cases where the fast LLM path is unavailable, malformed, low-confidence, conflicting, or recommends a risky emergency action. The user-facing wallet flow stays on Mantle. The app talks to GenLayer as a consensus validation layer, then uses the result before proposing or executing a Mantle-side response. Operators, reviewers, and protocol teams can inspect it directly here:
 
 | File | Purpose |
 | --- | --- |
 | [`contracts/genlayer/IncidentConsensusGuard.py`](./contracts/genlayer/IncidentConsensusGuard.py) | GenLayer intelligent contract that stores incidents, calls validator-side LLM reasoning, enforces the emergency-action allowlist, and records consensus decisions. |
 | [`tests/direct/test_incident_consensus_guard.py`](./tests/direct/test_incident_consensus_guard.py) | Direct-mode GenLayer tests for approval, rejection, low-confidence escalation, malformed validator output, unsafe action rejection, duplicate incidents, and execution marking. |
-| [`frontend/src/lib/genlayerConsensus.ts`](./frontend/src/lib/genlayerConsensus.ts) | Real `genlayer-js` read/write integration used by the Command Center fallback panel. |
-| [`frontend/src/app/dashboard/page.tsx`](./frontend/src/app/dashboard/page.tsx) | Operator UI panel for preparing the local GenLayer signer, reading consensus records, and escalating incidents once a deployed guard address is configured. |
+| [`frontend/src/lib/genlayerConsensus.ts`](./frontend/src/lib/genlayerConsensus.ts) | Real `genlayer-js` read/write integration used by the Command Center consensus guard panel. |
+| [`frontend/src/app/dashboard/page.tsx`](./frontend/src/app/dashboard/page.tsx) | Operator UI panel for preparing the app-managed GenLayer signer, reading consensus records, and validating incidents once a deployed guard address is configured. |
 
 The contract uses GenLayer nondeterminism and validator consensus through `gl.nondet.exec_prompt(...)` and `gl.vm.run_nondet_unsafe(...)`. It is not a getter/setter demo. It only approves scoped emergency actions such as `pause_protocol`, `quarantine_address`, `monitor_only`, `alert`, and `multisig_proposal`.
+
+Normal users do not switch wallets to GenLayer. Mantle remains the execution network for protected protocols, registry updates, wallet UX, and response transactions. GenLayer runs on StudioNet/testnet and receives incident context through the BreachResponse service/UI layer.
 
 Validate it with:
 
@@ -98,18 +100,9 @@ The current SentinelRegistry deployment used by the frontend is:
 
 ## Architecture
 
-```text
-Mantle RPC / protocol telemetry
-          |
-          v
-Python sentinel agent -> LLM incident analysis -> response proposal
-          |                         |                  |
-          v                         v                  v
-Next.js Command Center <------ safety checks <---- operator approval
-          |
-          v
-Mantle registry + protected protocol contracts
-```
+![BreachResponse architecture](./docs/assets/architecture.svg)
+
+BreachResponse protects Mantle contracts and escalates uncertain incident decisions to GenLayer for validator consensus. Mantle remains the execution network for registry state, monitored assets, wallet actions, and approved response transactions. GenLayer validates risky AI/security decisions before the operator acts.
 
 See [Architecture](./docs/ARCHITECTURE.md) for the full system design.
 

@@ -82,12 +82,6 @@ export default function LandingPage() {
     router.prefetch('/history');
   }, [router]);
 
-  useEffect(() => {
-    if (isConnected && isCorrectNetwork) {
-      router.replace('/dashboard');
-    }
-  }, [isConnected, isCorrectNetwork, router]);
-
   const handleAccess = () => {
     if (!isConnected) {
       if (!injectedConnector) return;
