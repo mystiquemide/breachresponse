@@ -80,6 +80,19 @@ Current Mantle Sepolia registry:
 
 ## Agent
 
+The agent uses Mantle RPC plus an LLM-assisted analysis client. Keep `SENTINEL_RESPONSE_MODE=manual` for normal demos and production pilots unless an explicit policy signer setup has been reviewed.
+
+Relevant environment variables:
+
+| Variable | Purpose |
+| --- | --- |
+| `MANTLE_RPC_URL` | Mantle RPC endpoint used by the sentinel scanner |
+| `OPENAI_API_KEY` | API key for LLM-assisted exploit analysis |
+| `OPENAI_BASE_URL` | Optional OpenAI-compatible provider endpoint |
+| `LLM_MODEL` | Model used for analysis, default `gpt-4o-mini` |
+| `SENTINEL_RESPONSE_MODE` | `manual` proposes actions, `autonomous` can broadcast scoped emergency actions |
+| `PRIVATE_KEY` | Testnet-only agent signer for local execution |
+
 ```bash
 cd agent
 python -m venv .venv

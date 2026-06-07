@@ -14,9 +14,11 @@ The Python agent connects to Mantle RPC, scans activity, and forwards structured
 - forwarding alerts to the Command Center
 - preparing candidate response actions
 
-### 2. Analysis and payload formulation
+### 2. LLM-assisted analysis and payload formulation
 
-The analysis layer converts raw telemetry into operator decisions. A response proposal includes:
+The analysis layer converts raw telemetry into operator decisions. Suspicious activity is submitted to the configured LLM as structured incident context, then normalized into a response proposal. The model is advisory by default and cannot bypass operator approval or policy controls.
+
+A response proposal includes:
 
 - threat class
 - affected protocol
@@ -26,6 +28,8 @@ The analysis layer converts raw telemetry into operator decisions. A response pr
 - target contract
 - calldata or high-level wallet action
 - confidence and risk notes
+
+See [AI Incident Analysis](./AI_INCIDENT_ANALYSIS.md) for the model schema and safety rules.
 
 ### 3. Command Center
 
@@ -56,7 +60,8 @@ The contracts layer provides a Mantle registry and simulation contracts. The reg
 ```text
 Mantle RPC
   -> Python sentinel
-  -> classifier and response proposal
+  -> LLM-assisted classifier and response proposal
+  -> safety checks
   -> Command Center incident card
   -> wallet, multisig, or policy engine approval
   -> Mantle response transaction
@@ -70,3 +75,4 @@ Mantle RPC
 3. Solidity contracts keep the registry and simulation layer explicit and testable.
 4. Human approval is default because autonomous response can become dangerous without scoped policy controls.
 5. The vulnerable test vault exists only to prove the exploit and mitigation path.
+6. LLM output is advisory until validated by deterministic safety rules and operator approval.
