@@ -64,10 +64,28 @@ const initialTransactions: Transaction[] = [
   }
 ];
 
+const FirstLoadPreloader = () => (
+  <div className="fixed inset-0 z-[140] bg-[#050507] flex items-center justify-center p-6">
+    <div className="w-full max-w-sm border border-[#10B981]/30 bg-black/80 rounded-2xl p-6 shadow-[0_0_70px_rgba(16,185,129,0.16)]">
+      <div className="flex items-center gap-3 mb-5">
+        <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-pulse" />
+        <span className="text-xs uppercase tracking-[0.35em] text-[#10B981]">Initializing</span>
+      </div>
+      <div className="space-y-3 text-xs text-gray-300">
+        <div className="flex items-center justify-between border-b border-white/5 pb-2"><span>MANTLE RPC</span><span className="text-[#10B981]">SYNC</span></div>
+        <div className="flex items-center justify-between border-b border-white/5 pb-2"><span>WALLET BRIDGE</span><span className="text-[#10B981]">READY</span></div>
+        <div className="flex items-center justify-between"><span>COMMAND CENTER</span><span className="text-[#10B981]">ONLINE</span></div>
+      </div>
+    </div>
+  </div>
+);
+
 export default function LandingPage() {
   const router = useRouter();
   const [codeTab, setCodeTab] = useState<'python' | 'typescript'>('python');
   const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
+  const [isLaunchingCommandCenter, setIsLaunchingCommandCenter] = useState(false);
+  const [showFirstLoadPreloader, setShowFirstLoadPreloader] = useState(true);
 
   const { isConnected, chainId } = useAccount();
   const { connect, connectors } = useConnect();
@@ -82,13 +100,43 @@ export default function LandingPage() {
     router.prefetch('/history');
   }, [router]);
 
-  const handleAccess = () => {
+  useEffect(() => {
+    const timer = window.setTimeout(() => setShowFirstLoadPreloader(false), 650);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (isLaunchingCommandCenter && isConnected && isCorrectNetwork) {
+      router.push('/dashboard');
+    }
+  }, [isLaunchingCommandCenter, isConnected, isCorrectNetwork, router]);
+
+  const handleWalletAccess = () => {
     if (!isConnected) {
       if (!injectedConnector) return;
       connect({ connector: injectedConnector });
     } else if (!isCorrectNetwork && switchChain) {
       switchChain({ chainId: mantleSepoliaTestnet.id });
     }
+  };
+
+  const handleCommandCenterAccess = () => {
+    setIsLaunchingCommandCenter(true);
+    if (!isConnected) {
+      if (!injectedConnector) return;
+      connect({ connector: injectedConnector });
+      return;
+    }
+    if (!isCorrectNetwork && switchChain) {
+      switchChain({ chainId: mantleSepoliaTestnet.id });
+      return;
+    }
+    router.push('/dashboard');
+  };
+
+  const handleDisconnect = () => {
+    setIsLaunchingCommandCenter(false);
+    disconnect();
   };
 
   useEffect(() => {
@@ -148,6 +196,7 @@ export default function LandingPage() {
 
   return (
     <main className="min-h-screen bg-[#050507] text-white font-mono overflow-x-hidden selection:bg-[#10B981] selection:text-black relative">
+      {showFirstLoadPreloader && <FirstLoadPreloader />}
       <div className="fixed inset-0 bg-engineer-grid opacity-20 pointer-events-none z-0 vignette-mask" />
       
       <div className="fixed top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#10B981]/3 rounded-full blur-[130px] pointer-events-none z-0" />
@@ -165,14 +214,14 @@ export default function LandingPage() {
         <div>
           {!isConnected ? (
             <button 
-              onClick={handleAccess}
+              onClick={handleWalletAccess}
               className="bg-[#10B981] text-black px-6 py-2.5 rounded text-sm font-bold hover:bg-green-400 hover:shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all shadow-lg flex items-center gap-2"
             >
               <Power className="w-4 h-4" /> Connect Wallet
             </button>
           ) : !isCorrectNetwork ? (
              <button 
-              onClick={handleAccess}
+              onClick={handleWalletAccess}
               className="bg-red-500 text-white px-6 py-2.5 rounded text-sm font-bold hover:bg-red-400 hover:shadow-[0_0_15px_rgba(239,68,68,0.4)] transition-all shadow-lg flex items-center gap-2"
             >
               <AlertTriangle className="w-4 h-4" /> Switch Network
@@ -180,17 +229,18 @@ export default function LandingPage() {
           ) : (
             <div className="flex gap-4 items-center">
               <button 
-                onClick={() => disconnect()}
+                onClick={handleDisconnect}
                 className="text-xs text-gray-500 hover:text-red-500 transition-colors"
               >
                 Disconnect
               </button>
-              <Link 
-                href="/dashboard"
+              <button
+                type="button"
+                onClick={handleCommandCenterAccess}
                 className="bg-black/50 backdrop-blur-md border border-white/20 text-white px-6 py-2.5 rounded text-sm font-bold hover:border-[#10B981] hover:text-[#10B981] transition-all shadow-lg"
               >
                 Command Center
-              </Link>
+              </button>
             </div>
           )}
         </div>
@@ -334,9 +384,13 @@ export default function LandingPage() {
                       LLM analysis, operator approval, and GenLayer consensus checks are wired for scoped emergency response.
                     </p>
                   </div>
-                  <Link href="/dashboard" className="w-full py-4 rounded-lg bg-[#10B981] text-black text-center font-bold text-sm shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_40px_rgba(16,185,129,0.6)] hover:bg-white transition-all transform hover:-translate-y-0.5">
+                  <button
+                    type="button"
+                    onClick={handleCommandCenterAccess}
+                    className="w-full py-4 rounded-lg bg-[#10B981] text-black text-center font-bold text-sm shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_40px_rgba(16,185,129,0.6)] hover:bg-white transition-all transform hover:-translate-y-0.5"
+                  >
                     Enter Command Center
-                  </Link>
+                  </button>
                 </div>
               </div>
             </div>
@@ -632,7 +686,7 @@ export default function LandingPage() {
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center">
             {!isConnected || !isCorrectNetwork ? (
               <button 
-                onClick={handleAccess}
+                onClick={handleCommandCenterAccess}
                 className="bg-[#10B981] text-black font-bold px-8 py-4 rounded text-sm hover:bg-green-400 transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_40px_rgba(16,185,129,0.5)] text-center font-mono flex items-center gap-2"
               >
                 <Terminal className="w-4 h-4" /> Enter Command Center

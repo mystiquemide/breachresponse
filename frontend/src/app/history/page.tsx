@@ -66,6 +66,11 @@ export default function ThreatHistory() {
   const handleDisconnect = () => {
     disconnect();
     router.replace('/');
+    window.setTimeout(() => {
+      if (window.location.pathname !== '/') {
+        window.location.assign('/');
+      }
+    }, 120);
   };
 
   useEffect(() => {
@@ -137,20 +142,20 @@ export default function ThreatHistory() {
   );
 
   return (
-    <main className="min-h-screen bg-[#050507] text-white font-mono p-4 lg:p-8 relative">
+    <main className="min-h-screen bg-[#050507] text-white font-mono p-4 lg:p-8 relative overflow-x-hidden">
       {/* Background Cyber Grid */}
       <div className="fixed inset-0 bg-engineer-grid opacity-25 pointer-events-none z-0 vignette-mask" />
       <div className="fixed top-1/3 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-[#10B981]/3 rounded-full blur-[120px] pointer-events-none z-0" />
 
       {/* Header */}
-      <header className="relative flex justify-between items-center mb-8 border-b border-gray-800/60 pb-4">
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="text-gray-500 hover:text-white transition-colors mr-2">
+      <header className="relative z-10 flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-center mb-8 border-b border-gray-800/60 pb-4">
+        <div className="flex items-center gap-4 min-w-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <Link href="/dashboard" className="text-gray-500 hover:text-white transition-colors mr-1 shrink-0">
               <ArrowLeft className="w-5 h-5" />
             </Link>
-            <History className="w-5 h-5 text-[#10B981]" />
-            <h1 className="text-lg md:text-xl font-bold tracking-widest uppercase">Threat History Ledger</h1>
+            <History className="w-5 h-5 text-[#10B981] shrink-0" />
+            <h1 className="text-base md:text-xl font-bold tracking-widest uppercase leading-tight">Threat History Ledger</h1>
           </div>
         </div>
         

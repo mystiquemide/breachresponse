@@ -93,12 +93,21 @@ export default function Dashboard() {
   const [consensusStatus, setConsensusStatus] = useState('GenLayer consensus guard is standing by. Users stay on Mantle.');
   const [consensusIncidents, setConsensusIncidents] = useState<unknown[]>([]);
   const [isConsensusBusy, setIsConsensusBusy] = useState(false);
-  const [showBootSequence, setShowBootSequence] = useState(false);
+  const [showBootSequence, setShowBootSequence] = useState(true);
   const consensusClientRef = useRef<IncidentConsensusGuardClient | null>(null);
+
+  const forceLanding = () => {
+    router.replace('/');
+    window.setTimeout(() => {
+      if (window.location.pathname !== '/') {
+        window.location.assign('/');
+      }
+    }, 120);
+  };
 
   const handleDisconnect = () => {
     disconnect();
-    router.replace('/');
+    forceLanding();
   };
 
   const handleBackToLanding = () => {
@@ -201,18 +210,12 @@ export default function Dashboard() {
 
   useEffect(() => {
     const hasSeenBoot = localStorage.getItem('breachresponse_boot_seen');
-    if (hasSeenBoot) return;
-
-    localStorage.setItem('breachresponse_boot_seen', 'true');
-    const startTimer = window.setTimeout(() => setShowBootSequence(true), 0);
-    return () => window.clearTimeout(startTimer);
-  }, []);
-
-  useEffect(() => {
-    if (!showBootSequence) return;
-    const timer = window.setTimeout(() => setShowBootSequence(false), 950);
+    if (!hasSeenBoot) {
+      localStorage.setItem('breachresponse_boot_seen', 'true');
+    }
+    const timer = window.setTimeout(() => setShowBootSequence(false), hasSeenBoot ? 500 : 950);
     return () => window.clearTimeout(timer);
-  }, [showBootSequence]);
+  }, []);
 
   const handleCloseOnboarding = () => {
     localStorage.setItem('breachresponse_onboarded', 'true');
@@ -502,6 +505,16 @@ export default function Dashboard() {
           )}
         </div>
       </header>
+
+      <nav className="relative z-10 grid grid-cols-2 gap-3 mb-6 md:hidden text-xs font-bold tracking-widest uppercase">
+        <Link href="/dashboard" className="rounded border border-[#10B981]/40 bg-[#10B981]/10 px-4 py-3 text-center text-[#10B981]">
+          Dashboard
+        </Link>
+        <Link href="/history" className="rounded border border-gray-800 bg-[#18181B]/80 px-4 py-3 text-center text-gray-300 hover:text-white">
+          Threat History
+        </Link>
+      </nav>
+
       <div className="fixed top-1/3 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#10B981]/5 rounded-full blur-[150px] pointer-events-none z-0" />
 
       {/* Stats Strip Bar */}
