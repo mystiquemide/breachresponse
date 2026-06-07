@@ -48,6 +48,16 @@ npm run compile
 npm test
 ```
 
+Verify the Mantle Sepolia registry source through Sourcify:
+
+```bash
+cd contracts
+npm run compile
+npm run verify:sourcify
+```
+
+The verification script submits the Solidity standard JSON input from Hardhat build info, the compiler version, the contract identifier, and the deployment transaction hash to Sourcify. Override the defaults with `REGISTRY_ADDRESS`, `CHAIN_ID`, `CREATION_TX_HASH`, or `CONTRACT_IDENTIFIER` if a new registry is deployed. The default contract identifier is `project/contracts/SentinelRegistry.sol:SentinelRegistry`, matching Hardhat 3 build info.
+
 Deployments should be recorded with:
 
 - network name
@@ -63,10 +73,10 @@ Current Mantle Sepolia registry:
 | --- | --- |
 | Network | Mantle Sepolia |
 | Registry contract address | `0xea3C039795B5b04105B795c8B0cB85e0a42Cc85C` |
-| Contract explorer | https://explorer.sepolia.mantle.xyz/address/0xea3C039795B5b04105B795c8B0cB85e0a42Cc85C |
-| Deployment transaction | https://explorer.sepolia.mantle.xyz/tx/0x0dac721b1ed137bf93132222348aab39bae48ed3a6e8b8e6ed0d0ee9d91f2b07 |
+| Contract explorer | https://sepolia.mantlescan.xyz/address/0xea3C039795B5b04105B795c8B0cB85e0a42Cc85C#code |
+| Deployment transaction | https://sepolia.mantlescan.xyz/tx/0x0dac721b1ed137bf93132222348aab39bae48ed3a6e8b8e6ed0d0ee9d91f2b07 |
 | Deployer | `0x9f758be3ae3d985713964339e2f0bd783fc6015c` |
-| Source verification | Pending on Mantlescan |
+| Source verification | Verified on Mantlescan and Sourcify |
 
 ## Agent
 

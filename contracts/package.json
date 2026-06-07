@@ -6,7 +6,8 @@
   "main": "index.js",
   "scripts": {
     "test": "hardhat test",
-    "compile": "hardhat compile"
+    "compile": "hardhat compile",
+    "verify:sourcify": "node scripts/verify_sourcify.mjs"
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-ethers": "^4.0.13",

@@ -184,7 +184,7 @@ export default function ThreatHistory() {
                       <td className="px-6 py-4 text-gray-500">{new Date(log.timestamp).toLocaleString()}</td>
                       <td className="px-6 py-4 font-bold text-gray-300">
                         {log.txHash}
-                        <a href={`https://explorer.sepolia.mantle.xyz/tx/${log.txHash}`} target="_blank" rel="noopener noreferrer" className="ml-2 text-[#10B981] hover:underline text-[10px]">Explorer ↗</a>
+                        <a href={`https://sepolia.mantlescan.xyz/tx/${log.txHash}`} target="_blank" rel="noopener noreferrer" className="ml-2 text-[#10B981] hover:underline text-[10px]">Explorer ↗</a>
                       </td>
                       <td className="px-6 py-4 text-white font-bold">{log.protocol}</td>
                       <td className="px-6 py-4">
