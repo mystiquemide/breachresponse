@@ -1,8 +1,8 @@
 # BreachResponse Frontend
 
-Next.js Command Center for BreachResponse, built for Mantle incident triage, sentinel registration, operator approval, and GenLayer consensus fallback.
+Next.js Command Center for BreachResponse, built for Mantle incident triage, sentinel registration, operator approval, and GenLayer consensus guard validation.
 
-This app is the operator surface for the repository. It connects the public landing page, dashboard, incident history, Mantle registry metadata, and GenLayer StudioNet escalation panel.
+This app is the operator surface for the repository. It connects the public landing page, dashboard, incident history, Mantle registry metadata, and GenLayer StudioNet validation panel. Users keep their wallet on Mantle while the app handles GenLayer consensus checks in the background.
 
 ## Stack
 
@@ -10,7 +10,7 @@ This app is the operator surface for the repository. It connects the public land
 - React 19
 - Tailwind CSS 4
 - Wagmi, Viem, and Ethers for wallet and contract interactions
-- GenLayer JS for the consensus fallback panel
+- GenLayer JS for the consensus guard panel
 
 ## Environment
 
@@ -53,7 +53,7 @@ The current VPS deployment runs from this directory under `breachresponse-fronte
 | Route | Purpose |
 | --- | --- |
 | `/` | Public product landing page |
-| `/dashboard` | Operator Command Center, sentinel registration, live telemetry, and GenLayer fallback |
+| `/dashboard` | Operator Command Center, sentinel registration, live telemetry, and GenLayer consensus guard |
 | `/history` | Incident and mitigation history |
 | `/api/vault/status` | Mantle RPC-backed vault status probe |
 | `/api/logs/stream` | Local server-sent event stream for sentinel logs |
@@ -75,8 +75,9 @@ Browser smoke checks should cover:
 - Landing page loads without console errors.
 - `/dashboard` loads without console errors.
 - GenLayer panel shows `CONTRACT LINKED` when the deployed guard address is configured.
-- `Prepare GenLayer signer` creates a local browser signer and enables the escalation control.
+- `Prepare guard signer` creates an app-managed StudioNet signer and enables the validation control.
 - Wallet UX handles disconnected state cleanly.
+- Mantle wallet state remains separate from the GenLayer consensus guard. No user wallet switch to GenLayer is required.
 
 ## Safety posture
 

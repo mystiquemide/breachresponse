@@ -63,6 +63,11 @@ export default function ThreatHistory() {
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
+  const handleDisconnect = () => {
+    disconnect();
+    router.replace('/');
+  };
+
   useEffect(() => {
     router.prefetch('/dashboard');
     router.prefetch('/');
@@ -152,7 +157,7 @@ export default function ThreatHistory() {
         <div>
           {isConnected && isCorrectNetwork ? (
             <button 
-              onClick={() => disconnect()} 
+              onClick={handleDisconnect} 
               className="flex items-center gap-2 bg-[#18181B] border border-gray-800 px-4 py-2 rounded hover:bg-gray-800 transition-colors text-xs"
             >
               <Power className="w-3.5 h-3.5 text-red-500" />

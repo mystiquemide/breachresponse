@@ -31,6 +31,34 @@ interface Asset {
 
 const capTerminal = (lines: string[]) => lines.slice(-120);
 
+const BootSequence = () => {
+  const lines = [
+    'MANTLE RPC LINKED',
+    'SENTINEL REGISTRY FOUND',
+    'GENLAYER CONSENSUS GUARD READY',
+    'COMMAND CENTER ONLINE',
+  ];
+
+  return (
+    <div className="fixed inset-0 z-[120] bg-[#050507]/95 backdrop-blur-sm flex items-center justify-center p-6">
+      <div className="w-full max-w-md border border-[#10B981]/30 bg-black/70 rounded-2xl p-6 shadow-[0_0_60px_rgba(16,185,129,0.18)]">
+        <div className="flex items-center gap-3 mb-5">
+          <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-pulse" />
+          <span className="text-xs uppercase tracking-[0.35em] text-[#10B981]">Boot sequence</span>
+        </div>
+        <div className="space-y-3 font-mono text-xs text-gray-300">
+          {lines.map((line, index) => (
+            <div key={line} className="flex items-center justify-between border-b border-white/5 pb-2">
+              <span>{line}</span>
+              <span className="text-[#10B981]">{index === lines.length - 1 ? 'READY' : 'OK'}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export default function Dashboard() {
   const router = useRouter();
   const { address, isConnected, chainId } = useAccount();
@@ -62,10 +90,16 @@ export default function Dashboard() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isAttackModalOpen, setIsAttackModalOpen] = useState(false);
   const [genLayerAccount, setGenLayerAccount] = useState<GenLayerAccount | null>(null);
-  const [consensusStatus, setConsensusStatus] = useState('GenLayer consensus fallback is standing by');
+  const [consensusStatus, setConsensusStatus] = useState('GenLayer consensus guard is standing by. Users stay on Mantle.');
   const [consensusIncidents, setConsensusIncidents] = useState<unknown[]>([]);
   const [isConsensusBusy, setIsConsensusBusy] = useState(false);
+  const [showBootSequence, setShowBootSequence] = useState(false);
   const consensusClientRef = useRef<IncidentConsensusGuardClient | null>(null);
+
+  const handleDisconnect = () => {
+    disconnect();
+    router.replace('/');
+  };
 
   useEffect(() => {
     const loadStoredSigner = window.setTimeout(() => {
@@ -100,7 +134,7 @@ export default function Dashboard() {
     const account = generateGenLayerAccount();
     setGenLayerAccount(account);
     consensusClientRef.current = new IncidentConsensusGuardClient(createGenLayerClient(account));
-    setConsensusStatus(`GenLayer local signer ready ${account.address.slice(0, 6)}...${account.address.slice(-4)}`);
+    setConsensusStatus(`GenLayer guard signer ready ${account.address.slice(0, 6)}...${account.address.slice(-4)}`);
   };
 
   const escalateDemoIncident = async () => {
@@ -128,7 +162,8 @@ export default function Dashboard() {
       await refreshConsensusIncidents();
       setTerminalLines((prev) => capTerminal([
         ...prev,
-        `[SYS] GenLayer fallback finalized validator consensus for ${incidentId}`,
+        `[SYS] GenLayer consensus guard finalized validator review for ${incidentId}`,
+        '[SYS] Mantle remains the execution network for any approved response',
       ]));
     } catch (err) {
       console.warn('GenLayer consensus escalation failed', err);
@@ -150,6 +185,21 @@ export default function Dashboard() {
       setTimeout(() => setShowOnboarding(true), 0);
     }
   }, []);
+
+  useEffect(() => {
+    const hasSeenBoot = localStorage.getItem('breachresponse_boot_seen');
+    if (hasSeenBoot) return;
+
+    localStorage.setItem('breachresponse_boot_seen', 'true');
+    const startTimer = window.setTimeout(() => setShowBootSequence(true), 0);
+    return () => window.clearTimeout(startTimer);
+  }, []);
+
+  useEffect(() => {
+    if (!showBootSequence) return;
+    const timer = window.setTimeout(() => setShowBootSequence(false), 950);
+    return () => window.clearTimeout(timer);
+  }, [showBootSequence]);
 
   const handleCloseOnboarding = () => {
     localStorage.setItem('breachresponse_onboarded', 'true');
@@ -414,7 +464,7 @@ export default function Dashboard() {
                 {address?.slice(0, 6)}...{address?.slice(-4)}
               </div>
               <button 
-                onClick={() => disconnect()} 
+                onClick={handleDisconnect} 
                 className="flex items-center gap-2 bg-red-500/10 text-red-500 border border-red-500/20 px-4 py-2 rounded hover:bg-red-500/20 transition-colors text-xs font-bold uppercase tracking-widest"
               >
                 <Power className="w-3.5 h-3.5" /> Disconnect
@@ -522,7 +572,7 @@ export default function Dashboard() {
               {isPending ? 'Executing Transaction...' : 'Initialize active defense'}
             </button>
             {isSuccess && <p className="text-[#10B981] mt-3 text-[10px] text-center">Protocol registered on Mantle Sepolia!</p>}
-            {!isConnected && <p className="text-red-500 mt-3 text-[10px] text-center font-sans">Connect wallet to initialize guards</p>}
+            {!isConnected && <p className="text-red-500 mt-3 text-[10px] text-center font-sans">Connect a Mantle wallet to initialize guards</p>}
             {!isConnected && connectError && (
               <p className="text-yellow-400 mt-2 text-[10px] text-center font-sans">
                 No injected wallet detected. Install MetaMask or open this app in a wallet browser.
@@ -530,16 +580,16 @@ export default function Dashboard() {
             )}
           </div>
 
-          {/* GenLayer Consensus Fallback */}
+          {/* GenLayer Consensus Guard */}
           <div id="ob-genlayer" className="sci-fi-panel p-6 relative overflow-hidden transition-all duration-500 border border-[#10B981]/20">
             <div className="flex items-start justify-between gap-4 mb-4">
               <div>
                 <h2 className="text-base font-bold mb-2 flex items-center gap-2">
                   <ShieldAlert className="w-4 h-4 text-[#10B981]" />
-                  GenLayer Consensus Fallback
+                  GenLayer Consensus Guard
                 </h2>
                 <p className="text-gray-400 text-xs leading-relaxed font-sans">
-                  Escalates low-confidence LLM incidents to a GenLayer intelligent contract for validator consensus before emergency action.
+                  Escalates low-confidence Mantle incidents to a GenLayer intelligent contract for validator consensus. Operators keep their wallet on Mantle.
                 </p>
               </div>
               <span className="text-[9px] uppercase tracking-widest text-[#10B981] bg-[#10B981]/10 border border-[#10B981]/20 rounded px-2 py-1">
@@ -555,7 +605,7 @@ export default function Dashboard() {
                 </span>
               </div>
               <div className="flex justify-between gap-4 border-b border-gray-800/60 pb-2">
-                <span>Local signer</span>
+                <span>App-managed signer</span>
                 <span className="text-gray-300">
                   {genLayerAccount ? `${genLayerAccount.address.slice(0, 6)}...${genLayerAccount.address.slice(-4)}` : 'Not generated'}
                 </span>
@@ -572,14 +622,14 @@ export default function Dashboard() {
                 onClick={connectGenLayerFallback}
                 className="bg-[#18181B] border border-gray-800 text-white font-bold py-3 rounded text-[10px] hover:border-[#10B981]/50 transition-colors uppercase tracking-widest"
               >
-                Prepare GenLayer signer
+                Prepare guard signer
               </button>
               <button
                 onClick={escalateDemoIncident}
                 disabled={isConsensusBusy || !genLayerAccount || !GENLAYER_CONSENSUS_GUARD_ADDRESS}
                 className={`bg-[#10B981] text-black font-bold py-3 rounded text-[10px] transition-all uppercase tracking-widest ${isConsensusBusy || !genLayerAccount || !GENLAYER_CONSENSUS_GUARD_ADDRESS ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-400 hover:shadow-[0_0_15px_rgba(16,185,129,0.3)]'}`}
               >
-                {isConsensusBusy ? 'Consensus running...' : 'Escalate incident'}
+                {isConsensusBusy ? 'Consensus running...' : 'Validate incident'}
               </button>
             </div>
           </div>
@@ -711,6 +761,7 @@ export default function Dashboard() {
       </div>
 
       {/* Setup Wizard Overlay */}
+      {showBootSequence && <BootSequence />}
       <Onboarding isOpen={showOnboarding} onClose={handleCloseOnboarding} />
 
       {/* Critical anomaly modal */}

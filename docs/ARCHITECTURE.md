@@ -43,7 +43,13 @@ The Next.js Command Center gives operators a live view of:
 
 Human approval is the default control path.
 
-### 4. On-chain response
+### 4. GenLayer consensus guard
+
+Low-confidence or disputed incident proposals can be sent to the GenLayer intelligent contract before an emergency response is proposed on Mantle. This path is application-mediated: BreachResponse submits Mantle incident context to GenLayer, GenLayer validators produce a consensus decision, and the Command Center uses that decision as a gate before any Mantle action.
+
+Normal users and operators keep their wallet on Mantle. The GenLayer StudioNet/testnet signer is app-managed for the consensus guard path and should be treated as backend or admin infrastructure, not as a second user wallet requirement.
+
+### 5. On-chain response
 
 The contracts layer provides a Mantle registry and simulation contracts. The registry tracks protected protocols and the authorized sentinel agent. The target vault and attacker contracts prove the threat model in tests.
 
@@ -61,6 +67,7 @@ The contracts layer provides a Mantle registry and simulation contracts. The reg
 Mantle RPC
   -> Python sentinel
   -> LLM-assisted classifier and response proposal
+  -> GenLayer consensus guard for low-confidence or risky cases
   -> safety checks
   -> Command Center incident card
   -> wallet, multisig, or policy engine approval
@@ -76,3 +83,4 @@ Mantle RPC
 4. Human approval is default because autonomous response can become dangerous without scoped policy controls.
 5. The vulnerable test vault exists only to prove the exploit and mitigation path.
 6. LLM output is advisory until validated by deterministic safety rules and operator approval.
+7. GenLayer is a consensus validation layer, not the user execution network. Mantle remains the chain for registry state and response transactions.
