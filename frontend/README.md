@@ -1,36 +1,83 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BreachResponse Frontend
 
-## Getting Started
+Next.js Command Center for BreachResponse, built for Mantle incident triage, sentinel registration, operator approval, and GenLayer consensus fallback.
 
-First, run the development server:
+This app is the operator surface for the repository. It connects the public landing page, dashboard, incident history, Mantle registry metadata, and GenLayer StudioNet escalation panel.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Stack
+
+- Next.js 16 App Router
+- React 19
+- Tailwind CSS 4
+- Wagmi, Viem, and Ethers for wallet and contract interactions
+- GenLayer JS for the consensus fallback panel
+
+## Environment
+
+Set these values before building or deploying:
+
+```env
+NEXT_PUBLIC_REGISTRY_ADDRESS=0xea3C039795B5b04105B795c8B0cB85e0a42Cc85C
+NEXT_PUBLIC_MANTLE_RPC_URL=https://rpc.sepolia.mantle.xyz
+NEXT_PUBLIC_GENLAYER_CONSENSUS_GUARD_ADDRESS=0x86369EC44fbB5EB682729368557176858aBe0c73
+NEXT_PUBLIC_GENLAYER_STUDIO_URL=https://studio.genlayer.com/api
+MANTLE_RPC_URL=https://rpc.sepolia.mantle.xyz
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Use safe testnet values only. Do not put private keys, wallet seeds, production RPC credentials, or API secrets in frontend env files.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Local development
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm ci
+npm run lint -- --max-warnings=0
+npx tsc --noEmit
+npm run build
+npm run dev
+```
 
-## Learn More
+Open http://localhost:3000.
 
-To learn more about Next.js, take a look at the following resources:
+## Production run
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+npm ci
+npm run build
+npm run start -- --hostname 0.0.0.0 --port 8900
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The current VPS deployment runs from this directory under `breachresponse-frontend.service` with the same public Mantle and GenLayer configuration.
 
-## Deploy on Vercel
+## Routes
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Route | Purpose |
+| --- | --- |
+| `/` | Public product landing page |
+| `/dashboard` | Operator Command Center, sentinel registration, live telemetry, and GenLayer fallback |
+| `/history` | Incident and mitigation history |
+| `/api/vault/status` | Mantle RPC-backed vault status probe |
+| `/api/logs/stream` | Local server-sent event stream for sentinel logs |
+| `/api/sentinels` | Sentinel registry API surface |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Verification
+
+Expected clean checks:
+
+```bash
+npm run lint -- --max-warnings=0
+npx tsc --noEmit
+npm run build
+npm audit --audit-level=moderate
+```
+
+Browser smoke checks should cover:
+
+- Landing page loads without console errors.
+- `/dashboard` loads without console errors.
+- GenLayer panel shows `CONTRACT LINKED` when the deployed guard address is configured.
+- `Prepare GenLayer signer` creates a local browser signer and enables the escalation control.
+- Wallet UX handles disconnected state cleanly.
+
+## Safety posture
+
+The UI should stay manual-first by default. Do not add unchecked autonomous execution, hidden signer behavior, or claims that a transaction executed unless the user approved it and the chain result is verified.
