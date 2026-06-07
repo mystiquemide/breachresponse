@@ -5,12 +5,12 @@ import { useRouter } from 'next/navigation';
 import { useAccount, useConnect, useDisconnect, useWriteContract, useSwitchChain } from 'wagmi';
 import { mantleSepoliaTestnet } from 'wagmi/chains';
 import { ShieldAlert, Radio, Activity, ShieldCheck, Power, Cpu, AlertTriangle, HelpCircle } from 'lucide-react';
-import Link from 'next/link';
 import { motion } from 'framer-motion';
 import Counter from './Counter';
 import Onboarding from './Onboarding';
 import AttackModal from './AttackModal';
 import { REGISTRY_ADDRESS, REGISTRY_ABI } from '../constants';
+import { DASHBOARD_PATH, HISTORY_PATH, LANDING_PATH, leaveCommandCenter, navigateToAppPath, replaceWithAppPath } from '../../lib/navigation';
 import {
   GENLAYER_CONSENSUS_GUARD_ADDRESS,
   type GenLayerAccount,
@@ -93,16 +93,27 @@ export default function Dashboard() {
   const [consensusStatus, setConsensusStatus] = useState('GenLayer consensus guard is standing by. Users stay on Mantle.');
   const [consensusIncidents, setConsensusIncidents] = useState<unknown[]>([]);
   const [isConsensusBusy, setIsConsensusBusy] = useState(false);
-  const [showBootSequence, setShowBootSequence] = useState(false);
+  const [showBootSequence, setShowBootSequence] = useState(true);
   const consensusClientRef = useRef<IncidentConsensusGuardClient | null>(null);
 
   const handleDisconnect = () => {
-    disconnect();
-    router.replace('/');
+    leaveCommandCenter({
+      disconnect,
+      location: window.location,
+      storage: window.sessionStorage,
+    });
   };
 
   const handleBackToLanding = () => {
-    window.location.assign('/');
+    replaceWithAppPath(window.location, LANDING_PATH);
+  };
+
+  const handleOpenDashboard = () => {
+    navigateToAppPath(window.location, DASHBOARD_PATH);
+  };
+
+  const handleOpenHistory = () => {
+    navigateToAppPath(window.location, HISTORY_PATH);
   };
 
   useEffect(() => {
@@ -201,18 +212,12 @@ export default function Dashboard() {
 
   useEffect(() => {
     const hasSeenBoot = localStorage.getItem('breachresponse_boot_seen');
-    if (hasSeenBoot) return;
-
-    localStorage.setItem('breachresponse_boot_seen', 'true');
-    const startTimer = window.setTimeout(() => setShowBootSequence(true), 0);
-    return () => window.clearTimeout(startTimer);
-  }, []);
-
-  useEffect(() => {
-    if (!showBootSequence) return;
-    const timer = window.setTimeout(() => setShowBootSequence(false), 950);
+    if (!hasSeenBoot) {
+      localStorage.setItem('breachresponse_boot_seen', 'true');
+    }
+    const timer = window.setTimeout(() => setShowBootSequence(false), hasSeenBoot ? 500 : 950);
     return () => window.clearTimeout(timer);
-  }, [showBootSequence]);
+  }, []);
 
   const handleCloseOnboarding = () => {
     localStorage.setItem('breachresponse_onboarded', 'true');
@@ -457,8 +462,8 @@ export default function Dashboard() {
           </div>
           
           <div className="hidden md:flex items-center gap-6 text-xs font-bold tracking-widest uppercase text-gray-400">
-            <Link href="/dashboard" className="text-white">Dashboard</Link>
-            <Link href="/history" className="hover:text-white transition-colors">Threat History</Link>
+            <button type="button" onClick={handleOpenDashboard} className="text-white">Dashboard</button>
+            <button type="button" onClick={handleOpenHistory} className="hover:text-white transition-colors">Threat History</button>
           </div>
         </div>
         
@@ -502,6 +507,16 @@ export default function Dashboard() {
           )}
         </div>
       </header>
+
+      <nav className="relative z-10 grid grid-cols-2 gap-3 mb-6 md:hidden text-xs font-bold tracking-widest uppercase">
+        <button type="button" onClick={handleOpenDashboard} className="rounded border border-[#10B981]/40 bg-[#10B981]/10 px-4 py-3 text-center text-[#10B981]">
+          Dashboard
+        </button>
+        <button type="button" onClick={handleOpenHistory} className="rounded border border-gray-800 bg-[#18181B]/80 px-4 py-3 text-center text-gray-300 hover:text-white">
+          Threat History
+        </button>
+      </nav>
+
       <div className="fixed top-1/3 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#10B981]/5 rounded-full blur-[150px] pointer-events-none z-0" />
 
       {/* Stats Strip Bar */}
