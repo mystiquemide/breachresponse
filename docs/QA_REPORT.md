@@ -1,25 +1,44 @@
-# QA & SECURITY REPORT: Sentinel.ax
+# QA Report
 
-## QA Testing Summary
-- [x] Local Hardhat Node Deployment: **PASS**
-- [x] Attacker Exploit Simulation (Reentrancy): **PASS** (Funds successfully drained in test)
-- [x] Sentinel Agent Mempool Detection: **PASS** (Mock scanner successfully identifies `Attacker.attack()`)
-- [x] Next.js Command Center Render: **PASS** (UI renders dark mode Command Center without errors)
-- [x] Web3 Edge Cases: WalletConnect initialized, handles disconnected state gracefully.
+## Current verification target
 
-## Security Audit Summary (OWASP & Smart Contracts)
-1. **TargetVault.sol**: 
-   - *Status*: INTENTIONALLY VULNERABLE.
-   - *Finding*: Critical Reentrancy vulnerability at line 28 (`msg.sender.call{value: amount}("")`). This is by design for the hackathon demo.
-2. **Attacker.sol**:
-   - *Status*: VERIFIED EXPLOIT.
-   - *Finding*: Correctly exploits the TargetVault.
-3. **Agent Security**:
-   - *Status*: SECURE.
-   - *Finding*: No private keys exposed in agent code. Byreal API keys properly sequestered in `.env`.
-4. **Frontend Security**:
-   - *Status*: SECURE.
-   - *Finding*: No cross-site scripting vulnerabilities detected. Wagmi integration safely handles provider injection.
+BreachResponse should pass local and CI checks for frontend, contracts, and agent syntax before any release branch is merged.
 
-## Conclusion
-Build phase successfully passed all regression and security gates. The platform is ready for testnet deployment.
+## Required checks
+
+```bash
+cd frontend
+npm ci
+npm run lint -- --max-warnings=0
+npx tsc --noEmit
+npm run build
+npm audit --audit-level=moderate
+
+cd ../contracts
+npm ci
+npm run compile
+npm test
+npm audit --audit-level=moderate
+
+cd ../agent
+python -m compileall -q .
+```
+
+## Contract simulation notes
+
+`TargetVault.sol` is intentionally vulnerable inside the simulation suite. It exists to prove the difference between an unprotected exploit path and a protected pause path.
+
+Expected result:
+
+- unprotected path drains the test vault
+- sentinel pause path blocks deposits, withdrawals, and recursive exploit execution
+
+## Release gate
+
+A release branch should not merge unless:
+
+- frontend lint, typecheck, build, and audit pass
+- contract compile, tests, and audit pass at moderate threshold
+- agent Python syntax check passes
+- public docs contain no internal planning language
+- environment files contain placeholders only

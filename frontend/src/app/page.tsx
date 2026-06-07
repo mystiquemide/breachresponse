@@ -1,13 +1,14 @@
 'use client'
 
 import React, { useEffect, useState } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import { Shield, Target, Zap, ArrowRight, Lock, Activity, Hexagon, Component, CheckCircle2, Power, AlertTriangle, Terminal, Layers, Cpu, ShieldCheck } from 'lucide-react';
+import { Shield, Target, Activity, Hexagon, Component, CheckCircle2, Power, AlertTriangle, Terminal, Layers, Cpu, ShieldCheck } from 'lucide-react';
 import { useAccount, useConnect, useSwitchChain, useDisconnect } from 'wagmi';
 import { injected } from 'wagmi/connectors';
 import { mantleSepoliaTestnet } from 'wagmi/chains';
-import { createPublicClient, http } from 'viem';
+import { createPublicClient, http, type Transaction as ViemTransaction } from 'viem';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -64,11 +65,10 @@ const initialTransactions: Transaction[] = [
 ];
 
 export default function LandingPage() {
-  const [terminalStep, setTerminalStep] = useState(0);
   const [codeTab, setCodeTab] = useState<'python' | 'typescript'>('python');
   const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
 
-  const { address, isConnected, chainId } = useAccount();
+  const { isConnected, chainId } = useAccount();
   const { connect } = useConnect();
   const { disconnect } = useDisconnect();
   const { switchChain } = useSwitchChain();
@@ -84,13 +84,6 @@ export default function LandingPage() {
   };
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTerminalStep((prev) => (prev < 3 ? prev + 1 : 0));
-    }, 2500);
-    return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
     const publicClient = createPublicClient({
       chain: mantleSepoliaTestnet,
       transport: http()
@@ -103,7 +96,7 @@ export default function LandingPage() {
       try {
         const block = await publicClient.getBlock({ includeTransactions: true });
         if (block && block.transactions && block.transactions.length > 0) {
-          const liveTxs: Transaction[] = block.transactions.slice(0, 5).map((tx: any, idx) => {
+          const liveTxs: Transaction[] = block.transactions.slice(0, 5).map((tx: ViemTransaction) => {
             // Generate some stable deterministic flavor based on the tx hash
             const hashInt = parseInt(tx.hash.slice(2, 10), 16);
             const isThreat = hashInt % 15 === 0; // 1 in 15 chance to show a mitigated threat
@@ -139,7 +132,7 @@ export default function LandingPage() {
       
       <nav className="absolute w-full flex justify-between items-center py-6 px-8 md:px-16 z-50">
         <div className="flex items-center gap-3">
-          <img src="/logo.png" alt="BreachResponse Logo" className="w-8 h-8 object-contain" />
+          <Image src="/logo.png" alt="BreachResponse Logo" width={32} height={32} className="object-contain" />
           <span className="text-lg font-bold tracking-widest text-white drop-shadow-md">BREACH RESPONSE</span>
         </div>
         <div className="hidden md:flex gap-8 text-xs tracking-widest uppercase font-bold text-gray-300 drop-shadow-md">
@@ -406,7 +399,7 @@ export default function LandingPage() {
         <motion.div initial="initial" whileInView="animate" viewport={{ once: true, margin: "-100px" }} variants={fadeInUp} className="container mx-auto px-6 relative z-10">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Built for scale</h2>
           <p className="text-xl text-gray-400 mb-16 max-w-2xl font-sans text-sm">
-            Traditional security platforms rely on alerting you after the funds are stolen, we formulate the counter transaction before the attacker's block is confirmed
+            Traditional security platforms rely on alerting you after the funds are stolen, we formulate the counter transaction before the attacker&apos;s block is confirmed
           </p>
         </motion.div>
         <motion.div variants={staggerContainer} initial="initial" whileInView="animate" viewport={{ once: true, margin: "-50px" }} className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -654,7 +647,7 @@ export default function LandingPage() {
         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8">
           <div className="flex flex-col items-center md:items-start text-center md:text-left">
             <div className="flex items-center gap-3 mb-6">
-              <img src="/logo.png" alt="BreachResponse Logo" className="w-6 h-6 object-contain" />
+              <Image src="/logo.png" alt="BreachResponse Logo" width={24} height={24} className="object-contain" />
               <span className="text-lg font-bold tracking-widest text-white">BREACH RESPONSE</span>
             </div>
             <p className="text-gray-500 text-sm leading-relaxed font-sans max-w-xs">

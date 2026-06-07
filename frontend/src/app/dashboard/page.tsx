@@ -4,9 +4,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAccount, useConnect, useDisconnect, useWriteContract, useSwitchChain } from 'wagmi';
 import { injected } from 'wagmi/connectors';
 import { mantleSepoliaTestnet } from 'wagmi/chains';
-import { ShieldAlert, Radio, Activity, ShieldCheck, Power, Terminal as TerminalIcon, Cpu, Play, Trash2, ArrowUpRight, AlertTriangle, Lock, HelpCircle } from 'lucide-react';
+import { ShieldAlert, Radio, Activity, ShieldCheck, Power, Cpu, AlertTriangle, HelpCircle } from 'lucide-react';
 import Link from 'next/link';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Counter from './Counter';
 import Onboarding from './Onboarding';
 import AttackModal from './AttackModal';
@@ -187,7 +187,7 @@ export default function Dashboard() {
       };
       saveSentinel();
     }
-  }, [isSuccess]);
+  }, [isSuccess, protocolAddress]);
 
   // Terminal commands interpreter
   const handleCommandSubmit = (e: React.FormEvent) => {
@@ -203,7 +203,7 @@ export default function Dashboard() {
         case 'simulate hack':
           setTerminalLines((prev) => [
             ...prev,
-            "[ALERT] INITIALIZING HACKATHON DEMO SEQUENCE...",
+            "[ALERT] INITIALIZING INCIDENT SIMULATION SEQUENCE...",
             "[SYS] INJECTING MALICIOUS PAYLOAD INTO MEMPOOL..."
           ]);
           setTimeout(() => setIsAttackModalOpen(true), 1500);
@@ -565,7 +565,7 @@ export default function Dashboard() {
       {/* Setup Wizard Overlay */}
       <Onboarding isOpen={showOnboarding} onClose={handleCloseOnboarding} />
 
-      {/* Hackathon Demo: Critical Anomaly Modal */}
+      {/* Critical anomaly modal */}
       <AttackModal 
         isOpen={isAttackModalOpen} 
         onClose={() => setIsAttackModalOpen(false)} 

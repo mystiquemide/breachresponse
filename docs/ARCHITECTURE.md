@@ -1,30 +1,72 @@
-# ARCHITECTURE: Sentinel.ax
+# Architecture
 
-## Overview
-Sentinel.ax uses a Python-based anomaly detection agent to scan the Mantle mempool. Upon detecting an exploit, it utilizes Byreal Skills CLI to formulate a defense payload, which is pushed to a Next.js frontend for human approval via a Web3 wallet (wagmi).
+BreachResponse is split into four layers: monitoring, analysis, operator control, and on-chain response.
 
-## Folder Structure
+## System layers
+
+### 1. Monitoring agent
+
+The Python agent connects to Mantle RPC, scans activity, and forwards structured alerts. It is responsible for:
+
+- polling or streaming transaction data
+- tracking protocol sentinel state
+- detecting known exploit patterns
+- forwarding alerts to the Command Center
+- preparing candidate response actions
+
+### 2. Analysis and payload formulation
+
+The analysis layer converts raw telemetry into operator decisions. A response proposal includes:
+
+- threat class
+- affected protocol
+- supporting evidence
+- expected blast radius
+- proposed action
+- target contract
+- calldata or high-level wallet action
+- confidence and risk notes
+
+### 3. Command Center
+
+The Next.js Command Center gives operators a live view of:
+
+- connected wallet and network state
+- registered sentinels
+- incident timeline
+- response status
+- simulated attack and mitigation path
+
+Human approval is the default control path.
+
+### 4. On-chain response
+
+The contracts layer provides a Mantle registry and simulation contracts. The registry tracks protected protocols and the authorized sentinel agent. The target vault and attacker contracts prove the threat model in tests.
+
+## Response modes
+
+| Mode | Purpose | Execution |
+| --- | --- | --- |
+| Manual approval | Default operator safety | Human signs response transaction |
+| Policy approval | Production automation with limits | Allowlisted actions pass predefined rules |
+| Emergency pause | Fast containment | Scoped pause or quarantine action only |
+
+## Data flow
+
+```text
+Mantle RPC
+  -> Python sentinel
+  -> classifier and response proposal
+  -> Command Center incident card
+  -> wallet, multisig, or policy engine approval
+  -> Mantle response transaction
+  -> audit log and post-incident review
 ```
-breachresponse/
-├── agent/            # Python agent, Byreal CLI integration, Mempool scanner
-├── contracts/        # Solidity (Hardhat/Foundry) - Target Vault & Attacker
-├── frontend/         # Next.js 14 App Router, Tailwind, Wagmi
-├── docs/             # PRD, TASKS, ARCHITECTURE, DESIGN, ANALYTICS, BRANDING
-├── memory.md         # Persistent context file
-└── AGENTS.md         # AI coding conventions
-```
 
-## Database Schema / State
-- **No external persistent database required.**
-- Agent state is in-memory (or local SQLite) for tracking mempool spikes.
-- Frontend uses React Context / Zustand for UI state and `wagmi` for blockchain state.
+## Design decisions
 
-## API Contracts
-- `POST /api/alert`: Agent sends detected anomaly payload to the frontend.
-  - Body: `{ txHash, severity, description, proposedRescueTx: { to, data, value } }`
-- Byreal CLI: Executed locally by the agent to translate "Pause the contract" into `0x8456cb59`.
-
-## Architectural Decision Records (ADRs)
-1. **ADR 1: Python for Agent**. Python is standard for data science / mempool scanning (Web3.py).
-2. **ADR 2: Next.js + Wagmi for Frontend**. Industry standard for fast, reliable Web3 UIs.
-3. **ADR 3: Byreal Skills CLI for Formulation**. Hackathon requirement/bonus points. Agent does not hold private keys; it only outputs raw calldata for the human to sign.
+1. Python handles monitoring because Web3.py and data tooling are mature for agent workflows.
+2. Next.js, Wagmi, and Viem handle wallet UX and Mantle network state.
+3. Solidity contracts keep the registry and simulation layer explicit and testable.
+4. Human approval is default because autonomous response can become dangerous without scoped policy controls.
+5. The vulnerable test vault exists only to prove the exploit and mitigation path.

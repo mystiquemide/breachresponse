@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
 import { injected } from 'wagmi/connectors';
 import { mantleSepoliaTestnet } from 'wagmi/chains';
-import { createPublicClient, http } from 'viem';
-import { Shield, ArrowLeft, Activity, ShieldCheck, Power, AlertTriangle, Lock, History, Search } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { createPublicClient, http, type Transaction as ViemTransaction } from 'viem';
+import { Shield, ArrowLeft, Activity, ShieldCheck, Power, AlertTriangle, History, Search } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 interface TransactionLog {
   id: string;
@@ -44,7 +44,7 @@ export default function ThreatHistory() {
       try {
         const block = await publicClient.getBlock({ includeTransactions: true });
         if (block && block.transactions && block.transactions.length > 0) {
-          const liveTxs: TransactionLog[] = block.transactions.slice(0, 25).map((tx: any, idx) => {
+          const liveTxs: TransactionLog[] = block.transactions.slice(0, 25).map((tx: ViemTransaction) => {
             const hashInt = parseInt(tx.hash.slice(2, 10), 16);
             const isThreat = hashInt % 15 === 0; 
             

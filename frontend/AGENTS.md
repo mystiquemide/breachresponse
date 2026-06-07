@@ -1,5 +1,9 @@
-<!-- BEGIN:nextjs-agent-rules -->
-# This is NOT the Next.js you know
+# Frontend Agent Rules
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
-<!-- END:nextjs-agent-rules -->
+## Standards
+
+- Keep the Command Center fast, readable, and operator-focused.
+- Handle wallet disconnected, wrong-network, pending, failed, and confirmed states.
+- Avoid claims that are not backed by UI behavior or docs.
+- Keep responsive layouts clean on mobile and desktop.
+- Do not commit local notes, screenshots with private data, or secrets.

@@ -1,9 +1,7 @@
 import { EventEmitter } from 'events';
 
-// Create a singleton EventEmitter to use across the Next.js dev server.
-// In a true serverless environment, this would be replaced with Redis Pub/Sub,
-// but for our VC wow-factor demo, this gives us true 0ms latency SSE.
-
+// Singleton EventEmitter for local SSE delivery. Production deployments should
+// replace this with Redis Pub/Sub or another durable event bus.
 const globalForEvents = globalThis as unknown as {
   sseEmitter: EventEmitter | undefined;
 };
