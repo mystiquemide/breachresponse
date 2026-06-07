@@ -1,11 +1,12 @@
 import { expect } from "chai";
-import { ethers } from "hardhat";
-import { SentinelRegistry, TargetVault, Attacker } from "../typechain-types";
+import hre from "hardhat";
+
+const { ethers } = await hre.network.create();
 
 describe("TargetVault & Attacker Exploit", function () {
-  let registry: SentinelRegistry;
-  let vault: TargetVault;
-  let attacker: Attacker;
+  let registry: any;
+  let vault: any;
+  let attacker: any;
   
   let owner: any;
   let user: any;

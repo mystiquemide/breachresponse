@@ -21,6 +21,7 @@ pip-delete-this-directory.txt
 cache/
 artifacts/
 typechain-types/
+types/
 
 # Environment Variables
 .env

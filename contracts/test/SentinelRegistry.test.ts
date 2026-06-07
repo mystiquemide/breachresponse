@@ -1,9 +1,10 @@
 import { expect } from "chai";
-import { ethers } from "hardhat";
-import { SentinelRegistry } from "../typechain-types";
+import hre from "hardhat";
+
+const { ethers } = await hre.network.create();
 
 describe("SentinelRegistry", function () {
-  let registry: SentinelRegistry;
+  let registry: any;
   let owner: any;
   let admin: any;
   let agent: any;

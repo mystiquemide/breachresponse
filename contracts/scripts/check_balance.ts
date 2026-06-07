@@ -1,4 +1,7 @@
-import { ethers } from "hardhat";
+// @ts-nocheck
+import hre from "hardhat";
+
+const { ethers } = await hre.network.connect();
 
 async function main() {
   const rpcs = [

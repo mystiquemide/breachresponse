@@ -1,4 +1,7 @@
-import { ethers } from "hardhat";
+// @ts-nocheck
+import hre from "hardhat";
+
+const { ethers } = await hre.network.connect();
 
 const VAULT_ADDRESS = "0x596Ff2Ca0f781a2CED29EC685cD1ba038378dE02";
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
