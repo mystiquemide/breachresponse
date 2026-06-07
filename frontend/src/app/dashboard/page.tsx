@@ -97,12 +97,15 @@ export default function Dashboard() {
   const consensusClientRef = useRef<IncidentConsensusGuardClient | null>(null);
 
   const forceLanding = () => {
-    router.replace('/');
+    const target = '/?wallet=disconnected';
+    window.setTimeout(() => {
+      window.location.replace(target);
+    }, 0);
     window.setTimeout(() => {
       if (window.location.pathname !== '/') {
-        window.location.assign('/');
+        window.location.href = target;
       }
-    }, 120);
+    }, 350);
   };
 
   const handleDisconnect = () => {
