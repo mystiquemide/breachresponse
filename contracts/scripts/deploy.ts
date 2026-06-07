@@ -1,4 +1,7 @@
-import { ethers } from "hardhat";
+// @ts-nocheck
+import hre from "hardhat";
+
+const { ethers } = await hre.network.connect();
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
