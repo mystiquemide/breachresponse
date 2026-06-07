@@ -1,7 +1,10 @@
-import { ethers } from "hardhat";
+// @ts-nocheck
+import hre from "hardhat";
+
+const { ethers } = await hre.network.connect();
 
 async function main() {
-  const registryAddress = "0x48c3eB74c378D1a2d8E1Ac81a956Ba22aF6502b0";
+  const registryAddress = process.env.REGISTRY_ADDRESS || process.env.NEXT_PUBLIC_REGISTRY_ADDRESS || "0xea3C039795B5b04105B795c8B0cB85e0a42Cc85C";
   console.log("Querying SentinelRegistry at:", registryAddress);
 
   const registry = await ethers.getContractAt("SentinelRegistry", registryAddress);

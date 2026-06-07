@@ -10,5 +10,5 @@
 | T6 | Docs | Keep architecture, threat model, deployment, and runbook current | Done |
 | T7 | CI | Run frontend, contracts, and agent checks on PRs | Done |
 | T8 | Security | Keep env templates secret-safe and audits clean at moderate threshold | Done |
-| T9 | Product | Add verified Mantle deployment metadata and explorer links | Next |
+| T9 | Product | Add Mantle deployment metadata and explorer links | Done |
 | T10 | Product | Add incident replay from historical Mantle transactions | Next |

@@ -1,4 +1,7 @@
-import { ethers } from "hardhat";
+// @ts-nocheck
+import hre from "hardhat";
+
+const { ethers } = await hre.network.connect();
 
 async function main() {
   const selector = ethers.id("pause()").substring(0, 10);

@@ -1,4 +1,7 @@
-import { ethers } from "hardhat";
+// @ts-nocheck
+import hre from "hardhat";
+
+const { ethers } = await hre.network.connect();
 
 async function main() {
   const txHash = "0x2c1d89e9a489b58fe7fd2d18c8064cc5c41f869891cade77b8a6be7b2f37d782";
