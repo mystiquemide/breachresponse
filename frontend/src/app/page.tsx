@@ -3,10 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Shield, Target, Activity, Hexagon, Component, CheckCircle2, Power, AlertTriangle, Terminal, Layers, Cpu, ShieldCheck } from 'lucide-react';
 import { useAccount, useConnect, useSwitchChain, useDisconnect } from 'wagmi';
-import { injected } from 'wagmi/connectors';
 import { mantleSepoliaTestnet } from 'wagmi/chains';
 import { createPublicClient, http, type Transaction as ViemTransaction } from 'viem';
 
@@ -65,19 +65,33 @@ const initialTransactions: Transaction[] = [
 ];
 
 export default function LandingPage() {
+  const router = useRouter();
   const [codeTab, setCodeTab] = useState<'python' | 'typescript'>('python');
   const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
 
   const { isConnected, chainId } = useAccount();
-  const { connect } = useConnect();
+  const { connect, connectors } = useConnect();
   const { disconnect } = useDisconnect();
   const { switchChain } = useSwitchChain();
 
   const isCorrectNetwork = chainId === mantleSepoliaTestnet.id;
+  const injectedConnector = connectors.find(connector => connector.id === 'injected') ?? connectors[0];
+
+  useEffect(() => {
+    router.prefetch('/dashboard');
+    router.prefetch('/history');
+  }, [router]);
+
+  useEffect(() => {
+    if (isConnected && isCorrectNetwork) {
+      router.replace('/dashboard');
+    }
+  }, [isConnected, isCorrectNetwork, router]);
 
   const handleAccess = () => {
     if (!isConnected) {
-      connect({ connector: injected() });
+      if (!injectedConnector) return;
+      connect({ connector: injectedConnector });
     } else if (!isCorrectNetwork && switchChain) {
       switchChain({ chainId: mantleSepoliaTestnet.id });
     }
@@ -91,36 +105,51 @@ export default function LandingPage() {
 
     const protocols = ['MantleSwap', 'LendX Protocol', 'YieldFlow', 'ApexVaults', 'LiquidMNT', 'MantleBridge'];
     const threatTypes = ['Reentrancy', 'Oracle Manipulation', 'Flash Loan Attack'];
+    let cancelled = false;
+
+    const runWhenIdle = (callback: () => void) => {
+      const idleWindow = window as Window & { requestIdleCallback?: (cb: IdleRequestCallback, opts?: IdleRequestOptions) => number };
+      if (idleWindow.requestIdleCallback) {
+        idleWindow.requestIdleCallback(callback, { timeout: 1500 });
+      } else {
+        setTimeout(callback, 250);
+      }
+    };
 
     const fetchRealScans = async () => {
       try {
-        const block = await publicClient.getBlock({ includeTransactions: true });
-        if (block && block.transactions && block.transactions.length > 0) {
-          const liveTxs: Transaction[] = block.transactions.slice(0, 5).map((tx: ViemTransaction) => {
-            // Generate some stable deterministic flavor based on the tx hash
-            const hashInt = parseInt(tx.hash.slice(2, 10), 16);
-            const isThreat = hashInt % 15 === 0; // 1 in 15 chance to show a mitigated threat
-            
-            return {
-              id: tx.hash,
-              txHash: tx.hash.slice(0, 8) + '...' + tx.hash.slice(-6),
-              protocol: protocols[hashInt % protocols.length],
-              type: isThreat ? threatTypes[hashInt % threatTypes.length] : 'Normal Transfer',
-              gasSaved: isThreat ? `${(hashInt % 500) + 50} MNT` : '-',
-              status: isThreat ? 'MITIGATED' : 'SAFE',
-              timestamp: new Date(Number(block.timestamp) * 1000).toISOString()
-            };
-          });
-          setTransactions(liveTxs);
-        }
+        const block = await Promise.race([
+          publicClient.getBlock({ includeTransactions: true }),
+          new Promise<null>((resolve) => setTimeout(() => resolve(null), 2200)),
+        ]);
+        if (cancelled || !block || !block.transactions || block.transactions.length === 0) return;
+
+        const liveTxs: Transaction[] = block.transactions.slice(0, 5).map((tx: ViemTransaction) => {
+          const hashInt = parseInt(tx.hash.slice(2, 10), 16);
+          const isThreat = hashInt % 15 === 0;
+
+          return {
+            id: tx.hash,
+            txHash: tx.hash.slice(0, 8) + '...' + tx.hash.slice(-6),
+            protocol: protocols[hashInt % protocols.length],
+            type: isThreat ? threatTypes[hashInt % threatTypes.length] : 'Normal Transfer',
+            gasSaved: isThreat ? `${(hashInt % 500) + 50} MNT` : '-',
+            status: isThreat ? 'MITIGATED' : 'SAFE',
+            timestamp: new Date(Number(block.timestamp) * 1000).toISOString()
+          };
+        });
+        setTransactions(liveTxs);
       } catch (err) {
         console.error("Failed to fetch live mantle blocks", err);
       }
     };
 
-    fetchRealScans();
-    const interval = setInterval(fetchRealScans, 4000); // Check for new blocks every 4s
-    return () => clearInterval(interval);
+    runWhenIdle(fetchRealScans);
+    const interval = setInterval(() => runWhenIdle(fetchRealScans), 30000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
   }, []);
 
   return (
@@ -202,12 +231,14 @@ export default function LandingPage() {
             <text x="145" y="145" fill="#10B981" fontSize="8" fontFamily="monospace" textAnchor="middle" className="opacity-30">315</text>
             {Array.from({ length: 36 }).map((_, i) => {
               const angle = (i * 10 * Math.PI) / 180;
-              const x1 = 420 + 380 * Math.cos(angle);
-              const y1 = 420 + 380 * Math.sin(angle);
-              const x2 = 420 + (380 - (i % 3 === 0 ? 8 : 4)) * Math.cos(angle);
-              const y2 = 420 + (380 - (i % 3 === 0 ? 8 : 4)) * Math.sin(angle);
+              const longTick = i % 3 === 0;
+              const formatCoord = (value: number) => Number(value.toFixed(3));
+              const x1 = formatCoord(420 + 380 * Math.cos(angle));
+              const y1 = formatCoord(420 + 380 * Math.sin(angle));
+              const x2 = formatCoord(420 + (380 - (longTick ? 8 : 4)) * Math.cos(angle));
+              const y2 = formatCoord(420 + (380 - (longTick ? 8 : 4)) * Math.sin(angle));
               return (
-                <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#10B981" strokeWidth="1" className={i % 3 === 0 ? "opacity-30" : "opacity-15"} />
+                <line key={i} x1={x1} y1={y1} x2={x2} y2={y2} stroke="#10B981" strokeWidth="1" className={longTick ? "opacity-30" : "opacity-15"} />
               );
             })}
           </svg>
@@ -217,7 +248,7 @@ export default function LandingPage() {
         <div className="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_center,rgba(16,185,129,0.12)_0%,rgba(9,9,11,1)_85%)] pointer-events-none" />
 
         <div className="relative z-10 w-full max-w-5xl px-8 mt-20 mb-20 flex flex-col items-center">
-          <motion.div initial="initial" animate="animate" variants={fadeInUp} className="text-center mb-16">
+          <motion.div initial={false} animate={{ opacity: 1, y: 0 }} className="text-center mb-16 opacity-100">
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight tracking-tight text-white drop-shadow-[0_0_20px_rgba(255,255,255,0.3)]">
               Breach Response
             </h1>
@@ -227,10 +258,10 @@ export default function LandingPage() {
           </motion.div>
 
           <motion.div 
-            initial={{ opacity: 0, y: 80, scale: 0.95 }}
+            initial={false}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-            className="relative mx-auto w-full max-w-4xl"
+            className="relative mx-auto w-full max-w-4xl opacity-100"
             style={{ perspective: '1000px' }}
           >
             <div className="absolute -inset-0.5 bg-gradient-to-b from-[#10B981] to-transparent rounded-3xl opacity-30" />
@@ -329,7 +360,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section className="py-20 px-8 md:px-16 max-w-6xl mx-auto relative z-40 bg-black/10 backdrop-blur-[1px] border-t border-gray-900/30">
+      <section id="features" className="scroll-mt-24 py-20 px-8 md:px-16 max-w-6xl mx-auto relative z-40 bg-black/10 backdrop-blur-[1px] border-t border-gray-900/30">
         <div className="container mx-auto px-6 relative z-10 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Pipeline Execution</h2>
           <p className="text-gray-400 font-sans max-w-2xl mx-auto mb-16">
@@ -395,7 +426,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <section id="features" className="py-20 px-8 md:px-16 max-w-6xl mx-auto relative z-40 bg-transparent">
+      <section className="py-20 px-8 md:px-16 max-w-6xl mx-auto relative z-40 bg-transparent">
         <motion.div initial={false} animate="animate" variants={fadeInUp} className="container mx-auto px-6 relative z-10">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Built for scale</h2>
           <p className="text-xl text-gray-400 mb-16 max-w-2xl font-sans text-sm">

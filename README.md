@@ -40,6 +40,33 @@ The LLM does not get unchecked execution authority. Human approval is the defaul
 
 See [AI Incident Analysis](./docs/AI_INCIDENT_ANALYSIS.md) for the model input/output shape and safety model.
 
+## GenLayer consensus fallback
+
+BreachResponse includes a GenLayer intelligent contract fallback for cases where the fast LLM path is unavailable, malformed, low-confidence, conflicting, or recommends a risky emergency action. Judges and reviewers can inspect it directly here:
+
+| File | Purpose |
+| --- | --- |
+| [`contracts/genlayer/IncidentConsensusGuard.py`](./contracts/genlayer/IncidentConsensusGuard.py) | GenLayer intelligent contract that stores incidents, calls validator-side LLM reasoning, enforces the emergency-action allowlist, and records consensus decisions. |
+| [`tests/direct/test_incident_consensus_guard.py`](./tests/direct/test_incident_consensus_guard.py) | Direct-mode GenLayer tests for approval, rejection, low-confidence escalation, malformed validator output, unsafe action rejection, duplicate incidents, and execution marking. |
+| [`frontend/src/lib/genlayerConsensus.ts`](./frontend/src/lib/genlayerConsensus.ts) | Real `genlayer-js` read/write integration used by the Command Center fallback panel. |
+| [`frontend/src/app/dashboard/page.tsx`](./frontend/src/app/dashboard/page.tsx) | Operator UI panel for preparing the local GenLayer signer, reading consensus records, and escalating incidents once a deployed guard address is configured. |
+
+The contract uses GenLayer nondeterminism and validator consensus through `gl.nondet.exec_prompt(...)` and `gl.vm.run_nondet_unsafe(...)`. It is not a getter/setter demo. It only approves scoped emergency actions such as `pause_protocol`, `quarantine_address`, `recommend_multisig`, `reject_incident`, and `require_human_approval`.
+
+Validate it with:
+
+```bash
+genvm-lint check contracts/genlayer/IncidentConsensusGuard.py --json
+python -m pytest tests/direct/test_incident_consensus_guard.py -q
+```
+
+To enable live frontend escalation after deployment, set:
+
+```bash
+NEXT_PUBLIC_GENLAYER_CONSENSUS_GUARD_ADDRESS=<deployed GenLayer contract address>
+NEXT_PUBLIC_GENLAYER_STUDIO_URL=https://studio.genlayer.com/api
+```
+
 ## Mantle Sepolia deployment
 
 The current SentinelRegistry deployment used by the frontend is:
@@ -155,14 +182,23 @@ cd ../agent
 python -m compileall -q .
 ```
 
+GenLayer fallback checks:
+
+```bash
+genvm-lint check contracts/genlayer/IncidentConsensusGuard.py --json
+python -m pytest tests/direct/test_incident_consensus_guard.py -q
+```
+
 ## Repository layout
 
 ```text
-agent/       Python monitoring and payload formulation agent
-contracts/   Solidity registry, target vault, attacker simulation, tests
-frontend/    Next.js Command Center and API routes
-docs/        Architecture, threat model, deployment, runbooks, roadmap
-.github/     CI, CodeQL, Dependabot, issue templates, PR template
+agent/                Python monitoring and payload formulation agent
+contracts/            Solidity registry, target vault, attacker simulation, tests
+contracts/genlayer/   GenLayer intelligent contract fallback for consensus incident review
+frontend/             Next.js Command Center and API routes
+tests/direct/         GenLayer direct-mode tests
+docs/                 Architecture, threat model, deployment, runbooks, roadmap
+.github/              CI, CodeQL, Dependabot, issue templates, PR template
 ```
 
 ## Production posture
