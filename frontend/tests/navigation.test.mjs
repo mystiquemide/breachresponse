@@ -1,12 +1,19 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
 import {
   DASHBOARD_PATH,
   HISTORY_PATH,
   LANDING_DISCONNECTED_PATH,
+  PIPELINE_EXECUTION_ANCHOR,
+  PIPELINE_EXECUTION_PATH,
   clearCommandCenterNavigationState,
   navigateToAppPath,
   leaveCommandCenter,
 } from '../src/lib/navigation.js';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 function createMockLocation(pathname = '/dashboard') {
   const calls = [];
@@ -40,6 +47,13 @@ function createMockStorage() {
 assert.equal(LANDING_DISCONNECTED_PATH, '/?wallet=disconnected');
 assert.equal(DASHBOARD_PATH, '/dashboard');
 assert.equal(HISTORY_PATH, '/history');
+assert.equal(PIPELINE_EXECUTION_ANCHOR, 'pipeline-execution');
+assert.equal(PIPELINE_EXECUTION_PATH, '#pipeline-execution');
+
+const landingSource = readFileSync(join(__dirname, '../src/app/page.tsx'), 'utf8');
+assert.match(landingSource, /href=\{PIPELINE_EXECUTION_PATH\}/);
+assert.match(landingSource, /id=\{PIPELINE_EXECUTION_ANCHOR\}/);
+assert.doesNotMatch(landingSource, /href="#features"/);
 
 {
   const storage = createMockStorage();
