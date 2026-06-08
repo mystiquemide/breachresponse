@@ -113,6 +113,55 @@ assert.equal(getPreferredWalletConnector([walletConnect]), walletConnect);
   assert.equal(redirectedTo, 'https://metamask.app.link/dapp/breachresponse.43.131.9.176.nip.io/dashboard?tour=1#connect');
 }
 
+{
+  let notice = '';
+  let requestedMethod = '';
+  const result = await connectWalletWithWagmi({
+    windowObject: {
+      isSecureContext: true,
+      ethereum: {
+        request: async ({ method }) => {
+          requestedMethod = method;
+          return ['0x1234567890123456789012345678901234567890'];
+        },
+      },
+    },
+    connectors: [genericInjected],
+    connectAsync: async () => ({ accounts: ['0x1234567890123456789012345678901234567890'] }),
+    setWalletNotice: (value) => {
+      notice = value;
+    },
+  });
+
+  assert.equal(result, 'connected');
+  assert.equal(requestedMethod, 'eth_requestAccounts');
+  assert.equal(notice, '');
+}
+
+{
+  let notice = '';
+  const never = new Promise(() => {});
+  const result = await connectWalletWithWagmi({
+    windowObject: {
+      isSecureContext: true,
+      ethereum: {
+        request: () => never,
+      },
+    },
+    connectors: [genericInjected],
+    connectAsync: () => {
+      throw new Error('should not call wagmi while wallet request is stuck');
+    },
+    setWalletNotice: (value) => {
+      notice = value;
+    },
+    timeoutMs: 5,
+  });
+
+  assert.equal(result, 'timed-out');
+  assert.equal(notice, 'Wallet request is still pending. Open MetaMask, approve the request, then tap Connect Wallet again.');
+}
+
 assert.equal(
   getMetaMaskDappLink({ location: { href: 'https://breachresponse.43.131.9.176.nip.io/history' } }),
   'https://metamask.app.link/dapp/breachresponse.43.131.9.176.nip.io/history'

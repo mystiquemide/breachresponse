@@ -8,7 +8,7 @@ import { createPublicClient, http, type Transaction as ViemTransaction } from 'v
 import { Shield, ArrowLeft, Activity, ShieldCheck, Power, AlertTriangle, History, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { DASHBOARD_PATH, leaveCommandCenter, navigateToAppPath } from '../../lib/navigation';
-import { connectWalletWithWagmi } from '../../lib/wagmiWallet';
+import { connectWalletWithWagmi, WALLET_REQUEST_PENDING_NOTICE } from '../../lib/wagmiWallet';
 
 interface TransactionLog {
   id: string;
@@ -196,7 +196,7 @@ export default function ThreatHistory() {
               className="flex items-center gap-2 bg-[#10B981] text-black font-bold py-2 px-5 rounded hover:bg-green-400 transition-all text-xs shadow-[0_0_15px_rgba(16,185,129,0.3)]"
             >
               <Power className="w-3.5 h-3.5" />
-              {isConnectPending ? 'Connecting...' : 'Connect Wallet'}
+              {isConnectPending && walletNotice !== WALLET_REQUEST_PENDING_NOTICE ? 'Connecting...' : 'Connect Wallet'}
             </button>
           )}
         </div>
