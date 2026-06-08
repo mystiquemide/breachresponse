@@ -49,4 +49,4 @@ The product intentionally excludes Byreal Skills CLI integration because that to
 
 ## Roadmap alignment
 
-The product should move from reliable operator demo to production pilot, then to multi-protocol monitoring and formal response policy controls.
+The product should move from reliable operator walkthrough to production pilot, then to multi-protocol monitoring and formal response policy controls.

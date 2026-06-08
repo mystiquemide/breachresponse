@@ -90,7 +90,7 @@ Current GenLayer StudioNet consensus guard:
 
 ## Agent
 
-The agent uses Mantle RPC plus an LLM-assisted analysis client. Keep `SENTINEL_RESPONSE_MODE=manual` for normal demos and production pilots unless an explicit policy signer setup has been reviewed.
+The agent uses Mantle RPC plus an LLM-assisted analysis client. Keep `SENTINEL_RESPONSE_MODE=manual` for reviewer walkthroughs and production pilots unless an explicit policy signer setup has been reviewed.
 
 Relevant environment variables:
 

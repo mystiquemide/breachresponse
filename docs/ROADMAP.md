@@ -1,6 +1,6 @@
 # Roadmap
 
-## Phase 1: Reliable operator demo
+## Phase 1: Reliable operator walkthrough
 
 - Product scope and integration-boundary documentation.
 - Green CI for frontend, contracts, and agent syntax.

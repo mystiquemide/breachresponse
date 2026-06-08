@@ -45,7 +45,7 @@ A release branch should not merge unless:
 - review workflow matches the live product behavior
 - screenshots are current and contain no private data or stale overlays
 
-## Final demo QA
+## Final product QA
 
 The current product review path is documented in [Review Workflow](./REVIEW_WORKFLOW.md). Before release, verify:
 

@@ -63,7 +63,7 @@ SENTINEL_ALLOWED_ACTIONS=pause,quarantine
 SENTINEL_MAX_ACTION_VALUE=0
 ```
 
-If no API key is configured, the agent falls back to deterministic mock analysis for local demo and CI-safe testing.
+If no API key is configured, the agent falls back to deterministic mock analysis for local development and CI-safe testing.
 
 ## Operator output
 
