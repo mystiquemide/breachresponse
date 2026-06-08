@@ -51,7 +51,7 @@ BreachResponse helps Mantle builders review suspicious activity, understand poss
 
 ![Mobile landing](./assets/product-screen-mobile.png)
 
-## Track-safe demo narrative
+## Product-safe review narrative
 
 Use this story when presenting the product:
 
@@ -62,4 +62,4 @@ Use this story when presenting the product:
 5. The operator approves or rejects the action.
 6. The dashboard records the incident for review.
 
-Avoid DEX automation, Byreal Skills CLI, liquidity farming, and agentic wallet claims in the demo. Those are outside this AI DevTools submission.
+Avoid DEX automation, Byreal Skills CLI, liquidity farming, and agentic wallet claims in the product walkthrough. Those are outside this AI DevTools submission.

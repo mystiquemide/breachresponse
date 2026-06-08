@@ -530,7 +530,7 @@ export default function LandingPage() {
                 <Cpu className="w-6 h-6" />
               </div>
               <h3 className="text-xl font-bold text-white mb-3">AI Payload Formulation</h3>
-              <p className="text-sm text-gray-400 leading-relaxed font-sans">Dynamically formulates complex pause and rescue transaction payloads the moment an anomaly crosses the threshold</p>
+              <p className="text-sm text-gray-400 leading-relaxed font-sans">Dynamically formulates complex pause and response transaction payloads the moment an anomaly crosses the threshold</p>
             </div>
             <div className="mt-8 pt-6 border-t border-gray-800/60 font-mono text-[10px] space-y-2 text-gray-500">
               <div className="flex justify-between"><span>MODEL</span> <span className="text-gray-400">OpenAI-compatible</span></div>

@@ -166,7 +166,7 @@ The Next.js Command Center gives operators a live view of:
 - registered sentinels
 - incident timeline
 - response status
-- simulated attack and mitigation path
+- controlled attack and mitigation path
 
 Human approval is the default control path.
 
