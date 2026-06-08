@@ -364,8 +364,8 @@ export default function Dashboard() {
         case 'trigger incident':
           setTerminalLines((prev) => capTerminal([
             ...prev,
-            "[ALERT] INITIALIZING INCIDENT RESPONSE SEQUENCE...",
-            "[SYS] INJECTING MALICIOUS PAYLOAD INTO MEMPOOL..."
+            "[ALERT] INITIALIZING INCIDENT RESPONSE WORKFLOW...",
+            "[SYS] LOADING HIGH-RISK TRANSACTION CONTEXT..."
           ]));
           setTimeout(() => setIsAttackModalOpen(true), 1500);
           break;

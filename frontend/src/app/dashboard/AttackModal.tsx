@@ -19,8 +19,8 @@ const payloadLines = [
   "> Estimated Loss: 1,420 mETH",
   "> Formulating scoped response proposal...",
   "> function pause() external;",
-  "> Injecting top-of-block priority fee...",
-  "> Payload ready for human signature."
+  "> Estimating execution route and priority fee...",
+  "> Response payload ready for operator signature."
 ];
 
 export default function AttackModal({ isOpen, onClose, onSuccess }: AttackModalProps) {
@@ -135,7 +135,7 @@ export default function AttackModal({ isOpen, onClose, onSuccess }: AttackModalP
                 
                 {isSuccess ? (
                   <div className="bg-[#10B981]/20 border border-[#10B981] text-[#10B981] px-8 py-4 rounded font-bold flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5" /> Threat Neutralized
+                    <CheckCircle2 className="w-5 h-5" /> Response Executed
                   </div>
                 ) : (
                   <button 
@@ -144,7 +144,7 @@ export default function AttackModal({ isOpen, onClose, onSuccess }: AttackModalP
                     className={`bg-[#10B981] text-black font-bold px-8 py-4 rounded flex items-center gap-3 transition-all ${isPending || payloadText.split('\n').length < payloadLines.length ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-400 hover:shadow-[0_0_30px_rgba(16,185,129,0.5)]'}`}
                   >
                     <Shield className="w-5 h-5" />
-                    {isPending ? "Awaiting Signature..." : "Approve & Execute Rescue"}
+                    {isPending ? "Awaiting Signature..." : "Approve Response"}
                     {!isPending && <ArrowRight className="w-5 h-5" />}
                   </button>
                 )}
@@ -152,7 +152,7 @@ export default function AttackModal({ isOpen, onClose, onSuccess }: AttackModalP
               
               {isError && (
                 <div className="text-red-500 text-xs text-center font-bold mt-2">
-                  Transaction rejected or failed. Attack continuing.
+                  Signature rejected or transaction failed. Response remains pending.
                 </div>
               )}
             </div>
