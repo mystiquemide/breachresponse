@@ -2,6 +2,7 @@
 
 ## Phase 1: Reliable operator demo
 
+- AI DevTools track alignment and sponsor-scope documentation.
 - Green CI for frontend, contracts, and agent syntax.
 - Clean Mantle Sepolia setup path.
 - Command Center incident simulation.
@@ -30,3 +31,8 @@
 - Response marketplace for verified mitigation playbooks.
 - Cross-protocol exploit intelligence sharing.
 - Formal verification for response payload constraints.
+
+
+## Scope guardrails
+
+BreachResponse stays focused on Mantle runtime audit assistance and controlled incident response. Byreal Skills CLI, DEX trading, liquidity management, and agentic wallet economy features remain out of scope unless the product intentionally pivots to the Agentic Wallets & Economy track.

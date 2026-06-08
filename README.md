@@ -23,6 +23,15 @@ Smart contract teams often see raw activity before they have enough context to a
 5. Keep high-risk next steps behind approval.
 6. Record the review trail for follow-up.
 
+
+## Hackathon track alignment
+
+BreachResponse is submitted under the AI DevTools track. It focuses on Mantle-specific security infrastructure: monitoring protocol activity, classifying suspicious behavior, and preparing scoped emergency response proposals for operator approval.
+
+It does not integrate Byreal Skills CLI because Byreal Skills targets agentic wallet and DEX/liquidity operations. BreachResponse is not a wallet economy, trading bot, or liquidity automation product. Keeping that boundary explicit makes the submission cleaner and keeps the demo centered on runtime audit assistance for Mantle builders.
+
+See [Hackathon Track Alignment](./docs/HACKATHON_ALIGNMENT.md) for the scope decision, demo story, and out-of-scope list.
+
 ## Core capabilities
 
 - Mantle sentinel registry for protocol onboarding and review permissions.
