@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAccount, useWriteContract } from 'wagmi';
+import { useWriteContract } from 'wagmi';
 import { ShieldAlert, Radio, Activity, ShieldCheck, Cpu, HelpCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Counter from './Counter';
@@ -10,7 +10,7 @@ import Onboarding from './Onboarding';
 import AttackModal from './AttackModal';
 import { REGISTRY_ADDRESS, REGISTRY_ABI } from '../constants';
 import { DASHBOARD_PATH, HISTORY_PATH, LANDING_PATH, clearCommandCenterNavigationState, navigateToAppPath, replaceWithAppPath } from '../../lib/navigation';
-import { WalletConnectControl } from '../../components/WalletConnectControl';
+import { WalletConnectControl, WalletStatusGate } from '../../components/WalletConnectControl';
 import {
   GENLAYER_CONSENSUS_GUARD_ADDRESS,
   type GenLayerAccount,
@@ -61,7 +61,6 @@ const BootSequence = () => {
 
 export default function Dashboard() {
   const router = useRouter();
-  const { isConnected } = useAccount();
   const { writeContract, isPending, isSuccess } = useWriteContract();
   
   const [protocolAddress, setProtocolAddress] = useState('');
@@ -550,15 +549,27 @@ export default function Dashboard() {
               placeholder="0x... (Contract Address)" 
               className="w-full bg-[#09090B] border border-gray-700 rounded p-3 text-xs text-white outline-none focus:border-[#10B981] mb-4 transition-colors font-mono"
             />
-            <button 
+            <WalletStatusGate>
+              {({ ready, connected, wrongNetwork }) => {
+                const canRegister = ready && connected && !wrongNetwork && !isPending;
+
+                return (
+                  <>
+                    <button 
               onClick={handleRegister}
-              disabled={isPending || !isConnected}
-              className={`w-full bg-[#10B981] text-black font-bold py-3 rounded text-xs transition-all ${isPending || !isConnected ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-400 hover:shadow-[0_0_15px_rgba(16,185,129,0.3)]'}`}
-            >
-              {isPending ? 'Submitting registration...' : 'Register sentinel guard'}
-            </button>
-            {isSuccess && <p className="text-[#10B981] mt-3 text-[10px] text-center">Sentinel registered on Mantle Sepolia</p>}
-            {!isConnected && <p className="text-red-500 mt-3 text-[10px] text-center font-sans">Connect a Mantle wallet to initialize guards</p>}
+                      disabled={!canRegister}
+                      className={`w-full bg-[#10B981] text-black font-bold py-3 rounded text-xs transition-all ${!canRegister ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-400 hover:shadow-[0_0_15px_rgba(16,185,129,0.3)]'}`}
+                    >
+                      {isPending ? 'Submitting registration...' : 'Register sentinel guard'}
+                    </button>
+                    {isSuccess && <p className="text-[#10B981] mt-3 text-[10px] text-center">Sentinel registered on Mantle Sepolia</p>}
+                    {!ready && <p className="text-gray-500 mt-3 text-[10px] text-center font-sans">Restoring wallet session...</p>}
+                    {ready && !connected && <p className="text-red-500 mt-3 text-[10px] text-center font-sans">Connect a Mantle wallet to initialize guards</p>}
+                    {ready && connected && wrongNetwork && <p className="text-yellow-400 mt-3 text-[10px] text-center font-sans">Switch to Mantle Sepolia to initialize guards</p>}
+                  </>
+                );
+              }}
+            </WalletStatusGate>
           </div>
 
           {/* Mantle Faucet Card */}
