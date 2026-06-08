@@ -126,7 +126,7 @@ See [Review Workflow](./docs/REVIEW_WORKFLOW.md) for the full walkthrough and ex
 
 ## Architecture
 
-BreachResponse documents its architecture as Mermaid code so reviewers and maintainers can inspect the system directly in GitHub markdown. Mantle remains the execution network for registry state, monitored assets, wallet actions, and approved response transactions. The external guard validates ambiguous AI/security decisions before high-risk actions reach approval.
+Mantle remains the execution network for registry state, monitored assets, wallet actions, and approved response transactions. The external guard validates ambiguous AI/security decisions before high-risk actions reach approval.
 
 ### System architecture
 
