@@ -13,4 +13,4 @@
 | T9 | Product | Add Mantle deployment metadata and explorer links | Done |
 | T10 | Product | Add incident replay from historical Mantle transactions | Next |
 | T11 | Product | Clarify product scope and remove Byreal scope drift | Done |
-| T12 | Docs | Keep README, PRD, roadmap, and submission copy aligned to Mantle runtime audit assistance | Next |
+| T12 | Docs | Keep README, PRD, roadmap, and product copy aligned to Mantle runtime audit assistance | Next |

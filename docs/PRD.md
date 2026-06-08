@@ -5,11 +5,11 @@
 BreachResponse gives protocol operators a real-time incident response console for Mantle smart contracts. It detects exploit patterns, explains the threat, and routes a scoped defense action through human approval or predefined policy controls.
 
 
-## Hackathon alignment
+## Product positioning
 
-BreachResponse is an AI DevTools submission for Mantle protocol security operations. It helps builders monitor runtime behavior, interpret suspicious activity, and route scoped emergency responses through a review workflow.
+BreachResponse is Mantle runtime security infrastructure for protocol operators. It helps builders monitor suspicious behavior, interpret runtime activity, and route scoped emergency responses through a review workflow before high-risk actions are proposed.
 
-The product intentionally excludes Byreal Skills CLI integration because that tool is built for agentic wallet and DEX/liquidity actions, which would move BreachResponse into a different track and weaken the runtime security narrative.
+The product intentionally excludes Byreal Skills CLI integration because that tool is built for agentic wallet, DEX, and liquidity actions. BreachResponse stays focused on security review, operator approval, and controlled response paths for Mantle contracts.
 
 ## Primary users
 

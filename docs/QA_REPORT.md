@@ -53,5 +53,7 @@ The current product review path is documented in [Review Workflow](./REVIEW_WORK
 - **Enter Command Center** opens the dashboard.
 - Disconnected wallet state keeps protected actions disabled.
 - Reconnect works after disconnect.
+- Connected wallet state exposes a clear disconnect control.
+- Wrong-network state is readable and does not enable protected actions by accident.
 - Browser back and **BACK** return users to the landing flow.
 - GenLayer wording says users stay on Mantle and GenLayer validates ambiguous incidents through the app layer.

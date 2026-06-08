@@ -7,16 +7,16 @@ Use this path when showing BreachResponse to reviewers, operators, or protocol t
 1. Open the landing page and point to the top-level product promise: AI-assisted runtime review for Mantle activity.
 2. Click **Features**. It should land on **Pipeline Execution**, the three-stage Monitor, Formulate, Intercept flow.
 3. Click **Enter Command Center**. The app opens the operator dashboard.
-4. Connect a Mantle Sepolia wallet if you want to show live wallet state. Without a wallet, the dashboard still shows the safe disconnected state and keeps guard actions disabled.
+4. Connect a Mantle Sepolia wallet if you want to show live wallet state. Without a wallet, the dashboard still shows the safe disconnected state and keeps guard actions disabled. After connecting, confirm the header exposes an intentional disconnect control.
 5. Review the Command Center cards:
    - **Blocks Scanned** shows monitored activity.
    - **Active Sentinels** shows registered monitoring nodes.
    - **Value Secured** is clearly marked as controlled product value.
    - **Response Proposals** tracks successful controlled responses.
-6. Review **Deploy Sentinel Guard**. The guard initialization action stays disabled until a Mantle wallet is connected and the operator supplies a contract address.
+6. Review **Register Sentinel Guard**. The guard initialization action stays disabled until a Mantle wallet is connected and the operator supplies a contract address.
 7. Review **GenLayer Consensus Guard**. Explain that normal users keep their wallet on Mantle. The app layer submits ambiguous Mantle incident context to GenLayer StudioNet, then uses the validator consensus result before proposing a Mantle-side response.
 8. Use **Threat History** to show past incident records and post-incident review.
-9. Use browser back or the **BACK** button to return to the landing page. The Command Center should not trap users after disconnecting or navigating back.
+9. Use browser back or the **BACK** button to return to the landing page. The Command Center should not trap users after disconnecting or navigating back. Disconnecting should return the dashboard to a safe readable state.
 
 ## What to say
 
@@ -34,6 +34,8 @@ BreachResponse helps Mantle builders review suspicious activity, understand poss
 - Disconnected wallet state is safe and readable.
 - Guard actions are disabled until the required wallet and input state exists.
 - Reconnect works after disconnect.
+- The connected wallet state exposes a clear disconnect control.
+- Wrong-network and disconnected states are readable and keep protected actions gated.
 - Browser back returns users to the landing flow instead of trapping them in Command Center.
 - GenLayer language clearly says users stay on Mantle and GenLayer validates decisions through the app layer.
 
@@ -62,4 +64,4 @@ Use this story when presenting the product:
 5. The operator approves or rejects the action.
 6. The dashboard records the incident for review.
 
-Avoid DEX automation, Byreal Skills CLI, liquidity farming, and agentic wallet claims in the product walkthrough. Those are outside this AI DevTools submission.
+Avoid DEX automation, Byreal Skills CLI, liquidity farming, and agentic wallet claims in the product walkthrough. Those are outside the product boundary for a Mantle runtime security and response workflow.

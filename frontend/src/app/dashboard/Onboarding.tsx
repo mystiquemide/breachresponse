@@ -41,9 +41,9 @@ const ONBOARDING_STEPS = [
     align: "center"
   },
   {
-    title: "Deploy Sentinels",
+    title: "Register Sentinels",
     icon: <ShieldCheck className="w-8 h-8 text-blue-400" />,
-    description: "Start by registering your smart contract addresses in the Deploy Sentinel Guard module. Once registered, our AI agents actively scan the mempool for malicious transactions targeting your protocol.",
+    description: "Start by registering your smart contract addresses in the Register Sentinel Guard module. Once registered, the sentinel agents actively scan the mempool for malicious transactions targeting your protocol.",
     color: "from-blue-500/20 to-transparent",
     border: "border-blue-500/50",
     targetId: "ob-sentinel",
