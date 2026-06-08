@@ -14,6 +14,7 @@ const PREFERRED_INJECTED_IDS = [
 
 export const WALLET_CONNECTOR_NOT_READY_NOTICE = 'Wallet connector is not ready yet. Reload the page and try again.';
 export const WALLET_CONNECTION_FAILED_NOTICE = 'Wallet connection failed. Unlock your Ethereum wallet and try again.';
+export const WALLET_ALREADY_CONNECTED_NOTICE = 'Wallet already connected. Continue in Command Center.';
 export const WALLET_REQUEST_PENDING_NOTICE = 'Wallet request is still pending. Open your Ethereum wallet, approve the request, then tap Connect Wallet again.';
 
 const DEFAULT_WALLET_REQUEST_TIMEOUT_MS = 12_000;
@@ -25,6 +26,11 @@ function getMissingInjectedWalletNotice() {
 function isProviderNotFoundError(error) {
   const message = error instanceof Error ? error.message : String(error ?? '');
   return /provider not found|no provider|injected provider|wallet not found/i.test(message);
+}
+
+function isConnectorAlreadyConnectedError(error) {
+  const message = error instanceof Error ? error.message : String(error ?? '');
+  return /connector already connected/i.test(message);
 }
 
 export function getPreferredWalletConnector(connectors = []) {
@@ -123,8 +129,12 @@ export async function connectWalletWithWagmi({ windowObject, connectors, connect
       return 'missing-provider';
     }
 
-    const message = error instanceof Error ? error.message : String(error ?? '');
-    setWalletNotice(message || WALLET_CONNECTION_FAILED_NOTICE);
+    if (isConnectorAlreadyConnectedError(error)) {
+      setWalletNotice(WALLET_ALREADY_CONNECTED_NOTICE);
+      return 'already-connected';
+    }
+
+    setWalletNotice(WALLET_CONNECTION_FAILED_NOTICE);
     return 'failed';
   }
 }
