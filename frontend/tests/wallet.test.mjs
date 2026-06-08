@@ -156,6 +156,7 @@ assert.equal(getPreferredWalletConnector([walletConnect]), walletConnect);
 
 {
   let notice = 'unchanged';
+  let reconnectedWith = null;
   const result = await connectWalletWithWagmi({
     windowObject: {
       isSecureContext: true,
@@ -166,6 +167,36 @@ assert.equal(getPreferredWalletConnector([walletConnect]), walletConnect);
     connectors: [genericInjected],
     connectAsync: () => {
       throw new Error('Connector already connected. Version: @wagmi/core@3.4.0');
+    },
+    reconnectAsync: async ({ connectors }) => {
+      reconnectedWith = connectors[0];
+      return [{ accounts: ['0x1234567890123456789012345678901234567890'] }];
+    },
+    setWalletNotice: (value) => {
+      notice = value;
+    },
+  });
+
+  assert.equal(result, 'connected');
+  assert.equal(notice, '');
+  assert.equal(reconnectedWith, genericInjected);
+}
+
+{
+  let notice = 'unchanged';
+  const result = await connectWalletWithWagmi({
+    windowObject: {
+      isSecureContext: true,
+      ethereum: {
+        request: async () => ['0x1234567890123456789012345678901234567890'],
+      },
+    },
+    connectors: [genericInjected],
+    connectAsync: () => {
+      throw new Error('Connector already connected. Version: @wagmi/core@3.4.0');
+    },
+    reconnectAsync: () => {
+      throw new Error('reconnect failed');
     },
     setWalletNotice: (value) => {
       notice = value;

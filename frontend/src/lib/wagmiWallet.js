@@ -79,7 +79,7 @@ async function requestInjectedAccounts(windowObject, timeoutMs) {
   );
 }
 
-export async function connectWalletWithWagmi({ windowObject, connectors, connect, connectAsync, setWalletNotice, timeoutMs = DEFAULT_WALLET_REQUEST_TIMEOUT_MS }) {
+export async function connectWalletWithWagmi({ windowObject, connectors, connect, connectAsync, reconnectAsync, setWalletNotice, timeoutMs = DEFAULT_WALLET_REQUEST_TIMEOUT_MS }) {
   if (!windowObject?.isSecureContext) {
     const notice = getWalletConnectionNotice({ isSecureContext: false, hasInjectedWallet: true });
     setWalletNotice(notice);
@@ -130,6 +130,17 @@ export async function connectWalletWithWagmi({ windowObject, connectors, connect
     }
 
     if (isConnectorAlreadyConnectedError(error)) {
+      if (typeof reconnectAsync === 'function') {
+        const reconnectResult = await withTimeout(
+          Promise.resolve().then(() => reconnectAsync({ connectors: [connector] })),
+          timeoutMs,
+        );
+        if (reconnectResult.status === 'resolved') {
+          setWalletNotice('');
+          return 'connected';
+        }
+      }
+
       setWalletNotice(WALLET_ALREADY_CONNECTED_NOTICE);
       return 'already-connected';
     }

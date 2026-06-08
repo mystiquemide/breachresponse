@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAccount, useConnect, useDisconnect, useSwitchChain } from 'wagmi';
+import { useAccount, useConnect, useDisconnect, useReconnect, useSwitchChain } from 'wagmi';
 import { mantleSepoliaTestnet } from 'wagmi/chains';
 import { createPublicClient, http, type Transaction as ViemTransaction } from 'viem';
 import { Shield, ArrowLeft, Activity, ShieldCheck, Power, AlertTriangle, History, Search } from 'lucide-react';
@@ -55,6 +55,7 @@ export default function ThreatHistory() {
   const { address, isConnected, chainId } = useAccount();
   const { connect, connectAsync, connectors, error: connectError, isPending: isConnectPending } = useConnect();
   const { disconnect, disconnectAsync } = useDisconnect();
+  const { reconnectAsync } = useReconnect();
   const { switchChain } = useSwitchChain();
   
   const isCorrectNetwork = chainId === mantleSepoliaTestnet.id;
@@ -70,6 +71,7 @@ export default function ThreatHistory() {
       connectors,
       connect,
       connectAsync,
+      reconnectAsync,
       setWalletNotice,
     });
   };
