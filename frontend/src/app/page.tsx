@@ -16,6 +16,7 @@ import {
   clearCommandCenterNavigationState,
   navigateToAppPath,
 } from '../lib/navigation';
+import { getBrowserWalletConnectionNotice } from '../lib/wallet';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -93,10 +94,11 @@ export default function LandingPage() {
   const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
   const [isLaunchingCommandCenter, setIsLaunchingCommandCenter] = useState(false);
   const [showFirstLoadPreloader, setShowFirstLoadPreloader] = useState(true);
+  const [walletNotice, setWalletNotice] = useState('');
 
   const { isConnected, chainId } = useAccount();
   const { connect, connectors } = useConnect();
-  const { disconnect } = useDisconnect();
+  const { disconnect, disconnectAsync } = useDisconnect();
   const { switchChain } = useSwitchChain();
 
   const isCorrectNetwork = chainId === mantleSepoliaTestnet.id;
@@ -140,6 +142,9 @@ export default function LandingPage() {
 
   const handleWalletAccess = () => {
     if (!isConnected) {
+      const notice = getBrowserWalletConnectionNotice(window);
+      setWalletNotice(notice);
+      if (notice) return;
       if (!injectedConnector) return;
       connect({ connector: injectedConnector });
     } else if (!isCorrectNetwork && switchChain) {
@@ -153,10 +158,14 @@ export default function LandingPage() {
     navigateToAppPath(window.location, DASHBOARD_PATH);
   };
 
-  const handleDisconnect = () => {
+  const handleDisconnect = async () => {
     setIsLaunchingCommandCenter(false);
     clearCommandCenterNavigationState(window.sessionStorage);
-    disconnect();
+    try {
+      await disconnectAsync();
+    } catch {
+      disconnect();
+    }
   };
 
   useEffect(() => {
@@ -265,6 +274,12 @@ export default function LandingPage() {
           )}
         </div>
       </nav>
+
+      {!isConnected && walletNotice && (
+        <p className="absolute top-24 left-0 right-0 z-50 mx-auto w-fit max-w-[90vw] rounded border border-yellow-500/30 bg-black/80 px-4 py-2 text-center text-[10px] text-yellow-300 font-sans">
+          {walletNotice}
+        </p>
+      )}
 
       <div className="relative min-h-screen w-full overflow-hidden flex items-center justify-center bg-[#050505]">
         <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none opacity-20">
