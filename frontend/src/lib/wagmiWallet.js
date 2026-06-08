@@ -10,6 +10,19 @@ const PREFERRED_INJECTED_IDS = [
 
 export const WALLET_CONNECTOR_NOT_READY_NOTICE = 'Wallet connector is not ready yet. Reload the page and try again.';
 export const WALLET_CONNECTION_FAILED_NOTICE = 'Wallet connection failed. Unlock MetaMask and try again.';
+export const WALLET_OPENING_METAMASK_NOTICE = 'No injected wallet found. Opening this dapp in MetaMask wallet browser.';
+
+export function getMetaMaskDappLink(windowObject) {
+  if (!windowObject?.location) return '';
+
+  const url = new URL(windowObject.location.href);
+  return `https://metamask.app.link/dapp/${url.host}${url.pathname}${url.search}${url.hash}`;
+}
+
+function isProviderNotFoundError(error) {
+  const message = error instanceof Error ? error.message : String(error ?? '');
+  return /provider not found|no provider|injected provider|wallet not found/i.test(message);
+}
 
 export function getPreferredWalletConnector(connectors = []) {
   if (!Array.isArray(connectors) || connectors.length === 0) return undefined;
@@ -50,6 +63,15 @@ export async function connectWalletWithWagmi({ windowObject, connectors, connect
     }
     return 'connecting';
   } catch (error) {
+    if (isProviderNotFoundError(error)) {
+      const metaMaskLink = getMetaMaskDappLink(windowObject);
+      if (metaMaskLink && windowObject?.location?.assign) {
+        setWalletNotice(WALLET_OPENING_METAMASK_NOTICE);
+        windowObject.location.assign(metaMaskLink);
+        return 'opening-metamask';
+      }
+    }
+
     const message = error instanceof Error ? error.message : String(error ?? '');
     setWalletNotice(message || WALLET_CONNECTION_FAILED_NOTICE);
     return 'failed';
