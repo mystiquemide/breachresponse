@@ -24,6 +24,15 @@ for (const [name, source] of [
   assert.match(source, /walletNotice !== WALLET_REQUEST_PENDING_NOTICE/, `${name} should stop showing Connecting after the wallet request times out`);
 }
 
+for (const [name, source] of [
+  ['landing', landingSource],
+  ['dashboard', dashboardSource],
+  ['history', historySource],
+]) {
+  assert.match(source, /useReconnect/, `${name} should recover Wagmi state when an injected wallet is already authorized`);
+  assert.match(source, /reconnectAsync,/, `${name} should pass Wagmi reconnect into the shared wallet helper`);
+}
+
 assert.doesNotMatch(historySource, /connectError\?\.message/, 'history should not render raw Wagmi error messages with library versions');
 assert.match(historySource, /Connected:/, 'history should label the connected wallet state');
 assert.match(historySource, /address \? `\$\{address\.slice\(0, 6\)\}\.\.\.\$\{address\.slice\(-4\)\}` : 'Syncing address'/, 'history should use a hydration copy instead of vague wallet connected text');

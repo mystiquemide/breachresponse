@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Shield, Target, Activity, Hexagon, Component, CheckCircle2, Power, AlertTriangle, Terminal, Layers, Cpu, ShieldCheck } from 'lucide-react';
-import { useAccount, useConnect, useSwitchChain, useDisconnect } from 'wagmi';
+import { useAccount, useConnect, useSwitchChain, useDisconnect, useReconnect } from 'wagmi';
 import { mantleSepoliaTestnet } from 'wagmi/chains';
 import { createPublicClient, http, type Transaction as ViemTransaction } from 'viem';
 import {
@@ -99,6 +99,7 @@ export default function LandingPage() {
   const { isConnected, chainId } = useAccount();
   const { connect, connectAsync, connectors } = useConnect();
   const { disconnect, disconnectAsync } = useDisconnect();
+  const { reconnectAsync } = useReconnect();
   const { switchChain } = useSwitchChain();
 
   const isCorrectNetwork = chainId === mantleSepoliaTestnet.id;
@@ -149,6 +150,7 @@ export default function LandingPage() {
         connectors,
         connect,
         connectAsync,
+        reconnectAsync,
         setWalletNotice,
       });
     } else if (!isCorrectNetwork && switchChain) {
