@@ -140,6 +140,9 @@ export default function LandingPage() {
   }, [isLaunchingCommandCenter, isConnected, isCorrectNetwork]);
 
   const handleWalletAccess = () => {
+    setIsLaunchingCommandCenter(true);
+    window.sessionStorage.setItem('breachresponse_launching_command_center', 'true');
+
     if (!isConnected) {
       void connectWalletWithWagmi({
         windowObject: window,
@@ -150,6 +153,8 @@ export default function LandingPage() {
       });
     } else if (!isCorrectNetwork && switchChain) {
       switchChain({ chainId: mantleSepoliaTestnet.id });
+    } else {
+      navigateToAppPath(window.location, DASHBOARD_PATH);
     }
   };
 
@@ -247,7 +252,7 @@ export default function LandingPage() {
               onClick={handleWalletAccess}
               className="bg-[#10B981] text-black px-6 py-2.5 rounded text-sm font-bold hover:bg-green-400 hover:shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all shadow-lg flex items-center gap-2"
             >
-              <Power className="w-4 h-4" /> Connect Wallet
+              <Power className="w-4 h-4" /> Connect and Enter
             </button>
           ) : !isCorrectNetwork ? (
              <button 
