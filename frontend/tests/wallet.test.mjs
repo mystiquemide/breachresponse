@@ -107,13 +107,13 @@ assert.equal(getPreferredWalletConnector([walletConnect]), walletConnect);
 
 {
   let notice = '';
-  let requestedMethod = '';
+  let providerRequestCount = 0;
   const result = await connectWalletWithWagmi({
     windowObject: {
       isSecureContext: true,
       ethereum: {
-        request: async ({ method }) => {
-          requestedMethod = method;
+        request: async () => {
+          providerRequestCount += 1;
           return ['0x1234567890123456789012345678901234567890'];
         },
       },
@@ -126,7 +126,7 @@ assert.equal(getPreferredWalletConnector([walletConnect]), walletConnect);
   });
 
   assert.equal(result, 'connected');
-  assert.equal(requestedMethod, 'eth_requestAccounts');
+  assert.equal(providerRequestCount, 0, 'the shared helper should let Wagmi own eth_requestAccounts so its connection storage is set');
   assert.equal(notice, '');
 }
 
@@ -134,16 +134,9 @@ assert.equal(getPreferredWalletConnector([walletConnect]), walletConnect);
   let notice = '';
   const never = new Promise(() => {});
   const result = await connectWalletWithWagmi({
-    windowObject: {
-      isSecureContext: true,
-      ethereum: {
-        request: () => never,
-      },
-    },
+    windowObject: { isSecureContext: true, ethereum: {} },
     connectors: [genericInjected],
-    connectAsync: () => {
-      throw new Error('should not call wagmi while wallet request is stuck');
-    },
+    connectAsync: () => never,
     setWalletNotice: (value) => {
       notice = value;
     },

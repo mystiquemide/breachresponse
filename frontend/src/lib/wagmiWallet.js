@@ -69,16 +69,6 @@ function withTimeout(promise, timeoutMs) {
   ]).finally(() => clearTimeout(timer));
 }
 
-async function requestInjectedAccounts(windowObject, timeoutMs) {
-  const request = windowObject?.ethereum?.request;
-  if (typeof request !== 'function') return { status: 'skipped' };
-
-  return withTimeout(
-    request.call(windowObject.ethereum, { method: 'eth_requestAccounts' }),
-    timeoutMs,
-  );
-}
-
 async function reconnectWalletState({ reconnectAsync, connector, timeoutMs }) {
   if (typeof reconnectAsync !== 'function') return false;
 
@@ -87,7 +77,7 @@ async function reconnectWalletState({ reconnectAsync, connector, timeoutMs }) {
     timeoutMs,
   );
 
-  return reconnectResult.status === 'resolved';
+  return reconnectResult.status === 'resolved' && Array.isArray(reconnectResult.value) && reconnectResult.value.length > 0;
 }
 
 export async function connectWalletWithWagmi({ windowObject, connectors, connect, connectAsync, reconnectAsync, setWalletNotice, timeoutMs = DEFAULT_WALLET_REQUEST_TIMEOUT_MS }) {
@@ -108,20 +98,8 @@ export async function connectWalletWithWagmi({ windowObject, connectors, connect
     return 'missing-connector';
   }
 
-  let walletApprovedAccounts = false;
-
   try {
     setWalletNotice('');
-
-    const accountRequest = await requestInjectedAccounts(windowObject, timeoutMs);
-    if (accountRequest.status === 'timed-out') {
-      setWalletNotice(WALLET_REQUEST_PENDING_NOTICE);
-      return 'timed-out';
-    }
-    if (accountRequest.status === 'rejected') {
-      throw accountRequest.error;
-    }
-    walletApprovedAccounts = accountRequest.status === 'resolved';
 
     const connectFn = connectAsync ?? connect;
     const result = connectFn({ connector });
@@ -138,11 +116,6 @@ export async function connectWalletWithWagmi({ windowObject, connectors, connect
     }
     return 'connecting';
   } catch (error) {
-    if (walletApprovedAccounts && await reconnectWalletState({ reconnectAsync, connector, timeoutMs })) {
-      setWalletNotice('');
-      return 'connected';
-    }
-
     if (isProviderNotFoundError(error)) {
       setWalletNotice(getMissingInjectedWalletNotice());
       return 'missing-provider';
@@ -156,6 +129,11 @@ export async function connectWalletWithWagmi({ windowObject, connectors, connect
 
       setWalletNotice(WALLET_ALREADY_CONNECTED_NOTICE);
       return 'already-connected';
+    }
+
+    if (await reconnectWalletState({ reconnectAsync, connector, timeoutMs })) {
+      setWalletNotice('');
+      return 'connected';
     }
 
     setWalletNotice(WALLET_CONNECTION_FAILED_NOTICE);
