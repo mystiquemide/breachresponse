@@ -8,6 +8,7 @@ import { createPublicClient, http, type Transaction as ViemTransaction } from 'v
 import { Shield, ArrowLeft, Activity, ShieldCheck, Power, AlertTriangle, History, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { DASHBOARD_PATH, leaveCommandCenter, navigateToAppPath } from '../../lib/navigation';
+import { getBrowserWalletConnectionNotice } from '../../lib/wallet';
 
 interface TransactionLog {
   id: string;
@@ -53,7 +54,7 @@ export default function ThreatHistory() {
   const router = useRouter();
   const { address, isConnected, chainId } = useAccount();
   const { connect, connectors } = useConnect();
-  const { disconnect } = useDisconnect();
+  const { disconnect, disconnectAsync } = useDisconnect();
   const { switchChain } = useSwitchChain();
   
   const isCorrectNetwork = chainId === mantleSepoliaTestnet.id;
@@ -62,10 +63,19 @@ export default function ThreatHistory() {
   const [logs, setLogs] = useState<TransactionLog[]>(initialLogs);
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [walletNotice, setWalletNotice] = useState('');
+
+  const handleConnectWallet = () => {
+    const notice = getBrowserWalletConnectionNotice(window);
+    setWalletNotice(notice);
+    if (notice || !injectedConnector) return;
+    connect({ connector: injectedConnector });
+  };
 
   const handleDisconnect = () => {
-    leaveCommandCenter({
+    void leaveCommandCenter({
       disconnect,
+      disconnectAsync,
       location: window.location,
       storage: window.sessionStorage,
     });
@@ -180,7 +190,7 @@ export default function ThreatHistory() {
             </button>
           ) : (
             <button 
-              onClick={() => injectedConnector && connect({ connector: injectedConnector })} 
+              onClick={handleConnectWallet} 
               className="flex items-center gap-2 bg-[#10B981] text-black font-bold py-2 px-5 rounded hover:bg-green-400 transition-all text-xs shadow-[0_0_15px_rgba(16,185,129,0.3)]"
             >
               <Power className="w-3.5 h-3.5" />
@@ -189,6 +199,12 @@ export default function ThreatHistory() {
           )}
         </div>
       </header>
+
+      {!isConnected && walletNotice && (
+        <p className="relative z-10 mb-4 text-center text-[10px] text-yellow-400 font-sans">
+          {walletNotice}
+        </p>
+      )}
 
       <motion.div 
         initial={false}

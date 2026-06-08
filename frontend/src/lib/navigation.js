@@ -44,12 +44,16 @@ export function replaceWithAppPath(location, path) {
   location.href = path;
 }
 
-export function leaveCommandCenter({ disconnect, location, storage } = {}) {
+export async function leaveCommandCenter({ disconnect, disconnectAsync, location, storage } = {}) {
   clearCommandCenterNavigationState(storage);
 
-  if (typeof disconnect === 'function') {
-    disconnect();
+  try {
+    if (typeof disconnectAsync === 'function') {
+      await disconnectAsync();
+    } else if (typeof disconnect === 'function') {
+      disconnect();
+    }
+  } finally {
+    replaceWithAppPath(location, LANDING_DISCONNECTED_PATH);
   }
-
-  replaceWithAppPath(location, LANDING_DISCONNECTED_PATH);
 }

@@ -72,18 +72,20 @@ assert.doesNotMatch(landingSource, /href="#features"/);
 
 {
   const location = createMockLocation('/dashboard');
-  let disconnected = false;
+  const events = [];
   const storage = createMockStorage();
 
-  leaveCommandCenter({
-    disconnect: () => {
-      disconnected = true;
+  await leaveCommandCenter({
+    disconnectAsync: async () => {
+      events.push('disconnect-start');
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      events.push('disconnect-complete');
     },
     location,
     storage,
   });
 
-  assert.equal(disconnected, true);
+  assert.deepEqual(events, ['disconnect-start', 'disconnect-complete']);
   assert.deepEqual(storage.removed, [
     'breachresponse_launching_command_center',
     'breachresponse_return_to_command_center',
@@ -92,10 +94,27 @@ assert.doesNotMatch(landingSource, /href="#features"/);
 }
 
 {
+  const location = createMockLocation('/dashboard');
+  let disconnected = false;
+  const storage = createMockStorage();
+
+  await leaveCommandCenter({
+    disconnect: () => {
+      disconnected = true;
+    },
+    location,
+    storage,
+  });
+
+  assert.equal(disconnected, true);
+  assert.deepEqual(location.calls, [['replace', LANDING_DISCONNECTED_PATH]]);
+}
+
+{
   const location = createMockLocation('/history');
   const storage = createMockStorage();
 
-  leaveCommandCenter({ location, storage });
+  await leaveCommandCenter({ location, storage });
 
   assert.deepEqual(location.calls, [['replace', LANDING_DISCONNECTED_PATH]]);
 }

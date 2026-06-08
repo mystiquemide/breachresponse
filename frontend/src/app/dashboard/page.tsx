@@ -11,6 +11,7 @@ import Onboarding from './Onboarding';
 import AttackModal from './AttackModal';
 import { REGISTRY_ADDRESS, REGISTRY_ABI } from '../constants';
 import { DASHBOARD_PATH, HISTORY_PATH, LANDING_PATH, clearCommandCenterNavigationState, leaveCommandCenter, navigateToAppPath, replaceWithAppPath } from '../../lib/navigation';
+import { getBrowserWalletConnectionNotice } from '../../lib/wallet';
 import {
   GENLAYER_CONSENSUS_GUARD_ADDRESS,
   type GenLayerAccount,
@@ -63,7 +64,7 @@ export default function Dashboard() {
   const router = useRouter();
   const { address, isConnected, chainId } = useAccount();
   const { connect, connectors, error: connectError, isPending: isConnectPending } = useConnect();
-  const { disconnect } = useDisconnect();
+  const { disconnect, disconnectAsync } = useDisconnect();
   const { switchChain } = useSwitchChain();
   const { writeContract, isPending, isSuccess } = useWriteContract();
   
@@ -94,11 +95,20 @@ export default function Dashboard() {
   const [consensusIncidents, setConsensusIncidents] = useState<unknown[]>([]);
   const [isConsensusBusy, setIsConsensusBusy] = useState(false);
   const [showBootSequence, setShowBootSequence] = useState(true);
+  const [walletNotice, setWalletNotice] = useState('');
   const consensusClientRef = useRef<IncidentConsensusGuardClient | null>(null);
 
+  const handleConnectWallet = () => {
+    const notice = getBrowserWalletConnectionNotice(window);
+    setWalletNotice(notice);
+    if (notice || !injectedConnector) return;
+    connect({ connector: injectedConnector });
+  };
+
   const handleDisconnect = () => {
-    leaveCommandCenter({
+    void leaveCommandCenter({
       disconnect,
+      disconnectAsync,
       location: window.location,
       storage: window.sessionStorage,
     });
@@ -500,7 +510,7 @@ export default function Dashboard() {
             </button>
           ) : (
             <button 
-              onClick={() => injectedConnector && connect({ connector: injectedConnector })} 
+              onClick={handleConnectWallet} 
               className="flex items-center gap-2 bg-[#10B981] text-black font-bold py-2 px-5 rounded hover:bg-green-400 transition-all text-xs shadow-[0_0_15px_rgba(16,185,129,0.3)]"
             >
               <Power className="w-3.5 h-3.5" />
@@ -603,9 +613,9 @@ export default function Dashboard() {
             </button>
             {isSuccess && <p className="text-[#10B981] mt-3 text-[10px] text-center">Sentinel registered on Mantle Sepolia</p>}
             {!isConnected && <p className="text-red-500 mt-3 text-[10px] text-center font-sans">Connect a Mantle wallet to initialize guards</p>}
-            {!isConnected && connectError && (
+            {!isConnected && (walletNotice || connectError) && (
               <p className="text-yellow-400 mt-2 text-[10px] text-center font-sans">
-                No injected wallet detected. Install MetaMask or open this app in a wallet browser.
+                {walletNotice || 'No injected wallet detected. Install MetaMask or open this app in a wallet browser.'}
               </p>
             )}
           </div>
