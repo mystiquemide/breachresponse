@@ -41,6 +41,6 @@ Human approval is the default mode. Autonomous execution must be scoped with:
 
 ## Known risk areas
 
-- The simulation contracts intentionally include a vulnerable target vault to prove the defense path in tests.
+- The validation contracts intentionally include a vulnerable target vault to prove the defense path in tests.
 - The monitoring agent is only as reliable as its RPC provider and configured policies.
 - AI-generated payloads must be validated against allowlists before execution.

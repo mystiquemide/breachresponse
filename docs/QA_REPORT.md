@@ -24,9 +24,9 @@ cd ../agent
 python -m compileall -q .
 ```
 
-## Contract simulation notes
+## Contract validation notes
 
-`TargetVault.sol` is intentionally vulnerable inside the simulation suite. It exists to prove the difference between an unprotected exploit path and a protected pause path.
+`TargetVault.sol` is intentionally vulnerable inside the validation suite. It exists to prove the difference between an unprotected exploit path and a protected pause path.
 
 Expected result:
 
