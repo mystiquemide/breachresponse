@@ -14,7 +14,7 @@ export async function GET() {
     const rpcUrl = process.env.MANTLE_RPC_URL || "https://rpc.sepolia.mantle.xyz";
     const provider = new ethers.JsonRpcProvider(rpcUrl);
     
-    // Hardcoded TargetVault address for our demo
+    // Default TargetVault address used by the vault status endpoint
     const targetVaultAddress = "0x9d9b602CFe69cfF9706EAc399808E84682ce94FB";
     const targetVault = new ethers.Contract(targetVaultAddress, vaultAbi, provider);
 
