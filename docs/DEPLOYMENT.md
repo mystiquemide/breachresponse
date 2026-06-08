@@ -88,11 +88,30 @@ Current GenLayer StudioNet consensus guard:
 | Deployer | `0x65567Bf52e47A20C10793748C36597fAC2E3056D` |
 | Verification | `genlayer schema` and `genlayer call get_stats` succeeded on StudioNet |
 
+## Backend state
+
+Production and reviewer environments should use persistent state instead of the local in-memory fallback.
+
+| Variable | Purpose |
+| --- | --- |
+| `DATABASE_URL` | Neon Postgres connection string used by Next.js API routes for sentinel nodes and telemetry logs |
+| `UPSTASH_REDIS_REST_URL` | Upstash Redis REST URL used for dashboard telemetry events |
+| `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis REST token used by the server-only telemetry API |
+
+The app creates the required `sentinel_nodes` and `telemetry_logs` tables lazily on first API use. If `DATABASE_URL` is missing, it falls back to local in-memory demo state so development builds still run.
+
 ## Agent
 
 The agent uses Mantle RPC plus an LLM-assisted analysis client. Keep `SENTINEL_RESPONSE_MODE=manual` for reviewer walkthroughs and production pilots unless an explicit policy signer setup has been reviewed.
 
-Relevant environment variables:
+Recommended hosting split:
+
+- Frontend and short API routes: Vercel
+- Python sentinel worker: Railway worker service
+- Durable state: Neon Postgres
+- Realtime-ish dashboard telemetry: Upstash Redis REST
+
+Relevant worker environment variables:
 
 | Variable | Purpose |
 | --- | --- |
@@ -102,7 +121,7 @@ Relevant environment variables:
 | `OPENAI_BASE_URL` | Optional OpenAI-compatible provider endpoint |
 | `LLM_MODEL` | Model used for analysis, default `gpt-4o-mini` |
 | `SENTINEL_RESPONSE_MODE` | `manual` proposes actions, `autonomous` can broadcast scoped emergency actions |
-| `PRIVATE_KEY` | Testnet-only agent signer for local execution |
+| `PRIVATE_KEY` | Dedicated low-balance testnet-only agent signer for Railway worker execution |
 
 ```bash
 cd agent
