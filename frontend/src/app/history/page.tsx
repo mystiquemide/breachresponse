@@ -8,7 +8,7 @@ import { createPublicClient, http, type Transaction as ViemTransaction } from 'v
 import { Shield, ArrowLeft, Activity, ShieldCheck, Power, AlertTriangle, History, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { DASHBOARD_PATH, leaveCommandCenter, navigateToAppPath } from '../../lib/navigation';
-import { connectWalletWithWagmi, WALLET_REQUEST_PENDING_NOTICE } from '../../lib/wagmiWallet';
+import { connectWalletWithWagmi, WALLET_CONNECTION_FAILED_NOTICE, WALLET_REQUEST_PENDING_NOTICE } from '../../lib/wagmiWallet';
 
 interface TransactionLog {
   id: string;
@@ -180,7 +180,7 @@ export default function ThreatHistory() {
               className="flex items-center gap-2 bg-[#18181B] border border-gray-800 px-4 py-2 rounded hover:bg-gray-800 transition-colors text-xs"
             >
               <Power className="w-3.5 h-3.5 text-red-500" />
-              {address?.slice(0, 6)}...{address?.slice(-4)}
+              {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Wallet connected'}
             </button>
           ) : isConnected && !isCorrectNetwork ? (
             <button 
@@ -204,7 +204,7 @@ export default function ThreatHistory() {
 
       {!isConnected && (walletNotice || connectError) && (
         <p className="relative z-10 mb-4 text-center text-[10px] text-yellow-400 font-sans">
-          {walletNotice || connectError?.message || 'Wallet connection failed. Unlock your Ethereum wallet and try again.'}
+          {walletNotice || WALLET_CONNECTION_FAILED_NOTICE}
         </p>
       )}
 
