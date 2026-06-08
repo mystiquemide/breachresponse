@@ -21,7 +21,7 @@ interface TransactionLog {
 
 const initialLogs: TransactionLog[] = [
   {
-    id: 'demo-1',
+    id: 'incident-1',
     txHash: '0x8f2a9aac22df9917c90a54dbd04f4716d98fe78d76400400cc091bf46dabe9aac',
     protocol: 'MantleSwap',
     type: 'Reentrancy',
@@ -30,7 +30,7 @@ const initialLogs: TransactionLog[] = [
     timestamp: new Date(Date.now() - 120000).toISOString(),
   },
   {
-    id: 'demo-2',
+    id: 'incident-2',
     txHash: '0x1b4d3bcf34a23ca729de9b19c0efb0102e0e334d9176fb7642821be043cc2ccf',
     protocol: 'LendX Protocol',
     type: 'Normal Transfer',
@@ -39,7 +39,7 @@ const initialLogs: TransactionLog[] = [
     timestamp: new Date(Date.now() - 300000).toISOString(),
   },
   {
-    id: 'demo-3',
+    id: 'incident-3',
     txHash: '0x48ce12ca0f943d803f414e12dbe66701e2b7721d4edb6134ef4e7e112aeceb7a',
     protocol: 'YieldFlow',
     type: 'Oracle Manipulation',
