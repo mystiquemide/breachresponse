@@ -15,6 +15,14 @@ for (const [name, source] of [
   assert.doesNotMatch(source, /connect\(\{ connector: injectedConnector \}\)/, `${name} should not use a route-local injected connector`);
 }
 
+for (const [name, source] of [
+  ['dashboard', dashboardSource],
+  ['history', historySource],
+]) {
+  assert.match(source, /WALLET_REQUEST_PENDING_NOTICE/, `${name} should import the pending wallet notice`);
+  assert.match(source, /walletNotice !== WALLET_REQUEST_PENDING_NOTICE/, `${name} should stop showing Connecting after the wallet request times out`);
+}
+
 assert.doesNotMatch(dashboardSource, /!hasOnboarded\s*\|\|\s*shouldOpenTour/, 'dashboard should not auto-open onboarding over wallet controls');
 assert.match(dashboardSource, /get\('tour'\) === '1'/, 'dashboard should still support explicit tour replay');
 assert.match(providerSource, /injected\(/, 'Web3Provider should keep injected wallet fallback support');

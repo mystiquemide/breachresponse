@@ -11,6 +11,9 @@ const PREFERRED_INJECTED_IDS = [
 export const WALLET_CONNECTOR_NOT_READY_NOTICE = 'Wallet connector is not ready yet. Reload the page and try again.';
 export const WALLET_CONNECTION_FAILED_NOTICE = 'Wallet connection failed. Unlock MetaMask and try again.';
 export const WALLET_OPENING_METAMASK_NOTICE = 'No injected wallet found. Opening this dapp in MetaMask wallet browser.';
+export const WALLET_REQUEST_PENDING_NOTICE = 'Wallet request is still pending. Open MetaMask, approve the request, then tap Connect Wallet again.';
+
+const DEFAULT_WALLET_REQUEST_TIMEOUT_MS = 12_000;
 
 export function getMetaMaskDappLink(windowObject) {
   if (!windowObject?.location) return '';
@@ -54,7 +57,32 @@ function openMetaMaskDappBrowser(windowObject, setWalletNotice) {
   return true;
 }
 
-export async function connectWalletWithWagmi({ windowObject, connectors, connect, connectAsync, setWalletNotice }) {
+function withTimeout(promise, timeoutMs) {
+  let timer;
+  const timeout = new Promise((resolve) => {
+    timer = setTimeout(() => resolve({ status: 'timed-out' }), timeoutMs);
+  });
+
+  return Promise.race([
+    Promise.resolve(promise).then(
+      (value) => ({ status: 'resolved', value }),
+      (error) => ({ status: 'rejected', error }),
+    ),
+    timeout,
+  ]).finally(() => clearTimeout(timer));
+}
+
+async function requestInjectedAccounts(windowObject, timeoutMs) {
+  const request = windowObject?.ethereum?.request;
+  if (typeof request !== 'function') return { status: 'skipped' };
+
+  return withTimeout(
+    request.call(windowObject.ethereum, { method: 'eth_requestAccounts' }),
+    timeoutMs,
+  );
+}
+
+export async function connectWalletWithWagmi({ windowObject, connectors, connect, connectAsync, setWalletNotice, timeoutMs = DEFAULT_WALLET_REQUEST_TIMEOUT_MS }) {
   if (!windowObject?.isSecureContext) {
     const notice = getWalletConnectionNotice({ isSecureContext: false, hasInjectedWallet: true });
     setWalletNotice(notice);
@@ -73,10 +101,28 @@ export async function connectWalletWithWagmi({ windowObject, connectors, connect
 
   try {
     setWalletNotice('');
+
+    const accountRequest = await requestInjectedAccounts(windowObject, timeoutMs);
+    if (accountRequest.status === 'timed-out') {
+      setWalletNotice(WALLET_REQUEST_PENDING_NOTICE);
+      return 'timed-out';
+    }
+    if (accountRequest.status === 'rejected') {
+      throw accountRequest.error;
+    }
+
     const connectFn = connectAsync ?? connect;
     const result = connectFn({ connector });
     if (result && typeof result.then === 'function') {
-      await result;
+      const wagmiConnect = await withTimeout(result, timeoutMs);
+      if (wagmiConnect.status === 'timed-out') {
+        setWalletNotice(WALLET_REQUEST_PENDING_NOTICE);
+        return 'timed-out';
+      }
+      if (wagmiConnect.status === 'rejected') {
+        throw wagmiConnect.error;
+      }
+      return 'connected';
     }
     return 'connecting';
   } catch (error) {

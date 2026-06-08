@@ -11,7 +11,7 @@ import Onboarding from './Onboarding';
 import AttackModal from './AttackModal';
 import { REGISTRY_ADDRESS, REGISTRY_ABI } from '../constants';
 import { DASHBOARD_PATH, HISTORY_PATH, LANDING_PATH, clearCommandCenterNavigationState, leaveCommandCenter, navigateToAppPath, replaceWithAppPath } from '../../lib/navigation';
-import { connectWalletWithWagmi } from '../../lib/wagmiWallet';
+import { connectWalletWithWagmi, WALLET_REQUEST_PENDING_NOTICE } from '../../lib/wagmiWallet';
 import {
   GENLAYER_CONSENSUS_GUARD_ADDRESS,
   type GenLayerAccount,
@@ -515,7 +515,7 @@ export default function Dashboard() {
               className="flex items-center gap-2 bg-[#10B981] text-black font-bold py-2 px-5 rounded hover:bg-green-400 transition-all text-xs shadow-[0_0_15px_rgba(16,185,129,0.3)]"
             >
               <Power className="w-3.5 h-3.5" />
-              {isConnectPending ? 'Connecting...' : 'Connect Wallet'}
+              {isConnectPending && walletNotice !== WALLET_REQUEST_PENDING_NOTICE ? 'Connecting...' : 'Connect Wallet'}
             </button>
           )}
         </div>
