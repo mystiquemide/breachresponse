@@ -16,7 +16,7 @@ import {
   clearCommandCenterNavigationState,
   navigateToAppPath,
 } from '../lib/navigation';
-import { getBrowserWalletConnectionNotice } from '../lib/wallet';
+import { connectWalletWithWagmi } from '../lib/wagmiWallet';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -102,7 +102,6 @@ export default function LandingPage() {
   const { switchChain } = useSwitchChain();
 
   const isCorrectNetwork = chainId === mantleSepoliaTestnet.id;
-  const injectedConnector = connectors.find(connector => connector.id === 'injected') ?? connectors[0];
 
   useEffect(() => {
     router.prefetch('/dashboard');
@@ -142,11 +141,12 @@ export default function LandingPage() {
 
   const handleWalletAccess = () => {
     if (!isConnected) {
-      const notice = getBrowserWalletConnectionNotice(window);
-      setWalletNotice(notice);
-      if (notice) return;
-      if (!injectedConnector) return;
-      connect({ connector: injectedConnector });
+      void connectWalletWithWagmi({
+        windowObject: window,
+        connectors,
+        connect,
+        setWalletNotice,
+      });
     } else if (!isCorrectNetwork && switchChain) {
       switchChain({ chainId: mantleSepoliaTestnet.id });
     }
