@@ -25,10 +25,14 @@ for (const [name, source] of [
   assert.doesNotMatch(source, /walletNotice|connectError|WALLET_REQUEST_PENDING_NOTICE/, `${name} should not render stale custom wallet notice state`);
 }
 
+assert.match(walletControlSource, /useDisconnect/, 'shared wallet control should expose an explicit disconnect action');
+assert.match(walletControlSource, />\s*Disconnect\s*</, 'shared wallet control should show a visible Disconnect button when connected');
+assert.match(walletControlSource, /WalletStatusGate/, 'shared wallet control should expose the same RainbowKit status for guarded UI');
+assert.match(walletControlSource, /wrongNetwork/, 'shared wallet status should distinguish connected wrong-network state');
 assert.match(walletControlSource, /ConnectButton\.Custom/, 'shared wallet control should use RainbowKit ConnectButton.Custom');
 assert.match(walletControlSource, /openConnectModal/, 'shared wallet control should let RainbowKit own wallet connection');
 assert.match(walletControlSource, /openChainModal/, 'shared wallet control should let RainbowKit own network switching');
-assert.match(walletControlSource, /account\.displayName/, 'shared wallet control should display the connected wallet account');
+assert.match(walletControlSource, /account\?\.displayName/, 'shared wallet control should display the connected wallet account');
 
 assert.match(providerSource, /RainbowKitProvider/, 'Web3Provider should wrap the app in RainbowKitProvider');
 assert.match(providerSource, /@rainbow-me\/rainbowkit\/styles\.css/, 'Web3Provider should load RainbowKit styles');
@@ -38,6 +42,10 @@ assert.match(providerSource, /ssr:\s*true/, 'Web3Provider should keep SSR-safe W
 
 assert.match(landingSource, /setIsLaunchingCommandCenter\(true\);\s*window\.sessionStorage\.setItem\('breachresponse_launching_command_center', 'true'\);/s, 'landing wallet CTA should mark Command Center intent before RainbowKit opens');
 assert.match(landingSource, /Connect and Enter/, 'landing primary wallet CTA should explain that connect continues into Command Center');
+
+assert.match(dashboardSource, /WalletStatusGate/, 'dashboard register guard should use the same RainbowKit status as the header');
+assert.doesNotMatch(dashboardSource, /useAccount/, 'dashboard should not gate the register form from a separate wallet state source');
+assert.match(dashboardSource, /Switch to Mantle Sepolia to initialize guards/, 'dashboard should explain wrong-network state instead of saying the wallet is disconnected');
 
 assert.match(dashboardSource, /Mantle Faucet/, 'dashboard should expose a Mantle faucet card');
 assert.match(dashboardSource, /https:\/\/faucet\.mantle\.xyz/, 'dashboard faucet card should link to the Mantle faucet');
