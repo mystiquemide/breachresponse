@@ -79,6 +79,17 @@ async function requestInjectedAccounts(windowObject, timeoutMs) {
   );
 }
 
+async function reconnectWalletState({ reconnectAsync, connector, timeoutMs }) {
+  if (typeof reconnectAsync !== 'function') return false;
+
+  const reconnectResult = await withTimeout(
+    Promise.resolve().then(() => reconnectAsync({ connectors: [connector] })),
+    timeoutMs,
+  );
+
+  return reconnectResult.status === 'resolved';
+}
+
 export async function connectWalletWithWagmi({ windowObject, connectors, connect, connectAsync, reconnectAsync, setWalletNotice, timeoutMs = DEFAULT_WALLET_REQUEST_TIMEOUT_MS }) {
   if (!windowObject?.isSecureContext) {
     const notice = getWalletConnectionNotice({ isSecureContext: false, hasInjectedWallet: true });
@@ -97,6 +108,8 @@ export async function connectWalletWithWagmi({ windowObject, connectors, connect
     return 'missing-connector';
   }
 
+  let walletApprovedAccounts = false;
+
   try {
     setWalletNotice('');
 
@@ -108,6 +121,7 @@ export async function connectWalletWithWagmi({ windowObject, connectors, connect
     if (accountRequest.status === 'rejected') {
       throw accountRequest.error;
     }
+    walletApprovedAccounts = accountRequest.status === 'resolved';
 
     const connectFn = connectAsync ?? connect;
     const result = connectFn({ connector });
@@ -124,21 +138,20 @@ export async function connectWalletWithWagmi({ windowObject, connectors, connect
     }
     return 'connecting';
   } catch (error) {
+    if (walletApprovedAccounts && await reconnectWalletState({ reconnectAsync, connector, timeoutMs })) {
+      setWalletNotice('');
+      return 'connected';
+    }
+
     if (isProviderNotFoundError(error)) {
       setWalletNotice(getMissingInjectedWalletNotice());
       return 'missing-provider';
     }
 
     if (isConnectorAlreadyConnectedError(error)) {
-      if (typeof reconnectAsync === 'function') {
-        const reconnectResult = await withTimeout(
-          Promise.resolve().then(() => reconnectAsync({ connectors: [connector] })),
-          timeoutMs,
-        );
-        if (reconnectResult.status === 'resolved') {
-          setWalletNotice('');
-          return 'connected';
-        }
+      if (await reconnectWalletState({ reconnectAsync, connector, timeoutMs })) {
+        setWalletNotice('');
+        return 'connected';
       }
 
       setWalletNotice(WALLET_ALREADY_CONNECTED_NOTICE);
