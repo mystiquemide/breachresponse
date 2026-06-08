@@ -59,6 +59,23 @@ jobs:
       - name: Production dependency audit
         run: npm audit --omit=dev --audit-level=moderate
 
+  genlayer-direct:
+    name: GenLayer Direct
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: tests/direct/requirements.txt
+      - name: Install direct test dependencies
+        run: pip install -r tests/direct/requirements.txt
+      - name: Run direct-mode intelligent contract tests
+        run: python -m pytest tests/direct/test_incident_consensus_guard.py -q
+
   agent:
     name: Agent
     runs-on: ubuntu-latest
