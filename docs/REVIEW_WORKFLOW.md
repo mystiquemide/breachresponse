@@ -39,10 +39,14 @@ BreachResponse helps Mantle builders review suspicious activity, understand poss
 
 ## Current product screenshots
 
-| Landing hero | Command Center |
-| --- | --- |
-| ![Landing hero](./assets/hero.png) | ![Command Center](./assets/product-screen-dashboard.png) |
+### Landing hero
 
-| Mobile landing |
-| --- |
-| ![Mobile landing](./assets/product-screen-mobile.png) |
+![Landing hero](./assets/hero.png)
+
+### Command Center
+
+![Command Center](./assets/product-screen-dashboard.png)
+
+### Mobile landing
+
+![Mobile landing](./assets/product-screen-mobile.png)
