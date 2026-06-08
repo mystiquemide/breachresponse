@@ -154,6 +154,52 @@ assert.equal(getPreferredWalletConnector([walletConnect]), walletConnect);
   assert.equal(notice, 'Wallet request is still pending. Open your Ethereum wallet, approve the request, then tap Connect Wallet again.');
 }
 
+{
+  let notice = 'unchanged';
+  const result = await connectWalletWithWagmi({
+    windowObject: {
+      isSecureContext: true,
+      ethereum: {
+        request: async () => ['0x1234567890123456789012345678901234567890'],
+      },
+    },
+    connectors: [genericInjected],
+    connectAsync: () => {
+      throw new Error('Connector already connected. Version: @wagmi/core@3.4.0');
+    },
+    setWalletNotice: (value) => {
+      notice = value;
+    },
+  });
+
+  assert.equal(result, 'already-connected');
+  assert.equal(notice, 'Wallet already connected. Continue in Command Center.');
+  assert.doesNotMatch(notice, /@wagmi\/core|Version:|Connector already connected/);
+}
+
+{
+  let notice = 'unchanged';
+  const result = await connectWalletWithWagmi({
+    windowObject: {
+      isSecureContext: true,
+      ethereum: {
+        request: async () => ['0x1234567890123456789012345678901234567890'],
+      },
+    },
+    connectors: [genericInjected],
+    connectAsync: () => {
+      throw new Error('Random provider failure. Version: @wagmi/core@3.5.0');
+    },
+    setWalletNotice: (value) => {
+      notice = value;
+    },
+  });
+
+  assert.equal(result, 'failed');
+  assert.equal(notice, 'Wallet connection failed. Unlock your Ethereum wallet and try again.');
+  assert.doesNotMatch(notice, /@wagmi\/core|Version:|Random provider failure/);
+}
+
 assert.equal(
   getWalletConnectionNotice({ isSecureContext: true, hasInjectedWallet: true }),
   ''
