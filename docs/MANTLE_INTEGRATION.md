@@ -8,7 +8,7 @@ BreachResponse targets Mantle because incident response for high-throughput DeFi
 - Mantle network switching through Wagmi.
 - Registry contract deployed on Mantle Sepolia and wired into the frontend.
 - Live block and transaction telemetry in the Command Center.
-- Simulation contracts proving pause-based defense against a reentrancy path.
+- Validation contracts proving pause-based defense against a reentrancy path.
 
 ## Environment
 

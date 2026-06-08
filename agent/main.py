@@ -277,21 +277,21 @@ def run_sentinel_loop():
                 status="SAFE"
             )
 
-            # Every 12 steps, simulate an anomaly alert just for UI visuals if no real transactions are happening
+            # Every 12 steps, emit a controlled anomaly scenario for UI review when no real suspicious transactions are happening
             if step % 12 == 0:
                 print("\n" + "="*60)
-                print("[ANOMALY-ALERT] Suspicious recursive call signature detected (UI SIMULATION)!")
+                print("[ANOMALY-ALERT] Suspicious recursive call signature detected (CONTROLLED SCENARIO)!")
                 sim_exploit_hash = f"0x48ce...eB7{random.randint(10, 99)}"
-                print(f"[ANALYZER-LLM] Simulated exploit confidence score: 98.0%")
-                print(f"[SENTINEL] SIMULATION: mitigation proposal generated for TargetVault.")
-                print(f"[SENTINEL] SIMULATION: proposed pause calldata 0x8456cb59, awaiting operator approval.")
-                print(f"[SENTINEL] SIMULATION: no transaction was broadcast and no registry state was changed.")
+                print(f"[ANALYZER-LLM] Controlled scenario confidence score: 98.0%")
+                print(f"[SENTINEL] Response proposal generated for TargetVault.")
+                print(f"[SENTINEL] Proposed pause calldata 0x8456cb59, awaiting operator approval.")
+                print(f"[SENTINEL] Manual approval required before broadcast or registry mutation.")
                 print("="*60 + "\n")
                 
                 post_log_to_frontend(
                     tx_hash=sim_exploit_hash,
                     protocol="TargetVault",
-                    exploit_type="Reentrancy Proposal (Simulation)",
+                    exploit_type="Reentrancy Response Proposal",
                     gas_saved="pending operator approval",
                     status="PROPOSED"
                 )

@@ -24,20 +24,18 @@ Smart contract teams often see raw activity before they have enough context to a
 6. Record the review trail for follow-up.
 
 
-## Hackathon track alignment
+## Product scope
 
-BreachResponse is submitted under the AI DevTools track. It focuses on Mantle-specific security infrastructure: monitoring protocol activity, classifying suspicious behavior, and preparing scoped emergency response proposals for operator approval.
+BreachResponse focuses on Mantle security infrastructure: monitoring protocol activity, classifying suspicious behavior, and preparing scoped emergency response proposals for operator approval. The product intentionally avoids trading automation, liquidity management, and wallet-economy features so the Command Center stays focused on runtime audit assistance for Mantle builders.
 
-It does not integrate Byreal Skills CLI because Byreal Skills targets agentic wallet and DEX/liquidity operations. BreachResponse is not a wallet economy, trading bot, or liquidity automation product. Keeping that boundary explicit makes the submission cleaner and keeps the demo centered on runtime audit assistance for Mantle builders.
-
-See [Hackathon Track Alignment](./docs/HACKATHON_ALIGNMENT.md) for the scope decision, demo story, and out-of-scope list.
+See [Product Scope](./docs/PRODUCT_SCOPE.md) for the scope decision, integration boundaries, and future adapter path.
 
 ## Core capabilities
 
 - Mantle sentinel registry for protocol onboarding and review permissions.
 - Next.js Command Center for suspicious-activity review, approval controls, and live telemetry.
 - Python monitoring agent for Mantle RPC scanning, LLM-assisted runtime analysis, and structured event output.
-- Solidity simulation contracts that prove the vulnerable path and the controlled defense path.
+- Solidity validation contracts and tests that prove the vulnerable path and the controlled defense path.
 - Safe environment templates with no committed keys or production secrets.
 - CI checks covering frontend, contracts, agent syntax, and dependency audits.
 
@@ -299,7 +297,7 @@ python -m pytest tests/direct/test_incident_consensus_guard.py -q
 
 ```text
 agent/                Python monitoring and payload formulation agent
-contracts/            Solidity registry, target vault, attacker simulation, tests
+contracts/            Solidity registry, target vault, attacker validation scenario, tests
 contracts/genlayer/   GenLayer intelligent contract fallback for consensus incident review
 frontend/             Next.js Command Center and API routes
 tests/direct/         GenLayer direct-mode tests

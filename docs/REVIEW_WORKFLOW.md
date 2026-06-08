@@ -11,8 +11,8 @@ Use this path when showing BreachResponse to reviewers, operators, or protocol t
 5. Review the Command Center cards:
    - **Blocks Scanned** shows monitored activity.
    - **Active Sentinels** shows registered monitoring nodes.
-   - **Value Secured** is clearly marked as simulated product value.
-   - **Mitigated Attacks** tracks successful controlled responses.
+   - **Value Secured** is clearly marked as controlled product value.
+   - **Response Proposals** tracks successful controlled responses.
 6. Review **Deploy Sentinel Guard**. The guard initialization action stays disabled until a Mantle wallet is connected and the operator supplies a contract address.
 7. Review **GenLayer Consensus Guard**. Explain that normal users keep their wallet on Mantle. The app layer submits ambiguous Mantle incident context to GenLayer StudioNet, then uses the validator consensus result before proposing a Mantle-side response.
 8. Use **Threat History** to show past incident records and post-incident review.

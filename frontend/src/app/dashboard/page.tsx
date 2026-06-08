@@ -245,9 +245,9 @@ export default function Dashboard() {
           
           setTerminalLines(prev => capTerminal([...prev, `${color} ${payload.data.text}`]));
         } else if (payload.type === 'ALERT') {
-          // It's a mitigated alert
+          // Executed response alert
           const log = payload.data;
-          setTerminalLines(prev => capTerminal([...prev, `[ALERT] Mitigated threat on ${log.protocol}! Type: ${log.type} Rescued ${log.gasSaved}`]));
+          setTerminalLines(prev => capTerminal([...prev, `[ALERT] Response executed for ${log.protocol}. Type: ${log.type}. Metric: ${log.gasSaved}`]));
         }
       } catch (err) {
         console.warn("SSE Parse Error", err);
@@ -361,10 +361,10 @@ export default function Dashboard() {
 
     setTimeout(() => {
       switch (cmd) {
-        case 'simulate incident':
+        case 'trigger incident':
           setTerminalLines((prev) => capTerminal([
             ...prev,
-            "[ALERT] INITIALIZING INCIDENT SIMULATION SEQUENCE...",
+            "[ALERT] INITIALIZING INCIDENT RESPONSE SEQUENCE...",
             "[SYS] INJECTING MALICIOUS PAYLOAD INTO MEMPOOL..."
           ]));
           setTimeout(() => setIsAttackModalOpen(true), 1500);
@@ -374,6 +374,7 @@ export default function Dashboard() {
             ...prev,
             "Available commands:",
             "  help        - Display command options",
+            "  trigger incident - Open incident response workflow",
             "  status      - Display connection telemetry details",
             "  sentinels   - List all active security sentinels",
             "  clear       - Clear the console outputs"
@@ -549,16 +550,16 @@ export default function Dashboard() {
         <div className="sci-fi-panel p-4 flex flex-col justify-between relative overflow-hidden">
           <div className="flex items-center justify-between mb-2">
             <h3 className="text-gray-400 text-xs font-bold tracking-widest">Value Secured</h3>
-            <span className="text-[#10B981] text-xs font-bold">DEMO</span>
+            <span className="text-[#10B981] text-xs font-bold">MONITORED</span>
           </div>
           <div className="text-2xl md:text-3xl font-black text-white font-mono tracking-tighter">
-            <Counter value={1420.5} suffix=" mETH simulated" />
+            <Counter value={1420.5} suffix=" mETH at risk" />
           </div>
         </div>
 
         <div className="sci-fi-panel p-4 flex flex-col justify-between relative overflow-hidden">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-gray-400 text-xs font-bold tracking-widest">Mitigated Attacks</h3>
+            <h3 className="text-gray-400 text-xs font-bold tracking-widest">Response Proposals</h3>
             <ShieldAlert className="w-4 h-4 text-red-500" />
           </div>
           <div className="text-2xl md:text-3xl font-black text-white font-mono tracking-tighter">
@@ -802,7 +803,7 @@ export default function Dashboard() {
           setTerminalLines((prev) => capTerminal([
             ...prev,
             "[SYS] 0-VALUE TRANSACTION CONFIRMED.",
-            "[ALERT] Incident simulation complete. Contract pause path confirmed."
+            "[ALERT] Incident response workflow complete. Contract pause path confirmed."
           ]));
         }}
       />

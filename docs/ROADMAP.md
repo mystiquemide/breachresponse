@@ -2,10 +2,10 @@
 
 ## Phase 1: Reliable operator demo
 
-- AI DevTools track alignment and sponsor-scope documentation.
+- Product scope and integration-boundary documentation.
 - Green CI for frontend, contracts, and agent syntax.
 - Clean Mantle Sepolia setup path.
-- Command Center incident simulation.
+- Command Center incident response workflow.
 - Safe env templates and threat model.
 
 ## Phase 2: Production pilot

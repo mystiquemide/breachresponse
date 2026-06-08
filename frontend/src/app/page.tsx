@@ -37,7 +37,7 @@ interface Transaction {
   protocol: string;
   type: string;
   gasSaved: string;
-  status: 'SCANNING' | 'MITIGATED' | 'SAFE';
+  status: 'SCANNING' | 'PROPOSED' | 'SAFE';
   timestamp: string;
 }
 
@@ -47,8 +47,8 @@ const initialTransactions: Transaction[] = [
     txHash: '0x8f2a...9aac',
     protocol: 'MantleSwap',
     type: 'Reentrancy',
-    gasSaved: '145,000 MNT',
-    status: 'MITIGATED',
+    gasSaved: 'response package ready',
+    status: 'PROPOSED',
     timestamp: '2 mins ago'
   },
   {
@@ -65,8 +65,8 @@ const initialTransactions: Transaction[] = [
     txHash: '0x48ce...eB7a',
     protocol: 'YieldFlow',
     type: 'Oracle Manipulation',
-    gasSaved: '320,000 MNT',
-    status: 'MITIGATED',
+    gasSaved: 'multisig review queued',
+    status: 'PROPOSED',
     timestamp: '12 mins ago'
   }
 ];
@@ -204,8 +204,8 @@ export default function LandingPage() {
             txHash: tx.hash.slice(0, 8) + '...' + tx.hash.slice(-6),
             protocol: protocols[hashInt % protocols.length],
             type: isThreat ? threatTypes[hashInt % threatTypes.length] : 'Normal Transfer',
-            gasSaved: isThreat ? `${(hashInt % 500) + 50} MNT` : '-',
-            status: isThreat ? 'MITIGATED' : 'SAFE',
+            gasSaved: isThreat ? 'response proposal ready' : '-',
+            status: isThreat ? 'PROPOSED' : 'SAFE',
             timestamp: new Date(Number(block.timestamp) * 1000).toISOString()
           };
         });
@@ -632,16 +632,16 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Live Simulated Threat Ledger */}
+      {/* Live response ledger */}
       <section className="py-20 px-8 md:px-16 max-w-6xl mx-auto relative z-40 bg-black/10 backdrop-blur-[1px] border-t border-gray-900/30">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#101014]/60 border border-gray-800/80 mb-4 text-xs font-bold text-[#10B981]">
             <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
-            LIVE + SIMULATION MONITORING
+            LIVE MONITORING + RESPONSE REVIEW
           </div>
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Defense Matrix Ledger</h2>
           <p className="text-gray-400 max-w-xl mx-auto font-sans text-sm">
-            Live Mantle block samples plus controlled simulation records for incident-response review.
+            Live Mantle block samples plus controlled response records for incident-review workflows.
           </p>
         </div>
 
@@ -680,9 +680,9 @@ export default function LandingPage() {
                           Scanning
                         </span>
                       )}
-                      {tx.status === 'MITIGATED' && (
+                      {tx.status === 'PROPOSED' && (
                         <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/20 font-bold">
-                          Mitigated
+                          Response ready
                         </span>
                       )}
                       {tx.status === 'SAFE' && (

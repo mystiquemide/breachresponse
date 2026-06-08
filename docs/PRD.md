@@ -42,7 +42,7 @@ The product intentionally excludes Byreal Skills CLI integration because that to
 | Metric | Target |
 | --- | --- |
 | Frontend build reliability | CI passes on every PR |
-| Contract safety simulation | Exploit and mitigation tests pass |
+| Contract safety validation | Exploit and mitigation tests pass |
 | Agent readiness | Python dependency install and syntax check pass |
 | Operator clarity | Incident card explains threat, target, and action |
 | Deployment readiness | Mantle env and registry setup documented |
