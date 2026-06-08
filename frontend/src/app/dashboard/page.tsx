@@ -35,7 +35,7 @@ const BootSequence = () => {
   const lines = [
     'MANTLE RPC LINKED',
     'SENTINEL REGISTRY FOUND',
-    'GENLAYER CONSENSUS GUARD READY',
+    'EXTERNAL CONSENSUS GUARD READY',
     'COMMAND CENTER ONLINE',
   ];
 
@@ -78,7 +78,7 @@ export default function Dashboard() {
   
   const [terminalLines, setTerminalLines] = useState<string[]>([
     "[SYS] Establishing connection to Mantle Sepolia RPC",
-    "[SYS] Connection established Pending filter initialized",
+    "[SYS] Connection established. Pending filter initialized",
     "[LOG] Scanning block mempool for anomalies",
     "[LOG] Type 'help' to see command options"
   ]);
@@ -247,7 +247,7 @@ export default function Dashboard() {
         } else if (payload.type === 'ALERT') {
           // Executed response alert
           const log = payload.data;
-          setTerminalLines(prev => capTerminal([...prev, `[ALERT] Response executed for ${log.protocol}. Type: ${log.type}. Metric: ${log.gasSaved}`]));
+          setTerminalLines(prev => capTerminal([...prev, `[ALERT] Response proposal recorded for ${log.protocol}. Type: ${log.type}. Metric: ${log.gasSaved}`]));
         }
       } catch (err) {
         console.warn("SSE Parse Error", err);
@@ -582,10 +582,10 @@ export default function Dashboard() {
           <div id="ob-sentinel" className="sci-fi-panel p-6 relative overflow-hidden transition-all duration-500">
             <h2 className="text-base font-bold mb-4 flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-[#10B981]" />
-              Deploy Sentinel Guard
+              Register Sentinel Guard
             </h2>
             <p className="text-gray-400 text-xs mb-4 leading-relaxed font-sans">
-              Register a smart contract on the Mantle Sepolia network. Once deployed, the active mempool scanning guard is initialized.
+              Register a Mantle Sepolia contract for sentinel monitoring and operator-reviewed response proposals.
             </p>
             <input 
               type="text" 
@@ -599,9 +599,9 @@ export default function Dashboard() {
               disabled={isPending || !isConnected}
               className={`w-full bg-[#10B981] text-black font-bold py-3 rounded text-xs transition-all ${isPending || !isConnected ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-400 hover:shadow-[0_0_15px_rgba(16,185,129,0.3)]'}`}
             >
-              {isPending ? 'Executing Transaction...' : 'Initialize active defense'}
+              {isPending ? 'Submitting registration...' : 'Register sentinel guard'}
             </button>
-            {isSuccess && <p className="text-[#10B981] mt-3 text-[10px] text-center">Protocol registered on Mantle Sepolia!</p>}
+            {isSuccess && <p className="text-[#10B981] mt-3 text-[10px] text-center">Sentinel registered on Mantle Sepolia</p>}
             {!isConnected && <p className="text-red-500 mt-3 text-[10px] text-center font-sans">Connect a Mantle wallet to initialize guards</p>}
             {!isConnected && connectError && (
               <p className="text-yellow-400 mt-2 text-[10px] text-center font-sans">
@@ -623,7 +623,7 @@ export default function Dashboard() {
                 </p>
               </div>
               <span className="text-[9px] uppercase tracking-widest text-[#10B981] bg-[#10B981]/10 border border-[#10B981]/20 rounded px-2 py-1">
-                {GENLAYER_CONSENSUS_GUARD_ADDRESS ? 'Contract linked' : 'Deploy pending'}
+                {GENLAYER_CONSENSUS_GUARD_ADDRESS ? 'StudioNet linked' : 'Address required'}
               </span>
             </div>
 

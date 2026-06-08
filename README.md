@@ -1,6 +1,6 @@
 # BreachResponse
 
-Mantle-specific runtime audit assistant for suspicious onchain activity.
+AI-assisted incident response for suspicious Mantle contract activity.
 
 ![Mantle Sepolia](https://img.shields.io/badge/Mantle-Sepolia_Testnet-10B981?style=flat-square&logo=ethereum)
 ![Next.js](https://img.shields.io/badge/Next.js-16.2-black?style=flat-square&logo=next.js)
@@ -8,7 +8,9 @@ Mantle-specific runtime audit assistant for suspicious onchain activity.
 ![Solidity](https://img.shields.io/badge/Solidity-0.8.24-363636?style=flat-square&logo=solidity)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)
 
-BreachResponse helps Mantle builders review unusual contract behavior, understand possible risk, and turn raw onchain signals into structured response context. The platform combines a Mantle-aware monitoring agent, Solidity review contracts, and a Command Center UI for controlled review and approval workflows.
+Live Command Center: http://43.131.9.176:8900
+
+BreachResponse watches Mantle contract activity, turns suspicious signals into structured incident context, and keeps high-risk response actions behind operator approval. The platform combines a Mantle-aware monitoring agent, Solidity review contracts, and a Command Center UI for controlled review and approval workflows.
 
 ![BreachResponse Command Center](./docs/assets/hero.png)
 
