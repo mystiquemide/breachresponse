@@ -42,12 +42,12 @@ A release branch should not merge unless:
 - agent Python syntax check passes
 - public docs contain no internal planning language
 - environment files contain placeholders only
-- demo flow matches the live product behavior
+- review workflow matches the live product behavior
 - screenshots are current and contain no private data or stale overlays
 
 ## Final demo QA
 
-The current judge demo path is documented in [Demo Flow](./DEMO_FLOW.md). Before submission, verify:
+The current product review path is documented in [Review Workflow](./REVIEW_WORKFLOW.md). Before release, verify:
 
 - **Features** scrolls to **Pipeline Execution**.
 - **Enter Command Center** opens the dashboard.
