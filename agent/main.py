@@ -6,7 +6,7 @@ import urllib.request
 from dotenv import load_dotenv
 from web3 import Web3
 from incident_analyzer import IncidentAnalyzer
-from reporter import Reporter
+from reporter import Reporter, frontend_api_url
 import builtins
 
 _original_print = builtins.print
@@ -50,7 +50,7 @@ def post_log_to_frontend(tx_hash: str, protocol: str, exploit_type: str, gas_sav
     """
     POSTs a log telemetry record to the Next.js API route.
     """
-    url = "http://localhost:3002/api/logs"
+    url = frontend_api_url("logs/ingest")
     payload = {
         "txHash": tx_hash,
         "protocol": protocol,
@@ -75,7 +75,7 @@ def get_registered_protocols():
     """
     Fetches the list of monitored protocols registered in the local Next.js DB.
     """
-    url = "http://localhost:3002/api/sentinels"
+    url = frontend_api_url("sentinels")
     try:
         req = urllib.request.Request(url, method='GET')
         with urllib.request.urlopen(req, timeout=3) as res:
@@ -280,20 +280,20 @@ def run_sentinel_loop():
             # Every 12 steps, simulate an anomaly alert just for UI visuals if no real transactions are happening
             if step % 12 == 0:
                 print("\n" + "="*60)
-                print("[ANOMALY-ALERT] Suspicious recursive call signature detected (UI Simulation)!")
+                print("[ANOMALY-ALERT] Suspicious recursive call signature detected (UI SIMULATION)!")
                 sim_exploit_hash = f"0x48ce...eB7{random.randint(10, 99)}"
-                print(f"[ANALYZER-LLM] Exploit confidence score: 98.0%")
-                print(f"[SENTINEL] Executing defensive payload action on TargetVault...")
-                print(f"[SENTINEL] Transaction broadcasted. Hash: {sim_exploit_hash}")
-                print(f"[SENTINEL] Registry state updated. TargetVault PAUSED.")
+                print(f"[ANALYZER-LLM] Simulated exploit confidence score: 98.0%")
+                print(f"[SENTINEL] SIMULATION: mitigation proposal generated for TargetVault.")
+                print(f"[SENTINEL] SIMULATION: proposed pause calldata 0x8456cb59, awaiting operator approval.")
+                print(f"[SENTINEL] SIMULATION: no transaction was broadcast and no registry state was changed.")
                 print("="*60 + "\n")
                 
                 post_log_to_frontend(
                     tx_hash=sim_exploit_hash,
                     protocol="TargetVault",
-                    exploit_type="Reentrancy Mitigated",
-                    gas_saved="1,420.5 mETH",
-                    status="MITIGATED"
+                    exploit_type="Reentrancy Proposal (Simulation)",
+                    gas_saved="pending operator approval",
+                    status="PROPOSED"
                 )
 
             time.sleep(3.0)
