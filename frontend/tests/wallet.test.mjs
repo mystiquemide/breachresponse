@@ -177,6 +177,14 @@ assert.equal(getPreferredWalletConnector([walletConnect]), walletConnect);
 
 {
   let notice = 'unchanged';
+  let disconnectCalled = false;
+  let connectAttempts = 0;
+  const staleConnector = {
+    ...genericInjected,
+    disconnect: async () => {
+      disconnectCalled = true;
+    },
+  };
   const result = await connectWalletWithWagmi({
     windowObject: {
       isSecureContext: true,
@@ -184,21 +192,24 @@ assert.equal(getPreferredWalletConnector([walletConnect]), walletConnect);
         request: async () => ['0x1234567890123456789012345678901234567890'],
       },
     },
-    connectors: [genericInjected],
-    connectAsync: () => {
-      throw new Error('Connector already connected. Version: @wagmi/core@3.4.0');
+    connectors: [staleConnector],
+    connectAsync: async () => {
+      connectAttempts += 1;
+      if (connectAttempts === 1) {
+        throw new Error('Connector already connected. Version: @wagmi/core@3.4.0');
+      }
+      return { accounts: ['0x1234567890123456789012345678901234567890'] };
     },
-    reconnectAsync: () => {
-      throw new Error('reconnect failed');
-    },
+    reconnectAsync: async () => [],
     setWalletNotice: (value) => {
       notice = value;
     },
   });
 
-  assert.equal(result, 'already-connected');
-  assert.equal(notice, 'Wallet already connected. Continue in Command Center.');
-  assert.doesNotMatch(notice, /@wagmi\/core|Version:|Connector already connected/);
+  assert.equal(result, 'connected');
+  assert.equal(notice, '');
+  assert.equal(disconnectCalled, true, 'stale already-connected connector should be disconnected before retrying');
+  assert.equal(connectAttempts, 2, 'normal Wagmi connect should be retried after clearing stale connector state');
 }
 
 {
