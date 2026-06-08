@@ -59,7 +59,7 @@ export default function AttackModal({ isOpen, onClose, onSuccess }: AttackModalP
   if (!isOpen) return null;
 
   const handleExecute = () => {
-    // Send a 0 value transaction to null address to trigger MetaMask signature securely
+    // Send a 0 value transaction to null address to trigger the connected wallet signature securely
     sendTransaction({
       to: '0x0000000000000000000000000000000000000000',
       value: parseEther('0'),
