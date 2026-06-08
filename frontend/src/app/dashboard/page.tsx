@@ -11,7 +11,7 @@ import Onboarding from './Onboarding';
 import AttackModal from './AttackModal';
 import { REGISTRY_ADDRESS, REGISTRY_ABI } from '../constants';
 import { DASHBOARD_PATH, HISTORY_PATH, LANDING_PATH, clearCommandCenterNavigationState, leaveCommandCenter, navigateToAppPath, replaceWithAppPath } from '../../lib/navigation';
-import { getBrowserWalletConnectionNotice } from '../../lib/wallet';
+import { connectWalletWithWagmi } from '../../lib/wagmiWallet';
 import {
   GENLAYER_CONSENSUS_GUARD_ADDRESS,
   type GenLayerAccount,
@@ -69,7 +69,6 @@ export default function Dashboard() {
   const { writeContract, isPending, isSuccess } = useWriteContract();
   
   const isCorrectNetwork = chainId === mantleSepoliaTestnet.id;
-  const injectedConnector = connectors.find(connector => connector.id === 'injected') ?? connectors[0];
   
   const [protocolAddress, setProtocolAddress] = useState('');
   const [customAssets, setCustomAssets] = useState<Asset[]>([]);
@@ -99,10 +98,12 @@ export default function Dashboard() {
   const consensusClientRef = useRef<IncidentConsensusGuardClient | null>(null);
 
   const handleConnectWallet = () => {
-    const notice = getBrowserWalletConnectionNotice(window);
-    setWalletNotice(notice);
-    if (notice || !injectedConnector) return;
-    connect({ connector: injectedConnector });
+    void connectWalletWithWagmi({
+      windowObject: window,
+      connectors,
+      connect,
+      setWalletNotice,
+    });
   };
 
   const handleDisconnect = () => {
@@ -213,10 +214,9 @@ export default function Dashboard() {
   }, [refreshConsensusIncidents]);
 
   useEffect(() => {
-    // Show the setup tour on first visit, and always allow forcing it with /dashboard?tour=1.
-    const hasOnboarded = localStorage.getItem('breachresponse_onboarded');
+    // Keep wallet actions available by default. The tour is still available from Replay Setup Tour or /dashboard?tour=1.
     const shouldOpenTour = new URLSearchParams(window.location.search).get('tour') === '1';
-    if (!hasOnboarded || shouldOpenTour) {
+    if (shouldOpenTour) {
       setTimeout(() => setShowOnboarding(true), 0);
     }
   }, []);

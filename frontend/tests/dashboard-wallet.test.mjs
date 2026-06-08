@@ -1,0 +1,18 @@
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+
+const dashboardSource = readFileSync(new URL('../src/app/dashboard/page.tsx', import.meta.url), 'utf8');
+const historySource = readFileSync(new URL('../src/app/history/page.tsx', import.meta.url), 'utf8');
+const landingSource = readFileSync(new URL('../src/app/page.tsx', import.meta.url), 'utf8');
+
+for (const [name, source] of [
+  ['landing', landingSource],
+  ['dashboard', dashboardSource],
+  ['history', historySource],
+]) {
+  assert.match(source, /connectWalletWithWagmi/, `${name} should use the shared Wagmi wallet connect helper`);
+  assert.doesNotMatch(source, /connect\(\{ connector: injectedConnector \}\)/, `${name} should not use a route-local injected connector`);
+}
+
+assert.doesNotMatch(dashboardSource, /!hasOnboarded\s*\|\|\s*shouldOpenTour/, 'dashboard should not auto-open onboarding over wallet controls');
+assert.match(dashboardSource, /get\('tour'\) === '1'/, 'dashboard should still support explicit tour replay');
