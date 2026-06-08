@@ -609,21 +609,21 @@ export default function Dashboard() {
             </div>
 
             <div className="space-y-3 text-[10px] text-gray-400 mb-4">
-              <div className="flex justify-between gap-4 border-b border-gray-800/60 pb-2">
+              <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] gap-3 border-b border-gray-800/60 pb-2">
                 <span>StudioNet Guard</span>
-                <span className="text-gray-300 break-all text-right">
-                  {GENLAYER_CONSENSUS_GUARD_ADDRESS || 'NEXT_PUBLIC_GENLAYER_CONSENSUS_GUARD_ADDRESS required'}
+                <span className="min-w-0 text-right text-gray-300 break-words">
+                  {GENLAYER_CONSENSUS_GUARD_ADDRESS || 'Env address required'}
                 </span>
               </div>
-              <div className="flex justify-between gap-4 border-b border-gray-800/60 pb-2">
+              <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] gap-3 border-b border-gray-800/60 pb-2">
                 <span>App-managed signer</span>
-                <span className="text-gray-300">
+                <span className="min-w-0 text-right text-gray-300">
                   {genLayerAccount ? `${genLayerAccount.address.slice(0, 6)}...${genLayerAccount.address.slice(-4)}` : 'Not generated'}
                 </span>
               </div>
-              <div className="flex justify-between gap-4">
+              <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] gap-3">
                 <span>Consensus records</span>
-                <span className="text-gray-300">{consensusIncidents.length}</span>
+                <span className="min-w-0 text-right text-gray-300">{consensusIncidents.length}</span>
               </div>
             </div>
 

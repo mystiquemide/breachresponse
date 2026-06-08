@@ -1,6 +1,6 @@
 # BreachResponse
 
-AI-assisted incident response for suspicious Mantle contract activity.
+Mantle runtime audit assistance for suspicious smart contract activity.
 
 ![Mantle Sepolia](https://img.shields.io/badge/Mantle-Sepolia_Testnet-10B981?style=flat-square&logo=ethereum)
 ![Next.js](https://img.shields.io/badge/Next.js-16.2-black?style=flat-square&logo=next.js)
@@ -8,22 +8,22 @@ AI-assisted incident response for suspicious Mantle contract activity.
 ![Solidity](https://img.shields.io/badge/Solidity-0.8.24-363636?style=flat-square&logo=solidity)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)
 
-Live Command Center: http://43.131.9.176:8900
+Live Command Center: https://breachresponse.vercel.app
 
-BreachResponse watches Mantle contract activity, turns suspicious signals into structured incident context, and keeps high-risk response actions behind operator approval. The platform combines a Mantle-aware monitoring agent, Solidity review contracts, and a Command Center UI for controlled review and approval workflows.
+BreachResponse is a Mantle-specific runtime audit assistant. It watches suspicious contract activity, turns raw signals into structured incident context, and keeps high-risk response actions behind operator approval. The system combines a Mantle-aware monitoring agent, Solidity review contracts, an external consensus guard, and a Command Center UI built for security teams that need controlled response paths instead of panic buttons.
 
 ![BreachResponse Command Center](./docs/assets/hero.png)
 
 ## Why it matters
 
-Smart contract teams often see raw activity before they have enough context to act. BreachResponse is built around a cleaner review model:
+Smart contract teams rarely get a clean decision window during an incident. BreachResponse is built around a tighter review model:
 
 1. Monitor Mantle activity and sentinel telemetry.
 2. Surface suspicious transaction patterns and protocol anomalies.
 3. Explain what changed in operator language.
-4. Structure the risk context for review.
-5. Keep high-risk next steps behind approval.
-6. Record the review trail for follow-up.
+4. Structure the risk context into a response proposal.
+5. Keep high-risk actions behind human approval and scoped policy controls.
+6. Record the review trail for follow-up and audit.
 
 
 ## Product scope
@@ -116,11 +116,12 @@ The current SentinelRegistry deployment used by the frontend is:
 For product review, use the shortest honest walkthrough:
 
 1. Open the landing page and click **Features** to jump to **Pipeline Execution**.
-2. Click **Enter Command Center** to open the operator dashboard.
+2. Click **Connect and Enter** or **Enter Command Center** to open the operator dashboard.
 3. Connect a Mantle Sepolia wallet for live wallet state, or leave it disconnected to show the safe disabled state.
-4. Review the Sentinel Guard and external decision guard panels.
-5. Explain the boundary clearly: normal users keep their wallet on Mantle, while BreachResponse submits ambiguous incident context to GenLayer through the app layer for validator-consensus review.
-6. Use **Threat History** for incident review, then return with browser back or **BACK** without getting trapped in the dashboard.
+4. Review **Register Sentinel Guard** and confirm guarded actions stay disabled until the required wallet and target contract state exists.
+5. Review **GenLayer Consensus Guard** and explain the boundary: normal users keep their wallet on Mantle, while BreachResponse submits ambiguous incident context to GenLayer through the app layer for validator-consensus review.
+6. Open **Threat History** for incident review, then return with browser back or **BACK** without getting trapped in the dashboard.
+7. Disconnect the wallet and confirm the dashboard returns to a safe readable state.
 
 See [Review Workflow](./docs/REVIEW_WORKFLOW.md) for the full walkthrough and exact wording.
 
