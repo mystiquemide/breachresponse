@@ -8,7 +8,7 @@ import { createPublicClient, http, type Transaction as ViemTransaction } from 'v
 import { Shield, ArrowLeft, Activity, ShieldCheck, Power, AlertTriangle, History, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { DASHBOARD_PATH, leaveCommandCenter, navigateToAppPath } from '../../lib/navigation';
-import { getBrowserWalletConnectionNotice } from '../../lib/wallet';
+import { connectWalletWithWagmi } from '../../lib/wagmiWallet';
 
 interface TransactionLog {
   id: string;
@@ -53,12 +53,11 @@ const initialLogs: TransactionLog[] = [
 export default function ThreatHistory() {
   const router = useRouter();
   const { address, isConnected, chainId } = useAccount();
-  const { connect, connectors } = useConnect();
+  const { connect, connectors, error: connectError, isPending: isConnectPending } = useConnect();
   const { disconnect, disconnectAsync } = useDisconnect();
   const { switchChain } = useSwitchChain();
   
   const isCorrectNetwork = chainId === mantleSepoliaTestnet.id;
-  const injectedConnector = connectors.find(connector => connector.id === 'injected') ?? connectors[0];
   
   const [logs, setLogs] = useState<TransactionLog[]>(initialLogs);
   const [search, setSearch] = useState('');
@@ -66,10 +65,12 @@ export default function ThreatHistory() {
   const [walletNotice, setWalletNotice] = useState('');
 
   const handleConnectWallet = () => {
-    const notice = getBrowserWalletConnectionNotice(window);
-    setWalletNotice(notice);
-    if (notice || !injectedConnector) return;
-    connect({ connector: injectedConnector });
+    void connectWalletWithWagmi({
+      windowObject: window,
+      connectors,
+      connect,
+      setWalletNotice,
+    });
   };
 
   const handleDisconnect = () => {
@@ -194,15 +195,15 @@ export default function ThreatHistory() {
               className="flex items-center gap-2 bg-[#10B981] text-black font-bold py-2 px-5 rounded hover:bg-green-400 transition-all text-xs shadow-[0_0_15px_rgba(16,185,129,0.3)]"
             >
               <Power className="w-3.5 h-3.5" />
-              Connect Wallet
+              {isConnectPending ? 'Connecting...' : 'Connect Wallet'}
             </button>
           )}
         </div>
       </header>
 
-      {!isConnected && walletNotice && (
+      {!isConnected && (walletNotice || connectError) && (
         <p className="relative z-10 mb-4 text-center text-[10px] text-yellow-400 font-sans">
-          {walletNotice}
+          {walletNotice || connectError?.message || 'Wallet connection failed. Unlock MetaMask and try again.'}
         </p>
       )}
 
