@@ -616,7 +616,7 @@ export default function Dashboard() {
             {!isConnected && <p className="text-red-500 mt-3 text-[10px] text-center font-sans">Connect a Mantle wallet to initialize guards</p>}
             {!isConnected && (walletNotice || connectError) && (
               <p className="text-yellow-400 mt-2 text-[10px] text-center font-sans">
-                {walletNotice || 'No injected wallet detected. Install MetaMask or open this app in a wallet browser.'}
+                {walletNotice || 'No injected Ethereum wallet detected. Open this app in Rabby, MetaMask, OKX, or another Ethereum wallet browser.'}
               </p>
             )}
           </div>

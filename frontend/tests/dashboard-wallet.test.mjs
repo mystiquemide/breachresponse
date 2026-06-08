@@ -13,6 +13,7 @@ for (const [name, source] of [
 ]) {
   assert.match(source, /connectWalletWithWagmi/, `${name} should use the shared Wagmi wallet connect helper`);
   assert.doesNotMatch(source, /connect\(\{ connector: injectedConnector \}\)/, `${name} should not use a route-local injected connector`);
+  assert.doesNotMatch(source, /Install MetaMask|Unlock MetaMask|Open MetaMask/, `${name} wallet copy should stay wallet-agnostic`);
 }
 
 for (const [name, source] of [
