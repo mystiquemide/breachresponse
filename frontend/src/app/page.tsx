@@ -5,8 +5,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Shield, Target, Activity, Hexagon, Component, CheckCircle2, Power, AlertTriangle, Terminal, Layers, Cpu, ShieldCheck } from 'lucide-react';
-import { useAccount, useConnect, useSwitchChain, useDisconnect, useReconnect } from 'wagmi';
+import { Shield, Target, Activity, Hexagon, Component, CheckCircle2, Layers, Cpu, ShieldCheck } from 'lucide-react';
+import { useAccount } from 'wagmi';
 import { mantleSepoliaTestnet } from 'wagmi/chains';
 import { createPublicClient, http, type Transaction as ViemTransaction } from 'viem';
 import {
@@ -16,7 +16,7 @@ import {
   clearCommandCenterNavigationState,
   navigateToAppPath,
 } from '../lib/navigation';
-import { connectWalletWithWagmi } from '../lib/wagmiWallet';
+import { WalletConnectControl } from '../components/WalletConnectControl';
 
 const fadeInUp = {
   initial: { opacity: 0, y: 30 },
@@ -94,13 +94,8 @@ export default function LandingPage() {
   const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
   const [isLaunchingCommandCenter, setIsLaunchingCommandCenter] = useState(false);
   const [showFirstLoadPreloader, setShowFirstLoadPreloader] = useState(true);
-  const [walletNotice, setWalletNotice] = useState('');
 
   const { isConnected, chainId } = useAccount();
-  const { connect, connectAsync, connectors } = useConnect();
-  const { disconnect, disconnectAsync } = useDisconnect();
-  const { reconnectAsync } = useReconnect();
-  const { switchChain } = useSwitchChain();
 
   const isCorrectNetwork = chainId === mantleSepoliaTestnet.id;
 
@@ -140,40 +135,14 @@ export default function LandingPage() {
     }
   }, [isLaunchingCommandCenter, isConnected, isCorrectNetwork]);
 
-  const handleWalletAccess = () => {
+  const beginCommandCenterLaunch = () => {
     setIsLaunchingCommandCenter(true);
     window.sessionStorage.setItem('breachresponse_launching_command_center', 'true');
-
-    if (!isConnected) {
-      void connectWalletWithWagmi({
-        windowObject: window,
-        connectors,
-        connect,
-        connectAsync,
-        reconnectAsync,
-        setWalletNotice,
-      });
-    } else if (!isCorrectNetwork && switchChain) {
-      switchChain({ chainId: mantleSepoliaTestnet.id });
-    } else {
-      navigateToAppPath(window.location, DASHBOARD_PATH);
-    }
   };
 
   const handleCommandCenterAccess = () => {
-    setIsLaunchingCommandCenter(true);
-    window.sessionStorage.setItem('breachresponse_launching_command_center', 'true');
+    beginCommandCenterLaunch();
     navigateToAppPath(window.location, DASHBOARD_PATH);
-  };
-
-  const handleDisconnect = async () => {
-    setIsLaunchingCommandCenter(false);
-    clearCommandCenterNavigationState(window.sessionStorage);
-    try {
-      await disconnectAsync();
-    } catch {
-      disconnect();
-    }
   };
 
   useEffect(() => {
@@ -249,45 +218,16 @@ export default function LandingPage() {
           <a href="https://docs.mantle.xyz" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Documentation</a>
         </div>
         <div>
-          {!isConnected ? (
-            <button 
-              onClick={handleWalletAccess}
-              className="bg-[#10B981] text-black px-6 py-2.5 rounded text-sm font-bold hover:bg-green-400 hover:shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all shadow-lg flex items-center gap-2"
-            >
-              <Power className="w-4 h-4" /> Connect and Enter
-            </button>
-          ) : !isCorrectNetwork ? (
-             <button 
-              onClick={handleWalletAccess}
-              className="bg-red-500 text-white px-6 py-2.5 rounded text-sm font-bold hover:bg-red-400 hover:shadow-[0_0_15px_rgba(239,68,68,0.4)] transition-all shadow-lg flex items-center gap-2"
-            >
-              <AlertTriangle className="w-4 h-4" /> Switch Network
-            </button>
-          ) : (
-            <div className="flex gap-4 items-center">
-              <button 
-                onClick={handleDisconnect}
-                className="text-xs text-gray-500 hover:text-red-500 transition-colors"
-              >
-                Disconnect
-              </button>
-              <button
-                type="button"
-                onClick={handleCommandCenterAccess}
-                className="bg-black/50 backdrop-blur-md border border-white/20 text-white px-6 py-2.5 rounded text-sm font-bold hover:border-[#10B981] hover:text-[#10B981] transition-all shadow-lg"
-              >
-                Command Center
-              </button>
-            </div>
-          )}
+          <WalletConnectControl
+            disconnectedLabel="Connect and Enter"
+            onBeforeConnect={beginCommandCenterLaunch}
+            onConnectedClick={handleCommandCenterAccess}
+            className="bg-[#10B981] text-black px-6 py-2.5 rounded text-sm font-bold hover:bg-green-400 hover:shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all shadow-lg flex items-center gap-2"
+            connectedClassName="bg-black/50 backdrop-blur-md border border-white/20 text-white px-6 py-2.5 rounded text-sm font-bold hover:border-[#10B981] hover:text-[#10B981] transition-all shadow-lg flex items-center gap-2"
+            connectedLabel="Command Center"
+          />
         </div>
       </nav>
-
-      {!isConnected && walletNotice && (
-        <p className="absolute top-24 left-0 right-0 z-50 mx-auto w-fit max-w-[90vw] rounded border border-yellow-500/30 bg-black/80 px-4 py-2 text-center text-[10px] text-yellow-300 font-sans">
-          {walletNotice}
-        </p>
-      )}
 
       <div className="relative min-h-screen w-full overflow-hidden flex items-center justify-center bg-[#050505]">
         <div className="absolute inset-0 z-0 flex items-center justify-center pointer-events-none opacity-20">
@@ -727,21 +667,14 @@ export default function LandingPage() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center">
-            {!isConnected || !isCorrectNetwork ? (
-              <button 
-                onClick={handleCommandCenterAccess}
-                className="bg-[#10B981] text-black font-bold px-8 py-4 rounded text-sm hover:bg-green-400 transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_40px_rgba(16,185,129,0.5)] text-center font-mono flex items-center gap-2"
-              >
-                <Terminal className="w-4 h-4" /> Enter Command Center
-              </button>
-            ) : (
-              <Link 
-                href="/dashboard" 
-                className="bg-[#10B981] text-black font-bold px-8 py-4 rounded text-sm hover:bg-green-400 transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_40px_rgba(16,185,129,0.5)] text-center font-mono"
-              >
-                Enter Command Center
-              </Link>
-            )}
+            <WalletConnectControl
+              disconnectedLabel="Enter Command Center"
+              onBeforeConnect={beginCommandCenterLaunch}
+              onConnectedClick={handleCommandCenterAccess}
+              className="bg-[#10B981] text-black font-bold px-8 py-4 rounded text-sm hover:bg-green-400 transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_40px_rgba(16,185,129,0.5)] text-center font-mono flex items-center gap-2"
+              connectedClassName="bg-[#10B981] text-black font-bold px-8 py-4 rounded text-sm hover:bg-green-400 transition-all shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_40px_rgba(16,185,129,0.5)] text-center font-mono flex items-center gap-2"
+              connectedLabel="Enter Command Center"
+            />
             <a 
               href="https://docs.mantle.xyz" 
               target="_blank" 

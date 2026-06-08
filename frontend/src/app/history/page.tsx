@@ -2,13 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAccount, useConnect, useDisconnect, useReconnect, useSwitchChain } from 'wagmi';
 import { mantleSepoliaTestnet } from 'wagmi/chains';
 import { createPublicClient, http, type Transaction as ViemTransaction } from 'viem';
-import { Shield, ArrowLeft, Activity, ShieldCheck, Power, AlertTriangle, History, Search } from 'lucide-react';
+import { Shield, ArrowLeft, Activity, ShieldCheck, History, Search } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { DASHBOARD_PATH, leaveCommandCenter, navigateToAppPath } from '../../lib/navigation';
-import { connectWalletWithWagmi, WALLET_CONNECTION_FAILED_NOTICE, WALLET_REQUEST_PENDING_NOTICE } from '../../lib/wagmiWallet';
+import { DASHBOARD_PATH, navigateToAppPath } from '../../lib/navigation';
+import { WalletConnectControl } from '../../components/WalletConnectControl';
 
 interface TransactionLog {
   id: string;
@@ -52,38 +51,9 @@ const initialLogs: TransactionLog[] = [
 
 export default function ThreatHistory() {
   const router = useRouter();
-  const { address, isConnected, chainId } = useAccount();
-  const { connect, connectAsync, connectors, error: connectError, isPending: isConnectPending } = useConnect();
-  const { disconnect, disconnectAsync } = useDisconnect();
-  const { reconnectAsync } = useReconnect();
-  const { switchChain } = useSwitchChain();
-  
-  const isCorrectNetwork = chainId === mantleSepoliaTestnet.id;
-  
   const [logs, setLogs] = useState<TransactionLog[]>(initialLogs);
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [walletNotice, setWalletNotice] = useState('');
-
-  const handleConnectWallet = () => {
-    void connectWalletWithWagmi({
-      windowObject: window,
-      connectors,
-      connect,
-      connectAsync,
-      reconnectAsync,
-      setWalletNotice,
-    });
-  };
-
-  const handleDisconnect = () => {
-    void leaveCommandCenter({
-      disconnect,
-      disconnectAsync,
-      location: window.location,
-      storage: window.sessionStorage,
-    });
-  };
 
   const handleBackToDashboard = () => {
     navigateToAppPath(window.location, DASHBOARD_PATH);
@@ -176,49 +146,9 @@ export default function ThreatHistory() {
         </div>
         
         <div>
-          {isConnected && isCorrectNetwork ? (
-            <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center">
-              <div className="flex items-center gap-2 bg-[#18181B] border border-[#10B981]/30 px-4 py-2 rounded text-xs text-gray-300">
-                <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
-                <span className="text-gray-500 uppercase tracking-widest">Connected:</span>
-                <span className="font-bold text-white">
-                  {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Syncing address'}
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={handleDisconnect}
-                className="flex items-center gap-2 bg-red-500/10 text-red-500 border border-red-500/20 px-4 py-2 rounded hover:bg-red-500/20 transition-colors text-xs font-bold uppercase tracking-widest"
-              >
-                <Power className="w-3.5 h-3.5" />
-                Disconnect
-              </button>
-            </div>
-          ) : isConnected && !isCorrectNetwork ? (
-            <button 
-              onClick={() => switchChain && switchChain({ chainId: mantleSepoliaTestnet.id })} 
-              className="flex items-center gap-2 bg-red-500 text-white font-bold py-2 px-5 rounded hover:bg-red-400 transition-all text-xs shadow-[0_0_15px_rgba(239,68,68,0.3)]"
-            >
-              <AlertTriangle className="w-3.5 h-3.5" />
-              Switch Network
-            </button>
-          ) : (
-            <button 
-              onClick={handleConnectWallet} 
-              className="flex items-center gap-2 bg-[#10B981] text-black font-bold py-2 px-5 rounded hover:bg-green-400 transition-all text-xs shadow-[0_0_15px_rgba(16,185,129,0.3)]"
-            >
-              <Power className="w-3.5 h-3.5" />
-              {isConnectPending && walletNotice !== WALLET_REQUEST_PENDING_NOTICE ? 'Connecting...' : 'Connect Wallet'}
-            </button>
-          )}
+          <WalletConnectControl />
         </div>
       </header>
-
-      {!isConnected && (walletNotice || connectError) && (
-        <p className="relative z-10 mb-4 text-center text-[10px] text-yellow-400 font-sans">
-          {walletNotice || WALLET_CONNECTION_FAILED_NOTICE}
-        </p>
-      )}
 
       <motion.div 
         initial={false}
