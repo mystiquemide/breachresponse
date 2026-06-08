@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAccount, useConnect, useDisconnect, useWriteContract, useSwitchChain } from 'wagmi';
+import { useAccount, useConnect, useDisconnect, useReconnect, useWriteContract, useSwitchChain } from 'wagmi';
 import { mantleSepoliaTestnet } from 'wagmi/chains';
 import { ShieldAlert, Radio, Activity, ShieldCheck, Power, Cpu, AlertTriangle, HelpCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -65,6 +65,7 @@ export default function Dashboard() {
   const { address, isConnected, chainId } = useAccount();
   const { connect, connectAsync, connectors, error: connectError, isPending: isConnectPending } = useConnect();
   const { disconnect, disconnectAsync } = useDisconnect();
+  const { reconnectAsync } = useReconnect();
   const { switchChain } = useSwitchChain();
   const { writeContract, isPending, isSuccess } = useWriteContract();
   
@@ -103,6 +104,7 @@ export default function Dashboard() {
       connectors,
       connect,
       connectAsync,
+      reconnectAsync,
       setWalletNotice,
     });
   };
