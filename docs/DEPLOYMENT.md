@@ -97,6 +97,7 @@ Relevant environment variables:
 | Variable | Purpose |
 | --- | --- |
 | `MANTLE_RPC_URL` | Mantle RPC endpoint used by the sentinel scanner |
+| `FRONTEND_API_BASE_URL` | Next.js API base used by the agent for logs, heartbeats, and sentinel lookup. Use `http://127.0.0.1:3000/api` locally or the hosted HTTPS origin plus `/api`. |
 | `OPENAI_API_KEY` | API key for LLM-assisted exploit analysis |
 | `OPENAI_BASE_URL` | Optional OpenAI-compatible provider endpoint |
 | `LLM_MODEL` | Model used for analysis, default `gpt-4o-mini` |
