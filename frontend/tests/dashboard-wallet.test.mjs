@@ -24,6 +24,9 @@ for (const [name, source] of [
   assert.match(source, /walletNotice !== WALLET_REQUEST_PENDING_NOTICE/, `${name} should stop showing Connecting after the wallet request times out`);
 }
 
+assert.doesNotMatch(historySource, /connectError\?\.message/, 'history should not render raw Wagmi error messages with library versions');
+assert.match(historySource, /address \? `\$\{address\.slice\(0, 6\)\}\.\.\.\$\{address\.slice\(-4\)\}` : 'Wallet connected'/, 'history should show a safe connected fallback while address hydrates');
+
 assert.doesNotMatch(dashboardSource, /!hasOnboarded\s*\|\|\s*shouldOpenTour/, 'dashboard should not auto-open onboarding over wallet controls');
 assert.match(dashboardSource, /get\('tour'\) === '1'/, 'dashboard should still support explicit tour replay');
 assert.match(providerSource, /injected\(/, 'Web3Provider should keep injected wallet fallback support');
