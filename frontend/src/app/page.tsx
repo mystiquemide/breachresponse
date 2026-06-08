@@ -280,7 +280,7 @@ export default function LandingPage() {
               Breach Response
             </h1>
             <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] font-sans">
-              AI-assisted incident response for suspicious Mantle contract activity
+              Mantle runtime audit assistance for suspicious smart contract activity
             </p>
           </motion.div>
 
@@ -695,7 +695,7 @@ export default function LandingPage() {
               <span className="text-lg font-bold tracking-widest text-white">BREACH RESPONSE</span>
             </div>
             <p className="text-gray-500 text-sm leading-relaxed font-sans max-w-xs">
-              AI-assisted incident response for suspicious Mantle contract activity
+              Mantle runtime audit assistance for suspicious smart contract activity
             </p>
           </div>
           
