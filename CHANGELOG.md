@@ -18,4 +18,4 @@
 
 ### Added
 
-- Initial Mantle sentinel registry, response dashboard, Python monitoring agent, and exploit simulation contracts.
+- Initial Mantle sentinel registry, response dashboard, Python monitoring agent, and exploit validation contracts.

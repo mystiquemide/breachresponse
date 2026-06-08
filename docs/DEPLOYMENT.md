@@ -140,5 +140,5 @@ WantedBy=multi-user.target
 - Wallet connection handles disconnected, wrong-network, and connected states.
 - Agent connects to Mantle RPC.
 - Registry contract address matches the configured network.
-- Incident simulation displays the expected mitigation path.
+- Incident response workflow displays the expected proposal and approval path.
 - Logs do not expose secrets.

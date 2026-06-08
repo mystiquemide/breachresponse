@@ -178,7 +178,7 @@ Normal users and operators keep their wallet on Mantle. The GenLayer StudioNet/t
 
 ### 5. On-chain response
 
-The contracts layer provides a Mantle registry and simulation contracts. The registry tracks protected protocols and the authorized sentinel agent. The target vault and attacker contracts prove the threat model in tests.
+The contracts layer provides a Mantle registry and validation contracts. The registry tracks protected protocols and the authorized sentinel agent. The target vault and attacker contracts prove the threat model in tests.
 
 ## Response modes
 
@@ -206,7 +206,7 @@ Mantle RPC
 
 1. Python handles monitoring because Web3.py and data tooling are mature for agent workflows.
 2. Next.js, Wagmi, and Viem handle wallet UX and Mantle network state.
-3. Solidity contracts keep the registry and simulation layer explicit and testable.
+3. Solidity contracts keep the registry and validation layer explicit and testable.
 4. Human approval is default because autonomous response can become dangerous without scoped policy controls.
 5. The vulnerable test vault exists only to prove the exploit and mitigation path.
 6. LLM output is advisory until validated by deterministic safety rules and operator approval.

@@ -13,7 +13,7 @@ Detect earlier. Decide faster. Contain damage before it spreads.
 - Dark command-center interface
 - Green Mantle-aligned telemetry accents
 - Monospace labels for operator trust
-- Clear status states: safe, scanning, alert, mitigated
+- Clear status states: safe, scanning, alert, validated
 - High-contrast incident cards for emergency decisions
 
 ## UX flow

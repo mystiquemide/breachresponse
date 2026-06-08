@@ -15,7 +15,7 @@ interface TransactionLog {
   protocol: string;
   type: string;
   gasSaved: string;
-  status: 'SCANNING' | 'MITIGATED' | 'SAFE';
+  status: 'SCANNING' | 'PROPOSED' | 'SAFE';
   timestamp: string;
 }
 
@@ -25,8 +25,8 @@ const initialLogs: TransactionLog[] = [
     txHash: '0x8f2a9aac22df9917c90a54dbd04f4716d98fe78d76400400cc091bf46dabe9aac',
     protocol: 'MantleSwap',
     type: 'Reentrancy',
-    gasSaved: '145 MNT',
-    status: 'MITIGATED',
+    gasSaved: 'response package ready',
+    status: 'PROPOSED',
     timestamp: new Date(Date.now() - 120000).toISOString(),
   },
   {
@@ -43,8 +43,8 @@ const initialLogs: TransactionLog[] = [
     txHash: '0x48ce12ca0f943d803f414e12dbe66701e2b7721d4edb6134ef4e7e112aeceb7a',
     protocol: 'YieldFlow',
     type: 'Oracle Manipulation',
-    gasSaved: '320 MNT',
-    status: 'MITIGATED',
+    gasSaved: 'multisig review queued',
+    status: 'PROPOSED',
     timestamp: new Date(Date.now() - 720000).toISOString(),
   },
 ];
@@ -116,8 +116,8 @@ export default function ThreatHistory() {
             txHash: tx.hash,
             protocol: protocols[hashInt % protocols.length],
             type: isThreat ? threatTypes[hashInt % threatTypes.length] : 'Normal Transfer',
-            gasSaved: isThreat ? `${(hashInt % 500) + 50} MNT` : '-',
-            status: isThreat ? 'MITIGATED' : 'SAFE',
+            gasSaved: isThreat ? 'response proposal ready' : '-',
+            status: isThreat ? 'PROPOSED' : 'SAFE',
             timestamp: new Date(Number(block.timestamp) * 1000).toISOString()
           };
         });
@@ -199,8 +199,8 @@ export default function ThreatHistory() {
         {/* Analytics Summary */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="sci-fi-panel rounded-xl p-6 border-glow">
-            <div className="text-gray-500 text-xs mb-2 flex items-center gap-2"><Shield className="w-4 h-4" /> TOTAL MITIGATIONS</div>
-            <div className="text-3xl font-bold text-[#10B981]">{logs.filter(l => l.status === 'MITIGATED').length}</div>
+            <div className="text-gray-500 text-xs mb-2 flex items-center gap-2"><Shield className="w-4 h-4" /> RESPONSE PROPOSALS</div>
+            <div className="text-3xl font-bold text-[#10B981]">{logs.filter(l => l.status === 'PROPOSED').length}</div>
           </div>
           <div className="sci-fi-panel rounded-xl p-6 border-glow">
             <div className="text-gray-500 text-xs mb-2 flex items-center gap-2"><Activity className="w-4 h-4" /> TOTAL EVENTS LOGGED</div>
@@ -238,8 +238,8 @@ export default function ThreatHistory() {
                     <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">{new Date(log.timestamp).toLocaleString()}</div>
                     <h2 className="text-sm font-bold text-white">{log.protocol}</h2>
                   </div>
-                  <span className={`shrink-0 px-2.5 py-1 rounded text-[10px] font-bold ${log.status === 'MITIGATED' ? 'bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/20' : 'bg-white/5 text-gray-400 border border-white/10'}`}>
-                    {log.status === 'MITIGATED' ? 'Mitigated' : 'Safe'}
+                  <span className={`shrink-0 px-2.5 py-1 rounded text-[10px] font-bold ${log.status === 'PROPOSED' ? 'bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/20' : 'bg-white/5 text-gray-400 border border-white/10'}`}>
+                    {log.status === 'PROPOSED' ? 'Response ready' : 'Safe'}
                   </span>
                 </div>
 
@@ -260,7 +260,7 @@ export default function ThreatHistory() {
                   </div>
                   <div>
                     <div className="text-[10px] text-gray-500 uppercase tracking-widest mb-1">Action</div>
-                    <div className="text-gray-300 font-bold">{log.status === 'MITIGATED' ? `${log.gasSaved} saved` : 'Allowed'}</div>
+                    <div className="text-gray-300 font-bold">{log.status === 'PROPOSED' ? log.gasSaved : 'Allowed'}</div>
                   </div>
                 </div>
               </article>
@@ -301,9 +301,9 @@ export default function ThreatHistory() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
-                        {log.status === 'MITIGATED' ? (
+                        {log.status === 'PROPOSED' ? (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/20 font-bold shadow-[0_0_10px_rgba(16,185,129,0.2)]">
-                            Mitigated ({log.gasSaved} Saved)
+                            Response ready ({log.gasSaved})
                           </span>
                         ) : log.status === 'SAFE' ? (
                           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-white/5 text-gray-400 border border-white/10 font-bold">

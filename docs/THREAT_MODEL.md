@@ -33,4 +33,4 @@
 3. Reject payloads with nonzero value unless explicitly approved.
 4. Log every proposed and executed action.
 5. Support operator override and agent shutdown.
-6. Test policy changes against simulations before deployment.
+6. Test policy changes against validation scenarios before deployment.
