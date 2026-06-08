@@ -2,16 +2,15 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAccount, useConnect, useDisconnect, useReconnect, useWriteContract, useSwitchChain } from 'wagmi';
-import { mantleSepoliaTestnet } from 'wagmi/chains';
-import { ShieldAlert, Radio, Activity, ShieldCheck, Power, Cpu, AlertTriangle, HelpCircle } from 'lucide-react';
+import { useAccount, useWriteContract } from 'wagmi';
+import { ShieldAlert, Radio, Activity, ShieldCheck, Cpu, HelpCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Counter from './Counter';
 import Onboarding from './Onboarding';
 import AttackModal from './AttackModal';
 import { REGISTRY_ADDRESS, REGISTRY_ABI } from '../constants';
-import { DASHBOARD_PATH, HISTORY_PATH, LANDING_PATH, clearCommandCenterNavigationState, leaveCommandCenter, navigateToAppPath, replaceWithAppPath } from '../../lib/navigation';
-import { connectWalletWithWagmi, WALLET_REQUEST_PENDING_NOTICE } from '../../lib/wagmiWallet';
+import { DASHBOARD_PATH, HISTORY_PATH, LANDING_PATH, clearCommandCenterNavigationState, navigateToAppPath, replaceWithAppPath } from '../../lib/navigation';
+import { WalletConnectControl } from '../../components/WalletConnectControl';
 import {
   GENLAYER_CONSENSUS_GUARD_ADDRESS,
   type GenLayerAccount,
@@ -62,14 +61,8 @@ const BootSequence = () => {
 
 export default function Dashboard() {
   const router = useRouter();
-  const { address, isConnected, chainId } = useAccount();
-  const { connect, connectAsync, connectors, error: connectError, isPending: isConnectPending } = useConnect();
-  const { disconnect, disconnectAsync } = useDisconnect();
-  const { reconnectAsync } = useReconnect();
-  const { switchChain } = useSwitchChain();
+  const { isConnected } = useAccount();
   const { writeContract, isPending, isSuccess } = useWriteContract();
-  
-  const isCorrectNetwork = chainId === mantleSepoliaTestnet.id;
   
   const [protocolAddress, setProtocolAddress] = useState('');
   const [customAssets, setCustomAssets] = useState<Asset[]>([]);
@@ -95,28 +88,7 @@ export default function Dashboard() {
   const [consensusIncidents, setConsensusIncidents] = useState<unknown[]>([]);
   const [isConsensusBusy, setIsConsensusBusy] = useState(false);
   const [showBootSequence, setShowBootSequence] = useState(true);
-  const [walletNotice, setWalletNotice] = useState('');
   const consensusClientRef = useRef<IncidentConsensusGuardClient | null>(null);
-
-  const handleConnectWallet = () => {
-    void connectWalletWithWagmi({
-      windowObject: window,
-      connectors,
-      connect,
-      connectAsync,
-      reconnectAsync,
-      setWalletNotice,
-    });
-  };
-
-  const handleDisconnect = () => {
-    void leaveCommandCenter({
-      disconnect,
-      disconnectAsync,
-      location: window.location,
-      storage: window.sessionStorage,
-    });
-  };
 
   const handleBackToLanding = () => {
     clearCommandCenterNavigationState(window.sessionStorage);
@@ -490,36 +462,7 @@ export default function Dashboard() {
           >
             <HelpCircle className="w-5 h-5" />
           </button>
-          {isConnected && isCorrectNetwork ? (
-            <div className="flex items-center gap-2">
-              <div className="hidden sm:flex items-center gap-2 bg-[#18181B] border border-gray-800 px-3 py-2 rounded text-xs text-gray-400">
-                <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse"></span>
-                {address?.slice(0, 6)}...{address?.slice(-4)}
-              </div>
-              <button 
-                onClick={handleDisconnect} 
-                className="flex items-center gap-2 bg-red-500/10 text-red-500 border border-red-500/20 px-4 py-2 rounded hover:bg-red-500/20 transition-colors text-xs font-bold uppercase tracking-widest"
-              >
-                <Power className="w-3.5 h-3.5" /> Disconnect
-              </button>
-            </div>
-          ) : isConnected && !isCorrectNetwork ? (
-            <button 
-              onClick={() => switchChain && switchChain({ chainId: mantleSepoliaTestnet.id })} 
-              className="flex items-center gap-2 bg-red-500 text-white font-bold py-2 px-5 rounded hover:bg-red-400 transition-all text-xs shadow-[0_0_15px_rgba(239,68,68,0.3)]"
-            >
-              <AlertTriangle className="w-3.5 h-3.5" />
-              Switch Network
-            </button>
-          ) : (
-            <button 
-              onClick={handleConnectWallet} 
-              className="flex items-center gap-2 bg-[#10B981] text-black font-bold py-2 px-5 rounded hover:bg-green-400 transition-all text-xs shadow-[0_0_15px_rgba(16,185,129,0.3)]"
-            >
-              <Power className="w-3.5 h-3.5" />
-              {isConnectPending && walletNotice !== WALLET_REQUEST_PENDING_NOTICE ? 'Connecting...' : 'Connect Wallet'}
-            </button>
-          )}
+          <WalletConnectControl />
         </div>
       </header>
 
@@ -616,11 +559,6 @@ export default function Dashboard() {
             </button>
             {isSuccess && <p className="text-[#10B981] mt-3 text-[10px] text-center">Sentinel registered on Mantle Sepolia</p>}
             {!isConnected && <p className="text-red-500 mt-3 text-[10px] text-center font-sans">Connect a Mantle wallet to initialize guards</p>}
-            {!isConnected && (walletNotice || connectError) && (
-              <p className="text-yellow-400 mt-2 text-[10px] text-center font-sans">
-                {walletNotice || 'No injected Ethereum wallet detected. Open this app in Rabby, MetaMask, OKX, or another Ethereum wallet browser.'}
-              </p>
-            )}
           </div>
 
           {/* Mantle Faucet Card */}
