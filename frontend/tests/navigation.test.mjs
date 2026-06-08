@@ -44,7 +44,7 @@ function createMockStorage() {
   };
 }
 
-assert.equal(LANDING_DISCONNECTED_PATH, '/?wallet=disconnected');
+assert.equal(LANDING_DISCONNECTED_PATH, '/');
 assert.equal(DASHBOARD_PATH, '/dashboard');
 assert.equal(HISTORY_PATH, '/history');
 assert.equal(PIPELINE_EXECUTION_ANCHOR, 'pipeline-execution');
