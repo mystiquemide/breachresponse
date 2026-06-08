@@ -68,8 +68,12 @@ Validate it with:
 
 ```bash
 genvm-lint check contracts/genlayer/IncidentConsensusGuard.py --json
-python -m pytest tests/direct/test_incident_consensus_guard.py -q
+python3.12 -m venv /tmp/breachresponse-direct
+/tmp/breachresponse-direct/bin/python -m pip install -r tests/direct/requirements.txt
+/tmp/breachresponse-direct/bin/python -m pytest tests/direct/test_incident_consensus_guard.py -q
 ```
+
+The direct-mode suite runs under Python 3.12 because current GenLayer test fixtures require Python 3.12+.
 
 The StudioNet deployment used by the frontend is:
 
