@@ -240,7 +240,7 @@ export default function Dashboard() {
           if (payload.data.level === "WARN") color = "[ERR]";
           if (payload.data.text.includes("[SCAN]")) color = "[LOG]";
           if (payload.data.text.includes("[ANOMALY-ALERT]")) color = "[ALERT]";
-          if (payload.data.text.includes("[BYREAL-LLM]")) color = "[SYS]";
+          if (payload.data.text.includes("[ANALYZER-LLM]")) color = "[SYS]";
           if (payload.data.text.includes("[SENTINEL]")) color = "[SYS]";
           
           setTerminalLines(prev => capTerminal([...prev, `${color} ${payload.data.text}`]));
