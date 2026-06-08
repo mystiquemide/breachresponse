@@ -3,7 +3,7 @@ import json
 import time
 from openai import OpenAI
 
-class ByrealClient:
+class IncidentAnalyzer:
     def __init__(self, api_key: str | None = None):
         # Prefer the explicit key, then fall back to OPENAI_API_KEY.
         self.api_key = api_key or os.getenv("OPENAI_API_KEY")
@@ -11,11 +11,11 @@ class ByrealClient:
         self.base_url = os.getenv("OPENAI_BASE_URL")
         
         if not self.api_key:
-            print("[BYREAL] Warning: OPENAI_API_KEY not found in environment. Using fallback mock mode.")
+            print("[ANALYZER] Warning: OPENAI_API_KEY not found in environment. Using fallback mock mode.")
             self.client = None
         else:
             self.client = OpenAI(api_key=self.api_key, base_url=self.base_url) if self.base_url else OpenAI(api_key=self.api_key)
-            print(f"[BYREAL] Initialized OpenAI analysis client with model: {self.model}")
+            print(f"[ANALYZER] Initialized OpenAI-compatible analysis client with model: {self.model}")
             
         self.last_analysis = {}
 
@@ -54,7 +54,7 @@ Respond strictly in JSON format matching this schema:
 """
 
         try:
-            print(f"[BYREAL-LLM] Requesting exploit analysis from {self.model}...")
+            print(f"[ANALYZER-LLM] Requesting exploit analysis from {self.model}...")
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
@@ -68,25 +68,25 @@ Respond strictly in JSON format matching this schema:
             response_content = response.choices[0].message.content or "{}"
             result = json.loads(response_content)
             self.last_analysis = result
-            print(f"[BYREAL-LLM] Analysis response:\n{json.dumps(result, indent=2)}")
+            print(f"[ANALYZER-LLM] Analysis response:\n{json.dumps(result, indent=2)}")
             return float(result.get("confidence_score", 0.0))
             
         except Exception as e:
-            print(f"[BYREAL-LLM] API Error: {e}. Falling back to 0 score.")
+            print(f"[ANALYZER-LLM] API Error: {e}. Falling back to 0 score.")
             return 0.0
 
     def formulate_rescue_transaction(self, target_address: str, exploit_type: str) -> dict:
         """
         Formulates the defensive transaction parameters based on LLM output.
         """
-        print(f"\n[BYREAL-AGENT] !!! THREAT DETECTED: {exploit_type} on {target_address} !!!")
-        print(f"[BYREAL-AGENT] Retrieving dynamic payload from LLM analysis...")
+        print(f"\n[ANALYZER-AGENT] !!! THREAT DETECTED: {exploit_type} on {target_address} !!!")
+        print(f"[ANALYZER-AGENT] Retrieving dynamic payload from LLM analysis...")
         time.sleep(0.5)
         
         pause_calldata = self.last_analysis.get("recommended_calldata", "0x8456cb59")
         
-        print(f"[BYREAL-AGENT] Mitigation payload generated: {pause_calldata}")
-        print(f"[BYREAL-AGENT] Recommended Action: Propose pause transaction for approval.")
+        print(f"[ANALYZER-AGENT] Mitigation payload generated: {pause_calldata}")
+        print(f"[ANALYZER-AGENT] Recommended Action: Propose pause transaction for approval.")
         
         return {
             "to": target_address,

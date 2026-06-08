@@ -9,7 +9,7 @@ The model is advisory by default. It does not get unchecked authority to move fu
 The LLM integration lives in the Python sentinel agent:
 
 - `agent/main.py` scans Mantle RPC activity and local sentinel telemetry.
-- `agent/byreal_client.py` sends suspicious activity to the configured OpenAI-compatible model.
+- `agent/incident_analyzer.py` sends suspicious activity to the configured OpenAI-compatible model.
 - `agent/reporter.py` streams logs and heartbeat events into the Command Center.
 
 ## Inputs
