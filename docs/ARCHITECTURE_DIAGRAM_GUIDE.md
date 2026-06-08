@@ -4,7 +4,7 @@
 
 Use architecture-as-code in the repository, not a decorative architecture image. For BreachResponse, the README should use Mermaid diagrams that GitHub renders directly from markdown.
 
-The pitch deck can still use the polished image, but the repo should show diagrams as code so judges can inspect, diff, and trust the design.
+The pitch deck can still use the polished image, but the repo should show diagrams as code so reviewers can inspect, diff, and trust the design.
 
 ## Why Mermaid fits BreachResponse
 
@@ -14,7 +14,7 @@ The pitch deck can still use the polished image, but the repo should show diagra
 - It looks technical and maintainable, not like a marketing poster.
 - It can show exact boundaries between Mantle, GenLayer, app services, wallet UX, and human approval.
 
-## Diagram types judges usually prefer
+## Diagram types reviewers usually prefer
 
 ### 1. C4-style system or container diagram
 
@@ -41,7 +41,7 @@ For BreachResponse, this should show:
 
 ### 2. Sequence diagram
 
-Best for judges who care whether the system actually works at runtime. It shows the step-by-step incident path.
+Best for reviewers who care whether the system actually works at runtime. It shows the step-by-step incident path.
 
 Use it to answer:
 
@@ -148,4 +148,4 @@ Use these in the repo:
 2. `docs/ARCHITECTURE.md`: full Mermaid system diagram, sequence diagram, trust boundary, layers, response modes, design decisions.
 3. Pitch deck or demo page: optional polished visual image.
 
-That gives judges both formats: visual polish for demo, code-style architecture for technical review.
+That gives reviewers both formats: visual polish and code-style architecture for technical review.

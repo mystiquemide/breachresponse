@@ -1,17 +1,17 @@
-# Demo Flow
+# Review Workflow
 
-Use this path when showing BreachResponse to judges, reviewers, or protocol teams.
+Use this path when showing BreachResponse to reviewers, operators, or protocol teams.
 
-## Judge walkthrough
+## Review path
 
-1. Open the landing page and point to the top-level product promise: AI-assisted incident response for Mantle smart contracts.
+1. Open the landing page and point to the top-level product promise: AI-assisted runtime review for Mantle activity.
 2. Click **Features**. It should land on **Pipeline Execution**, the three-stage Monitor, Formulate, Intercept flow.
 3. Click **Enter Command Center**. The app opens the operator dashboard.
-4. Connect a Mantle Sepolia wallet if you want to demonstrate live wallet state. Without a wallet, the dashboard still shows the safe disconnected state and keeps guard actions disabled.
+4. Connect a Mantle Sepolia wallet if you want to show live wallet state. Without a wallet, the dashboard still shows the safe disconnected state and keeps guard actions disabled.
 5. Review the Command Center cards:
    - **Blocks Scanned** shows monitored activity.
    - **Active Sentinels** shows registered monitoring nodes.
-   - **Value Secured** is clearly marked as simulated demo value.
+   - **Value Secured** is clearly marked as simulated product value.
    - **Mitigated Attacks** tracks successful controlled responses.
 6. Review **Deploy Sentinel Guard**. The guard initialization action stays disabled until a Mantle wallet is connected and the operator supplies a contract address.
 7. Review **GenLayer Consensus Guard**. Explain that normal users keep their wallet on Mantle. The app layer submits ambiguous Mantle incident context to GenLayer StudioNet, then uses the validator consensus result before proposing a Mantle-side response.
@@ -20,7 +20,7 @@ Use this path when showing BreachResponse to judges, reviewers, or protocol team
 
 ## What to say
 
-BreachResponse protects Mantle smart contracts by turning suspicious activity into scoped response proposals. Mantle remains the execution network for registry state, wallet UX, monitored assets, and approved response transactions. GenLayer acts as an external validator-consensus guard for ambiguous AI/security decisions.
+BreachResponse helps Mantle builders review suspicious activity, understand possible risk, and turn raw onchain signals into structured response context. Mantle remains the execution network for registry state, wallet UX, monitored assets, and approved response transactions. GenLayer acts as an external validator-consensus guard for ambiguous AI/security decisions.
 
 ## What not to say
 

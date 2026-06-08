@@ -1,6 +1,6 @@
 # BreachResponse
 
-Autonomous incident response infrastructure for Mantle smart contracts.
+Mantle-specific runtime audit assistant for suspicious onchain activity.
 
 ![Mantle Sepolia](https://img.shields.io/badge/Mantle-Sepolia_Testnet-10B981?style=flat-square&logo=ethereum)
 ![Next.js](https://img.shields.io/badge/Next.js-16.2-black?style=flat-square&logo=next.js)
@@ -8,41 +8,41 @@ Autonomous incident response infrastructure for Mantle smart contracts.
 ![Solidity](https://img.shields.io/badge/Solidity-0.8.24-363636?style=flat-square&logo=solidity)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)
 
-BreachResponse helps protocol operators detect exploit patterns, simulate blast radius, and route emergency defense actions before damage spreads. The platform combines a Mantle-aware monitoring agent, Solidity defense contracts, and a Command Center UI for human-approved or policy-approved response.
+BreachResponse helps Mantle builders review unusual contract behavior, understand possible risk, and turn raw onchain signals into structured response context. The platform combines a Mantle-aware monitoring agent, Solidity review contracts, and a Command Center UI for controlled review and approval workflows.
 
 ![BreachResponse Command Center](./docs/assets/hero.png)
 
 ## Why it matters
 
-Smart contract teams usually learn about an exploit after funds move. BreachResponse is built around the opposite operating model:
+Smart contract teams often see raw activity before they have enough context to act. BreachResponse is built around a cleaner review model:
 
 1. Monitor Mantle activity and sentinel telemetry.
-2. Detect suspicious transaction patterns and protocol anomalies.
-3. Explain the incident in operator language.
-4. Prepare a pause, quarantine, or rescue transaction.
-5. Route the action to a wallet, multisig, or approved autonomous policy.
-6. Record the response for post-incident review.
+2. Surface suspicious transaction patterns and protocol anomalies.
+3. Explain what changed in operator language.
+4. Structure the risk context for review.
+5. Keep high-risk next steps behind approval.
+6. Record the review trail for follow-up.
 
 ## Core capabilities
 
-- Mantle sentinel registry for protocol onboarding and agent permissions.
-- Next.js Command Center for incident triage, defense approval, and live telemetry.
-- Python monitoring agent for Mantle RPC scanning, LLM-assisted incident analysis, and alert forwarding.
-- Solidity simulation contracts that prove the vulnerable path and the paused defense path.
+- Mantle sentinel registry for protocol onboarding and review permissions.
+- Next.js Command Center for suspicious-activity review, approval controls, and live telemetry.
+- Python monitoring agent for Mantle RPC scanning, LLM-assisted runtime analysis, and structured event output.
+- Solidity simulation contracts that prove the vulnerable path and the controlled defense path.
 - Safe environment templates with no committed keys or production secrets.
 - CI checks covering frontend, contracts, agent syntax, and dependency audits.
 
-## AI incident analysis
+## Runtime audit assistance
 
-BreachResponse uses an LLM-assisted analysis layer to convert suspicious Mantle activity into structured incident reports and response proposals. The model classifies the likely exploit, assigns confidence, recommends scoped calldata, and passes the result into the operator approval path.
+BreachResponse uses an LLM-assisted analysis layer to convert suspicious Mantle activity into structured runtime review reports. The model explains the likely issue, assigns confidence, summarizes evidence, and passes the result into the approval path when a high-risk next step is involved.
 
-The LLM does not get unchecked execution authority. Human approval is the default response mode, and autonomous policies should only be enabled for allowlisted contracts, capped actions, emergency selectors, and monitored thresholds.
+The LLM does not get unchecked execution authority. Human approval is the default response mode, and any automated policy should be limited to allowlisted contracts, capped actions, emergency selectors, and monitored thresholds.
 
 See [AI Incident Analysis](./docs/AI_INCIDENT_ANALYSIS.md) for the model input/output shape and safety model.
 
-## GenLayer consensus guard
+## External decision guard
 
-BreachResponse includes a GenLayer intelligent contract guard for cases where the fast LLM path is unavailable, malformed, low-confidence, conflicting, or recommends a risky emergency action. The user-facing wallet flow stays on Mantle. The app talks to GenLayer as a consensus validation layer, then uses the result before proposing or executing a Mantle-side response. Operators, reviewers, and protocol teams can inspect it directly here:
+BreachResponse includes an external guard layer for cases where the fast LLM path is unavailable, malformed, low-confidence, conflicting, or recommends a risky action. The user-facing wallet flow stays on Mantle. In this version, the guard layer is powered by a GenLayer intelligent contract. The app talks to GenLayer as a consensus validation layer, then uses the result before a high-risk Mantle-side response reaches approval. Operators, reviewers, and protocol teams can inspect it directly here:
 
 | File | Purpose |
 | --- | --- |
@@ -51,7 +51,7 @@ BreachResponse includes a GenLayer intelligent contract guard for cases where th
 | [`frontend/src/lib/genlayerConsensus.ts`](./frontend/src/lib/genlayerConsensus.ts) | Real `genlayer-js` read/write integration used by the Command Center consensus guard panel. |
 | [`frontend/src/app/dashboard/page.tsx`](./frontend/src/app/dashboard/page.tsx) | Operator UI panel for preparing the app-managed GenLayer signer, reading consensus records, and validating incidents once a deployed guard address is configured. |
 
-The contract uses GenLayer nondeterminism and validator consensus through `gl.nondet.exec_prompt(...)` and `gl.vm.run_nondet_unsafe(...)`. It is not a getter/setter demo. It only approves scoped emergency actions such as `pause_protocol`, `quarantine_address`, `monitor_only`, `alert`, and `multisig_proposal`.
+The contract uses GenLayer nondeterminism and validator consensus through `gl.nondet.exec_prompt(...)` and `gl.vm.run_nondet_unsafe(...)`. It only approves scoped emergency actions such as `pause_protocol`, `quarantine_address`, `monitor_only`, `alert`, and `multisig_proposal`.
 
 Normal users do not switch wallets to GenLayer. Mantle remains the execution network for protected protocols, registry updates, wallet UX, and response transactions. GenLayer runs on StudioNet/testnet and receives incident context through the BreachResponse service/UI layer.
 
@@ -98,22 +98,22 @@ The current SentinelRegistry deployment used by the frontend is:
 | --- | --- |
 | ![Dashboard](./docs/assets/product-screen-dashboard.png) | ![Mobile overview](./docs/assets/product-screen-mobile.png) |
 
-## Demo flow
+## Product walkthrough
 
-For judging or review, use the shortest honest walkthrough:
+For product review, use the shortest honest walkthrough:
 
 1. Open the landing page and click **Features** to jump to **Pipeline Execution**.
 2. Click **Enter Command Center** to open the operator dashboard.
 3. Connect a Mantle Sepolia wallet for live wallet state, or leave it disconnected to show the safe disabled state.
-4. Review the Sentinel Guard and GenLayer Consensus Guard panels.
+4. Review the Sentinel Guard and external decision guard panels.
 5. Explain the boundary clearly: normal users keep their wallet on Mantle, while BreachResponse submits ambiguous incident context to GenLayer through the app layer for validator-consensus review.
 6. Use **Threat History** for incident review, then return with browser back or **BACK** without getting trapped in the dashboard.
 
-See [Demo Flow](./docs/DEMO_FLOW.md) for the full judge walkthrough and exact wording.
+See [Review Workflow](./docs/REVIEW_WORKFLOW.md) for the full walkthrough and exact wording.
 
 ## Architecture
 
-BreachResponse documents its architecture as Mermaid code so judges, reviewers, and maintainers can inspect the system directly in GitHub markdown. Mantle remains the execution network for registry state, monitored assets, wallet actions, and approved response transactions. GenLayer validates ambiguous AI/security decisions before the operator acts.
+BreachResponse documents its architecture as Mermaid code so reviewers and maintainers can inspect the system directly in GitHub markdown. Mantle remains the execution network for registry state, monitored assets, wallet actions, and approved response transactions. The external guard validates ambiguous AI/security decisions before high-risk actions reach approval.
 
 ### System architecture
 

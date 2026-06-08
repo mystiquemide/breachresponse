@@ -23,7 +23,7 @@ The agent can submit structured incident context such as:
 - observed protocol state
 - expected mitigation selector
 
-For the current demo flow, reentrant log patterns are classified as a reentrancy incident and mapped to the emergency pause selector.
+For the current review workflow, reentrant log patterns are classified as a reentrancy incident and mapped to the emergency pause selector.
 
 ## Model output
 
