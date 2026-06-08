@@ -41,9 +41,28 @@ assert.equal(getPreferredWalletConnector([walletConnect]), walletConnect);
 }
 
 {
+  let notice = 'unchanged';
+  let connectedWith = null;
+  const result = await connectWalletWithWagmi({
+    windowObject: { isSecureContext: true },
+    connectors: [metaMask],
+    connect: ({ connector }) => {
+      connectedWith = connector;
+    },
+    setWalletNotice: (value) => {
+      notice = value;
+    },
+  });
+
+  assert.equal(result, 'connecting');
+  assert.equal(notice, '');
+  assert.equal(connectedWith, metaMask);
+}
+
+{
   let notice = '';
   const result = await connectWalletWithWagmi({
-    windowObject: { isSecureContext: true, ethereum: {} },
+    windowObject: { isSecureContext: true },
     connectors: [],
     connect: () => {
       throw new Error('should not connect without a connector');

@@ -97,7 +97,7 @@ export default function LandingPage() {
   const [walletNotice, setWalletNotice] = useState('');
 
   const { isConnected, chainId } = useAccount();
-  const { connect, connectors } = useConnect();
+  const { connect, connectAsync, connectors } = useConnect();
   const { disconnect, disconnectAsync } = useDisconnect();
   const { switchChain } = useSwitchChain();
 
@@ -145,6 +145,7 @@ export default function LandingPage() {
         windowObject: window,
         connectors,
         connect,
+        connectAsync,
         setWalletNotice,
       });
     } else if (!isCorrectNetwork && switchChain) {
