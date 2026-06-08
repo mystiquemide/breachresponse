@@ -43,8 +43,17 @@ assert.equal(getPreferredWalletConnector([walletConnect]), walletConnect);
 {
   let notice = 'unchanged';
   let connectedWith = null;
+  let redirectedTo = '';
   const result = await connectWalletWithWagmi({
-    windowObject: { isSecureContext: true },
+    windowObject: {
+      isSecureContext: true,
+      location: {
+        href: 'https://breachresponse.43.131.9.176.nip.io/',
+        assign: (url) => {
+          redirectedTo = url;
+        },
+      },
+    },
     connectors: [metaMask],
     connect: ({ connector }) => {
       connectedWith = connector;
@@ -54,9 +63,10 @@ assert.equal(getPreferredWalletConnector([walletConnect]), walletConnect);
     },
   });
 
-  assert.equal(result, 'connecting');
-  assert.equal(notice, '');
-  assert.equal(connectedWith, metaMask);
+  assert.equal(result, 'opening-metamask');
+  assert.equal(notice, 'No injected wallet found. Opening this dapp in MetaMask wallet browser.');
+  assert.equal(connectedWith, null);
+  assert.equal(redirectedTo, 'https://metamask.app.link/dapp/breachresponse.43.131.9.176.nip.io/');
 }
 
 {

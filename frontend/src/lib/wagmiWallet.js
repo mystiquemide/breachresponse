@@ -41,11 +41,28 @@ export function getPreferredWalletConnector(connectors = []) {
   }) ?? connectors[0];
 }
 
+function hasInjectedWalletProvider(windowObject) {
+  return Boolean(windowObject?.ethereum);
+}
+
+function openMetaMaskDappBrowser(windowObject, setWalletNotice) {
+  const metaMaskLink = getMetaMaskDappLink(windowObject);
+  if (!metaMaskLink || !windowObject?.location?.assign) return false;
+
+  setWalletNotice(WALLET_OPENING_METAMASK_NOTICE);
+  windowObject.location.assign(metaMaskLink);
+  return true;
+}
+
 export async function connectWalletWithWagmi({ windowObject, connectors, connect, connectAsync, setWalletNotice }) {
   if (!windowObject?.isSecureContext) {
     const notice = getWalletConnectionNotice({ isSecureContext: false, hasInjectedWallet: true });
     setWalletNotice(notice);
     return 'blocked-by-environment';
+  }
+
+  if (!hasInjectedWalletProvider(windowObject) && openMetaMaskDappBrowser(windowObject, setWalletNotice)) {
+    return 'opening-metamask';
   }
 
   const connector = getPreferredWalletConnector(connectors);
