@@ -25,7 +25,16 @@ for (const [name, source] of [
 }
 
 assert.doesNotMatch(historySource, /connectError\?\.message/, 'history should not render raw Wagmi error messages with library versions');
-assert.match(historySource, /address \? `\$\{address\.slice\(0, 6\)\}\.\.\.\$\{address\.slice\(-4\)\}` : 'Wallet connected'/, 'history should show a safe connected fallback while address hydrates');
+assert.match(historySource, /Connected:/, 'history should label the connected wallet state');
+assert.match(historySource, /address \? `\$\{address\.slice\(0, 6\)\}\.\.\.\$\{address\.slice\(-4\)\}` : 'Syncing address'/, 'history should use a hydration copy instead of vague wallet connected text');
+assert.match(historySource, />\s*Disconnect\s*</, 'history should keep disconnect as a separate visible action');
+
+assert.match(landingSource, /setIsLaunchingCommandCenter\(true\);\s*window\.sessionStorage\.setItem\('breachresponse_launching_command_center', 'true'\);\s*if \(!isConnected\)/s, 'landing wallet connect should mark Command Center intent before connecting');
+assert.match(landingSource, /Connect and Enter/, 'landing primary wallet CTA should explain that connect continues into Command Center');
+
+assert.match(dashboardSource, /Mantle Faucet/, 'dashboard should expose a Mantle faucet card');
+assert.match(dashboardSource, /https:\/\/faucet\.mantle\.xyz/, 'dashboard faucet card should link to the Mantle faucet');
+assert.match(dashboardSource, /Need test MNT\?/, 'dashboard faucet card should explain why users need faucet funds');
 
 assert.doesNotMatch(dashboardSource, /!hasOnboarded\s*\|\|\s*shouldOpenTour/, 'dashboard should not auto-open onboarding over wallet controls');
 assert.match(dashboardSource, /get\('tour'\) === '1'/, 'dashboard should still support explicit tour replay');

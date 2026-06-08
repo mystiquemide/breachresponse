@@ -175,13 +175,23 @@ export default function ThreatHistory() {
         
         <div>
           {isConnected && isCorrectNetwork ? (
-            <button 
-              onClick={handleDisconnect} 
-              className="flex items-center gap-2 bg-[#18181B] border border-gray-800 px-4 py-2 rounded hover:bg-gray-800 transition-colors text-xs"
-            >
-              <Power className="w-3.5 h-3.5 text-red-500" />
-              {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Wallet connected'}
-            </button>
+            <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center">
+              <div className="flex items-center gap-2 bg-[#18181B] border border-[#10B981]/30 px-4 py-2 rounded text-xs text-gray-300">
+                <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
+                <span className="text-gray-500 uppercase tracking-widest">Connected:</span>
+                <span className="font-bold text-white">
+                  {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Syncing address'}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={handleDisconnect}
+                className="flex items-center gap-2 bg-red-500/10 text-red-500 border border-red-500/20 px-4 py-2 rounded hover:bg-red-500/20 transition-colors text-xs font-bold uppercase tracking-widest"
+              >
+                <Power className="w-3.5 h-3.5" />
+                Disconnect
+              </button>
+            </div>
           ) : isConnected && !isCorrectNetwork ? (
             <button 
               onClick={() => switchChain && switchChain({ chainId: mantleSepoliaTestnet.id })} 

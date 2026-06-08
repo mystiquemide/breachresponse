@@ -621,6 +621,25 @@ export default function Dashboard() {
             )}
           </div>
 
+          {/* Mantle Faucet Card */}
+          <div className="sci-fi-panel p-6 relative overflow-hidden transition-all duration-500 border border-[#10B981]/20">
+            <h2 className="text-base font-bold mb-3 flex items-center gap-2">
+              <Activity className="w-4 h-4 text-[#10B981]" />
+              Mantle Faucet
+            </h2>
+            <p className="text-gray-400 text-xs mb-4 leading-relaxed font-sans">
+              Need test MNT? Fund your wallet before registering a sentinel guard on Mantle Sepolia.
+            </p>
+            <a
+              href="https://faucet.mantle.xyz"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex w-full items-center justify-center rounded border border-[#10B981]/40 bg-[#10B981]/10 px-4 py-3 text-xs font-bold uppercase tracking-widest text-[#10B981] transition-colors hover:bg-[#10B981]/20"
+            >
+              Open Mantle Faucet
+            </a>
+          </div>
+
           {/* GenLayer Consensus Guard */}
           <div id="ob-genlayer" className="sci-fi-panel p-6 relative overflow-hidden transition-all duration-500 border border-[#10B981]/20">
             <div className="flex items-start justify-between gap-4 mb-4">
