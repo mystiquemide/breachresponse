@@ -5,7 +5,7 @@ import random
 import urllib.request
 from dotenv import load_dotenv
 from web3 import Web3
-from byreal_client import ByrealClient
+from incident_analyzer import IncidentAnalyzer
 from reporter import Reporter
 import builtins
 
@@ -22,12 +22,11 @@ builtins.print = custom_print
 load_dotenv(dotenv_path="../.env")
 
 MANTLE_RPC_URL = os.getenv("MANTLE_RPC_URL", "https://rpc.sepolia.mantle.xyz")
-BYREAL_API_KEY = os.getenv("BYREAL_API_KEY")
 PRIVATE_KEY = os.getenv("PRIVATE_KEY")
 SENTINEL_RESPONSE_MODE = os.getenv("SENTINEL_RESPONSE_MODE", "manual").lower()
 
-# Initialize Byreal client
-byreal = ByrealClient(api_key=BYREAL_API_KEY)
+# Initialize LLM-assisted incident analyzer
+incident_analyzer = IncidentAnalyzer()
 
 # Initialize Web3
 w3 = None
@@ -205,15 +204,18 @@ def run_sentinel_loop():
                                             
                                             vault_addr = logs_in_tx[0]['address']
                                             
-                                            # Analyze with Byreal
-                                            confidence = byreal.analyze_exploit_payload("Multiple reentrant event calls detected on-chain")
-                                            print(f"[BYREAL-LLM] Exploit confidence score: {confidence * 100}%")
+                                            # Analyze with the incident analyzer
+                                            confidence = incident_analyzer.analyze_exploit_payload("Multiple reentrant event calls detected on-chain")
+                                            print(f"[ANALYZER-LLM] Exploit confidence score: {confidence * 100}%")
                                             
                                             if confidence > 0.9:
                                                 print(f"[SENTINEL] Threat verified. Preparing emergency response proposal...")
                                                 
                                                 # Use LLM formulation for the mitigation
-                                                rescue_tx = byreal.formulate_rescue_transaction(vault_addr, byreal.last_analysis.get("exploit_type", "Reentrancy"))
+                                                rescue_tx = incident_analyzer.formulate_rescue_transaction(
+                                                    vault_addr,
+                                                    incident_analyzer.last_analysis.get("exploit_type", "Reentrancy")
+                                                )
                                                 
                                                 if SENTINEL_RESPONSE_MODE != "autonomous":
                                                     print(f"[SENTINEL] Manual approval mode active. Proposed action: send {rescue_tx['data']} to {vault_addr}.")
@@ -280,7 +282,7 @@ def run_sentinel_loop():
                 print("\n" + "="*60)
                 print("[ANOMALY-ALERT] Suspicious recursive call signature detected (UI Simulation)!")
                 sim_exploit_hash = f"0x48ce...eB7{random.randint(10, 99)}"
-                print(f"[BYREAL-LLM] Exploit confidence score: 98.0%")
+                print(f"[ANALYZER-LLM] Exploit confidence score: 98.0%")
                 print(f"[SENTINEL] Executing defensive payload action on TargetVault...")
                 print(f"[SENTINEL] Transaction broadcasted. Hash: {sim_exploit_hash}")
                 print(f"[SENTINEL] Registry state updated. TargetVault PAUSED.")
