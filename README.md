@@ -94,9 +94,13 @@ The current SentinelRegistry deployment used by the frontend is:
 
 ## Product screens
 
-| Command Center | Mobile overview |
-| --- | --- |
-| ![Dashboard](./docs/assets/product-screen-dashboard.png) | ![Mobile overview](./docs/assets/product-screen-mobile.png) |
+### Command Center
+
+![Command Center overview](./docs/assets/product-screen-dashboard.png)
+
+### Mobile overview
+
+![Mobile overview](./docs/assets/product-screen-mobile.png)
 
 ## Product walkthrough
 
