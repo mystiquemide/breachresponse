@@ -1,5 +1,5 @@
 export const LANDING_PATH = '/';
-export const LANDING_DISCONNECTED_PATH = '/?wallet=disconnected';
+export const LANDING_DISCONNECTED_PATH = '/';
 export const DASHBOARD_PATH = '/dashboard';
 export const HISTORY_PATH = '/history';
 export const PIPELINE_EXECUTION_ANCHOR = 'pipeline-execution';
