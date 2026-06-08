@@ -1,4 +1,4 @@
-import { getBrowserWalletConnectionNotice } from './wallet.js';
+import { getWalletConnectionNotice } from './wallet.js';
 
 const PREFERRED_INJECTED_IDS = [
   'io.metamask',
@@ -28,10 +28,12 @@ export function getPreferredWalletConnector(connectors = []) {
   }) ?? connectors[0];
 }
 
-export async function connectWalletWithWagmi({ windowObject, connectors, connect, setWalletNotice }) {
-  const notice = getBrowserWalletConnectionNotice(windowObject);
-  setWalletNotice(notice);
-  if (notice) return 'blocked-by-environment';
+export async function connectWalletWithWagmi({ windowObject, connectors, connect, connectAsync, setWalletNotice }) {
+  if (!windowObject?.isSecureContext) {
+    const notice = getWalletConnectionNotice({ isSecureContext: false, hasInjectedWallet: true });
+    setWalletNotice(notice);
+    return 'blocked-by-environment';
+  }
 
   const connector = getPreferredWalletConnector(connectors);
   if (!connector) {
@@ -40,11 +42,12 @@ export async function connectWalletWithWagmi({ windowObject, connectors, connect
   }
 
   try {
-    const result = connect({ connector });
+    setWalletNotice('');
+    const connectFn = connectAsync ?? connect;
+    const result = connectFn({ connector });
     if (result && typeof result.then === 'function') {
       await result;
     }
-    setWalletNotice('');
     return 'connecting';
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error ?? '');

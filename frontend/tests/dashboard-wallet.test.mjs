@@ -4,6 +4,7 @@ import { readFileSync } from 'node:fs';
 const dashboardSource = readFileSync(new URL('../src/app/dashboard/page.tsx', import.meta.url), 'utf8');
 const historySource = readFileSync(new URL('../src/app/history/page.tsx', import.meta.url), 'utf8');
 const landingSource = readFileSync(new URL('../src/app/page.tsx', import.meta.url), 'utf8');
+const providerSource = readFileSync(new URL('../src/app/Web3Provider.tsx', import.meta.url), 'utf8');
 
 for (const [name, source] of [
   ['landing', landingSource],
@@ -16,3 +17,4 @@ for (const [name, source] of [
 
 assert.doesNotMatch(dashboardSource, /!hasOnboarded\s*\|\|\s*shouldOpenTour/, 'dashboard should not auto-open onboarding over wallet controls');
 assert.match(dashboardSource, /get\('tour'\) === '1'/, 'dashboard should still support explicit tour replay');
+assert.match(providerSource, /injected\(/, 'Web3Provider should keep injected wallet fallback support');

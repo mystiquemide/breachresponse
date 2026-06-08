@@ -53,7 +53,7 @@ const initialLogs: TransactionLog[] = [
 export default function ThreatHistory() {
   const router = useRouter();
   const { address, isConnected, chainId } = useAccount();
-  const { connect, connectors, error: connectError, isPending: isConnectPending } = useConnect();
+  const { connect, connectAsync, connectors, error: connectError, isPending: isConnectPending } = useConnect();
   const { disconnect, disconnectAsync } = useDisconnect();
   const { switchChain } = useSwitchChain();
   
@@ -69,6 +69,7 @@ export default function ThreatHistory() {
       windowObject: window,
       connectors,
       connect,
+      connectAsync,
       setWalletNotice,
     });
   };
