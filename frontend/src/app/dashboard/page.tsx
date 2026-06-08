@@ -63,7 +63,7 @@ const BootSequence = () => {
 export default function Dashboard() {
   const router = useRouter();
   const { address, isConnected, chainId } = useAccount();
-  const { connect, connectors, error: connectError, isPending: isConnectPending } = useConnect();
+  const { connect, connectAsync, connectors, error: connectError, isPending: isConnectPending } = useConnect();
   const { disconnect, disconnectAsync } = useDisconnect();
   const { switchChain } = useSwitchChain();
   const { writeContract, isPending, isSuccess } = useWriteContract();
@@ -102,6 +102,7 @@ export default function Dashboard() {
       windowObject: window,
       connectors,
       connect,
+      connectAsync,
       setWalletNotice,
     });
   };
