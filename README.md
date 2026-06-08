@@ -98,6 +98,19 @@ The current SentinelRegistry deployment used by the frontend is:
 | --- | --- |
 | ![Dashboard](./docs/assets/product-screen-dashboard.png) | ![Mobile overview](./docs/assets/product-screen-mobile.png) |
 
+## Demo flow
+
+For judging or review, use the shortest honest walkthrough:
+
+1. Open the landing page and click **Features** to jump to **Pipeline Execution**.
+2. Click **Enter Command Center** to open the operator dashboard.
+3. Connect a Mantle Sepolia wallet for live wallet state, or leave it disconnected to show the safe disabled state.
+4. Review the Sentinel Guard and GenLayer Consensus Guard panels.
+5. Explain the boundary clearly: normal users keep their wallet on Mantle, while BreachResponse submits ambiguous incident context to GenLayer through the app layer for validator-consensus review.
+6. Use **Threat History** for incident review, then return with browser back or **BACK** without getting trapped in the dashboard.
+
+See [Demo Flow](./docs/DEMO_FLOW.md) for the full judge walkthrough and exact wording.
+
 ## Architecture
 
 BreachResponse documents its architecture as Mermaid code so judges, reviewers, and maintainers can inspect the system directly in GitHub markdown. Mantle remains the execution network for registry state, monitored assets, wallet actions, and approved response transactions. GenLayer validates ambiguous AI/security decisions before the operator acts.

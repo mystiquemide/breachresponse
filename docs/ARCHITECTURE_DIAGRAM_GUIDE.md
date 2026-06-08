@@ -105,7 +105,7 @@ sequenceDiagram
   ...
 ```
 
-See [Architecture](./docs/ARCHITECTURE.md) for the trust boundary and full system design.
+See [Architecture](./ARCHITECTURE.md) for the trust boundary and full system design.
 ~~~
 
 ## Wording to use for BreachResponse
