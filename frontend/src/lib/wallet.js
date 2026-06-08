@@ -4,7 +4,7 @@ export function getWalletConnectionNotice({ isSecureContext = true, hasInjectedW
   }
 
   if (!hasInjectedWallet) {
-    return 'No injected wallet detected. Install MetaMask or open this app in a wallet browser.';
+    return 'No injected Ethereum wallet detected. Open this app in Rabby, MetaMask, OKX, or another Ethereum wallet browser.';
   }
 
   return '';

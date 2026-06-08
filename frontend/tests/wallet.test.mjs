@@ -8,16 +8,18 @@ assert.equal(
 
 assert.equal(
   getWalletConnectionNotice({ isSecureContext: true, hasInjectedWallet: false }),
-  'No injected wallet detected. Install MetaMask or open this app in a wallet browser.'
+  'No injected Ethereum wallet detected. Open this app in Rabby, MetaMask, OKX, or another Ethereum wallet browser.'
 );
 
-const { getPreferredWalletConnector, connectWalletWithWagmi, getMetaMaskDappLink } = await import('../src/lib/wagmiWallet.js');
+const { getPreferredWalletConnector, connectWalletWithWagmi } = await import('../src/lib/wagmiWallet.js');
 
 const genericInjected = { id: 'injected', name: 'Injected' };
+const rabby = { id: 'io.rabby', name: 'Rabby Wallet' };
 const metaMask = { id: 'io.metamask', name: 'MetaMask' };
 const walletConnect = { id: 'walletConnect', name: 'WalletConnect' };
 
-assert.equal(getPreferredWalletConnector([walletConnect, genericInjected, metaMask]), metaMask);
+assert.equal(getPreferredWalletConnector([walletConnect, genericInjected, metaMask]), genericInjected);
+assert.equal(getPreferredWalletConnector([walletConnect, rabby, metaMask]), rabby);
 assert.equal(getPreferredWalletConnector([walletConnect, genericInjected]), genericInjected);
 assert.equal(getPreferredWalletConnector([walletConnect]), walletConnect);
 
@@ -43,15 +45,11 @@ assert.equal(getPreferredWalletConnector([walletConnect]), walletConnect);
 {
   let notice = 'unchanged';
   let connectedWith = null;
-  let redirectedTo = '';
   const result = await connectWalletWithWagmi({
     windowObject: {
       isSecureContext: true,
       location: {
         href: 'https://breachresponse.43.131.9.176.nip.io/',
-        assign: (url) => {
-          redirectedTo = url;
-        },
       },
     },
     connectors: [metaMask],
@@ -63,10 +61,9 @@ assert.equal(getPreferredWalletConnector([walletConnect]), walletConnect);
     },
   });
 
-  assert.equal(result, 'opening-metamask');
-  assert.equal(notice, 'No injected wallet found. Opening this dapp in MetaMask wallet browser.');
+  assert.equal(result, 'missing-provider');
+  assert.equal(notice, 'No injected Ethereum wallet detected. Open this app in Rabby, MetaMask, OKX, or another Ethereum wallet browser.');
   assert.equal(connectedWith, null);
-  assert.equal(redirectedTo, 'https://metamask.app.link/dapp/breachresponse.43.131.9.176.nip.io/');
 }
 
 {
@@ -82,21 +79,17 @@ assert.equal(getPreferredWalletConnector([walletConnect]), walletConnect);
     },
   });
 
-  assert.equal(result, 'missing-connector');
-  assert.equal(notice, 'Wallet connector is not ready yet. Reload the page and try again.');
+  assert.equal(result, 'missing-provider');
+  assert.equal(notice, 'No injected Ethereum wallet detected. Open this app in Rabby, MetaMask, OKX, or another Ethereum wallet browser.');
 }
 
 {
   let notice = '';
-  let redirectedTo = '';
   const result = await connectWalletWithWagmi({
     windowObject: {
       isSecureContext: true,
       location: {
         href: 'https://breachresponse.43.131.9.176.nip.io/dashboard?tour=1#connect',
-        assign: (url) => {
-          redirectedTo = url;
-        },
       },
     },
     connectors: [genericInjected],
@@ -108,9 +101,8 @@ assert.equal(getPreferredWalletConnector([walletConnect]), walletConnect);
     },
   });
 
-  assert.equal(result, 'opening-metamask');
-  assert.equal(notice, 'No injected wallet found. Opening this dapp in MetaMask wallet browser.');
-  assert.equal(redirectedTo, 'https://metamask.app.link/dapp/breachresponse.43.131.9.176.nip.io/dashboard?tour=1#connect');
+  assert.equal(result, 'missing-provider');
+  assert.equal(notice, 'No injected Ethereum wallet detected. Open this app in Rabby, MetaMask, OKX, or another Ethereum wallet browser.');
 }
 
 {
@@ -159,13 +151,8 @@ assert.equal(getPreferredWalletConnector([walletConnect]), walletConnect);
   });
 
   assert.equal(result, 'timed-out');
-  assert.equal(notice, 'Wallet request is still pending. Open MetaMask, approve the request, then tap Connect Wallet again.');
+  assert.equal(notice, 'Wallet request is still pending. Open your Ethereum wallet, approve the request, then tap Connect Wallet again.');
 }
-
-assert.equal(
-  getMetaMaskDappLink({ location: { href: 'https://breachresponse.43.131.9.176.nip.io/history' } }),
-  'https://metamask.app.link/dapp/breachresponse.43.131.9.176.nip.io/history'
-);
 
 assert.equal(
   getWalletConnectionNotice({ isSecureContext: true, hasInjectedWallet: true }),

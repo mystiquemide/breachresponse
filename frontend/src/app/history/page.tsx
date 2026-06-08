@@ -204,7 +204,7 @@ export default function ThreatHistory() {
 
       {!isConnected && (walletNotice || connectError) && (
         <p className="relative z-10 mb-4 text-center text-[10px] text-yellow-400 font-sans">
-          {walletNotice || connectError?.message || 'Wallet connection failed. Unlock MetaMask and try again.'}
+          {walletNotice || connectError?.message || 'Wallet connection failed. Unlock your Ethereum wallet and try again.'}
         </p>
       )}
 

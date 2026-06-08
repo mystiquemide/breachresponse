@@ -1,25 +1,25 @@
 import { getWalletConnectionNotice } from './wallet.js';
 
 const PREFERRED_INJECTED_IDS = [
+  'injected',
+  'io.rabby',
+  'rabby',
+  'com.okex.wallet',
+  'okx',
   'io.metamask',
   'metaMask',
   'metamask',
   'com.metamask',
-  'injected',
 ];
 
 export const WALLET_CONNECTOR_NOT_READY_NOTICE = 'Wallet connector is not ready yet. Reload the page and try again.';
-export const WALLET_CONNECTION_FAILED_NOTICE = 'Wallet connection failed. Unlock MetaMask and try again.';
-export const WALLET_OPENING_METAMASK_NOTICE = 'No injected wallet found. Opening this dapp in MetaMask wallet browser.';
-export const WALLET_REQUEST_PENDING_NOTICE = 'Wallet request is still pending. Open MetaMask, approve the request, then tap Connect Wallet again.';
+export const WALLET_CONNECTION_FAILED_NOTICE = 'Wallet connection failed. Unlock your Ethereum wallet and try again.';
+export const WALLET_REQUEST_PENDING_NOTICE = 'Wallet request is still pending. Open your Ethereum wallet, approve the request, then tap Connect Wallet again.';
 
 const DEFAULT_WALLET_REQUEST_TIMEOUT_MS = 12_000;
 
-export function getMetaMaskDappLink(windowObject) {
-  if (!windowObject?.location) return '';
-
-  const url = new URL(windowObject.location.href);
-  return `https://metamask.app.link/dapp/${url.host}${url.pathname}${url.search}${url.hash}`;
+function getMissingInjectedWalletNotice() {
+  return getWalletConnectionNotice({ isSecureContext: true, hasInjectedWallet: false });
 }
 
 function isProviderNotFoundError(error) {
@@ -46,15 +46,6 @@ export function getPreferredWalletConnector(connectors = []) {
 
 function hasInjectedWalletProvider(windowObject) {
   return Boolean(windowObject?.ethereum);
-}
-
-function openMetaMaskDappBrowser(windowObject, setWalletNotice) {
-  const metaMaskLink = getMetaMaskDappLink(windowObject);
-  if (!metaMaskLink || !windowObject?.location?.assign) return false;
-
-  setWalletNotice(WALLET_OPENING_METAMASK_NOTICE);
-  windowObject.location.assign(metaMaskLink);
-  return true;
 }
 
 function withTimeout(promise, timeoutMs) {
@@ -89,8 +80,9 @@ export async function connectWalletWithWagmi({ windowObject, connectors, connect
     return 'blocked-by-environment';
   }
 
-  if (!hasInjectedWalletProvider(windowObject) && openMetaMaskDappBrowser(windowObject, setWalletNotice)) {
-    return 'opening-metamask';
+  if (!hasInjectedWalletProvider(windowObject)) {
+    setWalletNotice(getMissingInjectedWalletNotice());
+    return 'missing-provider';
   }
 
   const connector = getPreferredWalletConnector(connectors);
@@ -127,12 +119,8 @@ export async function connectWalletWithWagmi({ windowObject, connectors, connect
     return 'connecting';
   } catch (error) {
     if (isProviderNotFoundError(error)) {
-      const metaMaskLink = getMetaMaskDappLink(windowObject);
-      if (metaMaskLink && windowObject?.location?.assign) {
-        setWalletNotice(WALLET_OPENING_METAMASK_NOTICE);
-        windowObject.location.assign(metaMaskLink);
-        return 'opening-metamask';
-      }
+      setWalletNotice(getMissingInjectedWalletNotice());
+      return 'missing-provider';
     }
 
     const message = error instanceof Error ? error.message : String(error ?? '');
