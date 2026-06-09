@@ -32,6 +32,16 @@ const globalStore = globalThis as unknown as {
 
 const seedNodes: SentinelNode[] = [
   {
+    id: 'sentinel-ax-node',
+    name: 'Sentinel.ax Node',
+    address: '0x9f758be3ae3D985713964339E2f0bD783fC6015c',
+    status: 'ACTIVE',
+    latency: '8ms',
+    events: 939,
+    lastHeartbeat: new Date(),
+    registeredAt: new Date('2026-01-03T00:00:00.000Z')
+  },
+  {
     id: 'mantleswap-sentinel',
     name: 'MantleSwap Sentinel',
     address: '0x5e8c000000000000000000000000000000001a2f',

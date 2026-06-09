@@ -280,7 +280,7 @@ export default function LandingPage() {
               Breach Response
             </h1>
             <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] font-sans">
-              Mantle runtime audit assistance for suspicious smart contract activity
+              Monitor Mantle contracts, detect suspicious behavior, and prepare scoped response proposals with humans in control
             </p>
           </motion.div>
 
@@ -364,7 +364,7 @@ export default function LandingPage() {
                   <div>
                     <h3 className="text-white font-bold mb-4 flex items-center gap-2 text-lg"><Shield className="w-5 h-5 text-[#10B981]" /> Defense Matrix</h3>
                     <p className="text-sm text-gray-400 mb-8 leading-relaxed font-sans">
-                      LLM analysis, operator approval, and GenLayer consensus checks turn suspicious activity into scoped response proposals.
+                      Mantle telemetry, LLM triage, operator approval, and GenLayer consensus checks turn suspicious activity into scoped response proposals.
                     </p>
                   </div>
                   <button
@@ -395,7 +395,7 @@ export default function LandingPage() {
         <div className="container mx-auto px-6 relative z-10 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Pipeline Execution</h2>
           <p className="text-gray-400 font-sans max-w-2xl mx-auto mb-16">
-            Three controlled stages for reviewing suspicious smart contract activity on Mantle
+            A clear path from contract monitoring to human-approved response on Mantle
           </p>
         </div>
         <div className="relative grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-8 items-start">
@@ -410,9 +410,9 @@ export default function LandingPage() {
               </svg>
             </div>
             <span className="text-xs text-[#10B981] font-bold tracking-widest mb-2 block uppercase">01 / Monitor</span>
-            <h3 className="text-lg font-bold text-white mb-3">Runtime Signal Scan</h3>
+            <h3 className="text-lg font-bold text-white mb-3">Contract Watch</h3>
             <p className="text-xs text-gray-400 font-sans leading-relaxed">
-              The sentinel watches Mantle RPC activity and flags unusual contract behavior for review
+              Sentinels watch Mantle RPC activity, registered contracts, and telemetry from protected protocols
             </p>
           </div>
           <div className="flex flex-col items-center text-center px-4 relative">
@@ -431,10 +431,10 @@ export default function LandingPage() {
                 <circle cx="18" cy="18" r="2" fill="currentColor" />
               </svg>
             </div>
-            <span className="text-xs text-[#10B981] font-bold tracking-widest mb-2 block uppercase">02 / Formulate</span>
+            <span className="text-xs text-[#10B981] font-bold tracking-widest mb-2 block uppercase">02 / Detect</span>
             <h3 className="text-lg font-bold text-white mb-3">AI Incident Triage</h3>
             <p className="text-xs text-gray-400 font-sans leading-relaxed">
-              If an exploit pattern is identified, the sentinel agent produces a scoped response proposal for operator review
+              Suspicious calls, repeated event patterns, and protocol anomalies become structured incident context
             </p>
           </div>
           <div className="flex flex-col items-center text-center px-4 relative">
@@ -449,9 +449,9 @@ export default function LandingPage() {
               </svg>
             </div>
             <span className="text-xs text-[#10B981] font-bold tracking-widest mb-2 block uppercase">03 / Approve</span>
-            <h3 className="text-lg font-bold text-white mb-3">Approval Routing</h3>
+            <h3 className="text-lg font-bold text-white mb-3">Human Gate</h3>
             <p className="text-xs text-gray-400 font-sans leading-relaxed">
-              The response proposal is routed to wallet, multisig, or policy-controlled approval before any execution
+              Proposed calldata stays behind operator, multisig, or policy approval before any Mantle-side action
             </p>
           </div>
         </div>
@@ -488,7 +488,7 @@ export default function LandingPage() {
             </div>
             <div className="mt-8 pt-6 border-t border-gray-800/60 font-mono text-[10px] space-y-2 text-gray-500">
               <div className="flex justify-between"><span>MODEL</span> <span className="text-gray-400">OpenAI-compatible</span></div>
-              <div className="flex justify-between"><span>ACCURACY</span> <span className="text-[#10B981]">GenLayer fallback</span></div>
+              <div className="flex justify-between"><span>GUARD</span> <span className="text-[#10B981]">GenLayer consensus</span></div>
             </div>
           </motion.div>
           <motion.div variants={fadeInUp}>
@@ -695,7 +695,7 @@ export default function LandingPage() {
               <span className="text-lg font-bold tracking-widest text-white">BREACH RESPONSE</span>
             </div>
             <p className="text-gray-500 text-sm leading-relaxed font-sans max-w-xs">
-              Mantle runtime audit assistance for suspicious smart contract activity
+              Mantle contract monitoring, anomaly detection, and human-approved response routing
             </p>
           </div>
           

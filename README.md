@@ -25,6 +25,17 @@ Smart contract teams rarely get a clean decision window during an incident. Brea
 5. Keep high-risk actions behind human approval and scoped policy controls.
 6. Record the review trail for follow-up and audit.
 
+## How it works
+
+1. A protocol registers a protected Mantle contract or sentinel address.
+2. The sentinel watches Mantle RPC activity, telemetry, and registered protocol state.
+3. Suspicious behavior becomes structured incident context instead of a vague alert.
+4. The agent prepares scoped response calldata and routes ambiguous cases through the external decision guard.
+5. The operator approves or rejects the action before any Mantle-side execution.
+
+## Backed value monitoring
+
+The Command Center includes a **Value Monitored** card backed by read-only Mantle Sepolia RPC calls. It aggregates native MNT balances from active sentinel addresses and optional allowlisted ERC-20 balances. The route uses no signer, no private key, and no transaction. Missing token prices stay unavailable instead of being faked.
 
 ## Product scope
 
