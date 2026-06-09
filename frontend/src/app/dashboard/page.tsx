@@ -27,6 +27,7 @@ interface Asset {
   status: 'ACTIVE' | 'PAUSED' | 'MITIGATING';
   latency: string;
   events: number;
+  lastHeartbeat?: string;
 }
 
 const capTerminal = (lines: string[]) => lines.slice(-120);
@@ -226,6 +227,9 @@ export default function Dashboard() {
           if (payload.data.text.includes("[ANOMALY-ALERT]")) color = "[ALERT]";
           if (payload.data.text.includes("[ANALYZER-LLM]")) color = "[SYS]";
           if (payload.data.text.includes("[SENTINEL]")) color = "[SYS]";
+          if (payload.data.text.includes("[SCAN] Scanning Mantle Sepolia Block #")) {
+            setBlocksScanned((prev) => prev + 1);
+          }
           
           setTerminalLines(prev => capTerminal([...prev, `${color} ${payload.data.text}`]));
         } else if (payload.type === 'ALERT') {
@@ -243,13 +247,8 @@ export default function Dashboard() {
       sse.close();
     };
 
-    const interval = setInterval(() => {
-      setBlocksScanned((prev) => prev + 1);
-    }, 2500);
-    
     return () => {
       sse.close();
-      clearInterval(interval);
     };
   }, []);
 
@@ -259,14 +258,20 @@ export default function Dashboard() {
       try {
         const res = await fetch('/api/sentinels');
         if (res.ok) {
-          const data = await res.json();
+          const data: Asset[] = await res.json();
           setCustomAssets(data);
+          const liveChecks = data
+            .filter((asset) => asset.name === 'Sentinel.ax Node')
+            .reduce((sum, asset) => sum + asset.events, 0);
+          setBlocksScanned((prev) => Math.max(prev, liveChecks));
         }
       } catch (err) {
         console.warn("Failed to load sentinels from database", err);
       }
     };
     fetchSentinels();
+    const interval = window.setInterval(fetchSentinels, 15000);
+    return () => window.clearInterval(interval);
   }, []);
 
   // Update live waveform oscilloscope
@@ -420,12 +425,10 @@ export default function Dashboard() {
     }
   };
 
-  // Combined asset list (default assets + custom user-registered assets)
-  const defaultAssets: Asset[] = [
-    { id: 'd1', name: 'MantleSwap Sentinel', address: '0x5e8c20b5...1a2f', status: 'ACTIVE', latency: '6.8ms', events: 1294 },
-    { id: 'd2', name: 'LendX Sentinel', address: '0x8b3f890a...9c4d', status: 'ACTIVE', latency: '7.2ms', events: 451 }
-  ];
-  const allAssets = [...customAssets, ...defaultAssets];
+  const allAssets = customAssets;
+  const liveWorkerChecks = allAssets
+    .filter((asset) => asset.name === 'Sentinel.ax Node')
+    .reduce((sum, asset) => sum + asset.events, 0);
 
   return (
     <main className="min-h-screen bg-[#050507] text-white font-mono p-4 lg:p-8 relative">
@@ -504,11 +507,11 @@ export default function Dashboard() {
 
         <div className="sci-fi-panel p-4 flex flex-col justify-between relative overflow-hidden">
           <div className="flex items-center justify-between mb-2">
-            <h3 className="text-gray-400 text-xs font-bold tracking-widest">Value Secured</h3>
-            <span className="text-[#10B981] text-xs font-bold">MONITORED</span>
+            <h3 className="text-gray-400 text-xs font-bold tracking-widest">Worker Checks</h3>
+            <span className="text-[#10B981] text-xs font-bold">LIVE</span>
           </div>
           <div className="text-2xl md:text-3xl font-black text-white font-mono tracking-tighter">
-            <Counter value={1420.5} suffix=" mETH at risk" />
+            <Counter value={liveWorkerChecks || blocksScanned} suffix=" checks" />
           </div>
         </div>
 
