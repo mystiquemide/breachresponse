@@ -565,10 +565,10 @@ export default function Dashboard() {
             {valueMetrics ? `$${valueMetrics.totalUsd.toLocaleString(undefined, { maximumFractionDigits: 2 })}` : valueMetricsError ? 'N/A' : '...' }
           </div>
           <p className="mt-2 text-[9px] leading-relaxed text-gray-500 font-sans">
-            {valueMetrics ? summarizeValueMetrics(valueMetrics) : 'Mantle Sepolia RPC, read-only'}
+            {valueMetrics ? summarizeValueMetrics(valueMetrics) : 'Read-only balance aggregation. No signer, private key, or transaction.'}
           </p>
           <p className="mt-1 text-[8px] uppercase tracking-widest text-[#10B981]/80">
-            Mantle Sepolia RPC, read-only
+            Read-only RPC. No signer, private key, or transaction.
           </p>
         </div>
 

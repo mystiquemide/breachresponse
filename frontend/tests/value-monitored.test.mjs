@@ -72,5 +72,5 @@ assert.match(routeSource, /balanceOf/, 'value metrics route should read ERC-20 b
 assert.doesNotMatch(routeSource, /privateKey|Wallet\(/i, 'value metrics route must not create a signer or spend funds');
 
 assert.match(dashboardSource, /Value Monitored/, 'dashboard should expose a Value Monitored card');
-assert.match(dashboardSource, /Mantle Sepolia RPC, read-only/, 'dashboard should disclose the metrics source');
+assert.match(dashboardSource, /Read-only RPC\. No signer, private key, or transaction\./, 'dashboard should disclose the read-only metrics source');
 assert.match(dashboardSource, /\/api\/metrics\/value-monitored/, 'dashboard should load value metrics from the API route');

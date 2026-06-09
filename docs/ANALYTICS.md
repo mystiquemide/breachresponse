@@ -8,4 +8,4 @@
 
 ## Dashboard Specs (Frontend)
 - The main UI itself is an analytics dashboard for the protocol.
-- It displays a live chart of "Value at Risk" vs "Value Secured".
+- It displays backed dashboard metrics such as live sentinel activity, worker checks, and read-only value monitored from active sentinel addresses.

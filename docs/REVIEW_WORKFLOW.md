@@ -5,14 +5,14 @@ Use this path when showing BreachResponse to reviewers, operators, or protocol t
 ## Review path
 
 1. Open the landing page and point to the top-level product promise: AI-assisted runtime review for Mantle activity.
-2. Click **Features**. It should land on **Pipeline Execution**, the three-stage Monitor, Formulate, Intercept flow.
+2. Click **Features**. It should land on **Pipeline Execution**, the monitor, detect, propose, approve, and execute flow.
 3. Click **Enter Command Center**. The app opens the operator dashboard.
 4. Connect a Mantle Sepolia wallet if you want to show live wallet state. Without a wallet, the dashboard still shows the safe disconnected state and keeps guard actions disabled. After connecting, confirm the header exposes an intentional disconnect control.
 5. Review the Command Center cards:
    - **Blocks Scanned** shows monitored activity.
    - **Active Sentinels** shows registered monitoring nodes.
-   - **Value Secured** is clearly marked as controlled product value.
-   - **Response Proposals** tracks successful controlled responses.
+   - **Value Monitored** shows read-only RPC balance aggregation from active sentinel addresses.
+   - **Response Proposals** tracks operator-review items that still require approval before execution.
 6. Review **Register Sentinel Guard**. The guard initialization action stays disabled until a Mantle wallet is connected and the operator supplies a contract address.
 7. Review **GenLayer Consensus Guard**. Explain that normal users keep their wallet on Mantle. The app layer submits ambiguous Mantle incident context to GenLayer StudioNet, then uses the validator consensus result before proposing a Mantle-side response.
 8. Use **Threat History** to show past incident records and post-incident review.
