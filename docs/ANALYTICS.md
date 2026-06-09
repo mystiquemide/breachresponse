@@ -8,4 +8,4 @@
 
 ## Dashboard Specs (Frontend)
 - The main UI itself is an analytics dashboard for the protocol.
-- It displays backed dashboard metrics such as live sentinel activity, worker checks, and read-only value monitored from active sentinel addresses.
+- It displays backed dashboard metrics such as live sentinel activity, worker checks, and read-only monitored value from active sentinel addresses.
