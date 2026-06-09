@@ -5,7 +5,7 @@ Use this path when showing BreachResponse to reviewers, operators, or protocol t
 ## Review path
 
 1. Open the landing page and point to the top-level product promise: AI-assisted runtime review for Mantle activity.
-2. Click **Features**. It should land on **Pipeline Execution**, the monitor, detect, propose, approve, and execute flow.
+2. Click **Features**. It should land on **Pipeline Execution**, the monitor, detect, propose, approve, and execute path.
 3. Click **Enter Command Center**. The app opens the operator dashboard.
 4. Connect a Mantle Sepolia wallet if you want to show live wallet state. Without a wallet, the dashboard still shows the safe disconnected state and keeps guard actions disabled. After connecting, confirm the header exposes an intentional disconnect control.
 5. Review the Command Center cards:
