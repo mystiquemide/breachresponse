@@ -3,8 +3,11 @@ import { simulator } from 'genlayer-js/chains';
 import { TransactionStatus, type Address } from 'genlayer-js/types';
 
 const STORAGE_KEY = 'breachresponse_genlayer_pk';
+const DEFAULT_GENLAYER_CONSENSUS_GUARD_ADDRESS = '0x86369EC44fbB5EB682729368557176858aBe0c73';
 
-export const GENLAYER_CONSENSUS_GUARD_ADDRESS = (process.env.NEXT_PUBLIC_GENLAYER_CONSENSUS_GUARD_ADDRESS || '') as Address | '';
+export const GENLAYER_CONSENSUS_GUARD_ADDRESS = (
+  process.env.NEXT_PUBLIC_GENLAYER_CONSENSUS_GUARD_ADDRESS || DEFAULT_GENLAYER_CONSENSUS_GUARD_ADDRESS
+) as Address;
 export const GENLAYER_STUDIO_URL = process.env.NEXT_PUBLIC_GENLAYER_STUDIO_URL || 'https://studio.genlayer.com/api';
 
 export type GenLayerAccount = ReturnType<typeof createAccount>;
