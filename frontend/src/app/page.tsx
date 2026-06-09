@@ -280,7 +280,7 @@ export default function LandingPage() {
               Breach Response
             </h1>
             <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] font-sans">
-              Monitor Mantle contracts, detect suspicious behavior, and prepare scoped response proposals with humans in control
+              Monitor Mantle contracts, detect suspicious behavior, and prepare scoped response proposals behind human approval
             </p>
           </motion.div>
 

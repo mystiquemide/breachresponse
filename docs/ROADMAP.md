@@ -35,4 +35,4 @@
 
 ## Scope guardrails
 
-BreachResponse stays focused on Mantle runtime audit assistance and controlled incident response. Byreal Skills CLI, DEX trading, liquidity management, and agentic wallet economy features remain out of scope unless the product intentionally pivots toward wallet-economy automation.
+BreachResponse stays focused on Mantle runtime audit assistance and controlled incident response. Byreal Skills CLI, DEX trading, liquidity management, and agentic wallet economy features remain out of scope unless the product deliberately pivots toward wallet-economy automation.
