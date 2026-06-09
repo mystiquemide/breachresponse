@@ -10,6 +10,7 @@ import Onboarding from './Onboarding';
 import AttackModal from './AttackModal';
 import { REGISTRY_ADDRESS, REGISTRY_ABI } from '../constants';
 import { DASHBOARD_PATH, HISTORY_PATH, LANDING_PATH, clearCommandCenterNavigationState, navigateToAppPath, replaceWithAppPath } from '../../lib/navigation';
+import { summarizeValueMetrics } from '../../lib/valueMonitored';
 import { WalletConnectControl, WalletStatusGate } from '../../components/WalletConnectControl';
 import {
   GENLAYER_CONSENSUS_GUARD_ADDRESS,
@@ -28,6 +29,24 @@ interface Asset {
   latency: string;
   events: number;
   lastHeartbeat?: string;
+}
+
+interface ValueMetrics {
+  network: string;
+  chainId: number;
+  source: string;
+  totalUsd: number;
+  native: {
+    symbol: string;
+    amount: string;
+    usd: number | null;
+  };
+  tokens: Array<{
+    symbol: string;
+    amount: string;
+    usd: number | null;
+  }>;
+  updatedAt?: string;
 }
 
 const capTerminal = (lines: string[]) => lines.slice(-120);
@@ -66,6 +85,8 @@ export default function Dashboard() {
   
   const [protocolAddress, setProtocolAddress] = useState('');
   const [customAssets, setCustomAssets] = useState<Asset[]>([]);
+  const [valueMetrics, setValueMetrics] = useState<ValueMetrics | null>(null);
+  const [valueMetricsError, setValueMetricsError] = useState(false);
   const [blocksScanned, setBlocksScanned] = useState(0);
   const [commandInput, setCommandInput] = useState('');
   const [waveform, setWaveform] = useState<number[]>([15, 30, 10, 45, 25, 60, 35, 20, 50, 40, 30, 20, 45, 65, 40, 25, 55, 30, 15, 40]);
@@ -271,6 +292,26 @@ export default function Dashboard() {
     };
     fetchSentinels();
     const interval = window.setInterval(fetchSentinels, 15000);
+    return () => window.clearInterval(interval);
+  }, []);
+
+  // Fetch read-only value monitored metrics from Mantle RPC
+  useEffect(() => {
+    const fetchValueMetrics = async () => {
+      try {
+        const res = await fetch('/api/metrics/value-monitored');
+        if (!res.ok) throw new Error('Value metrics request failed');
+        const data: ValueMetrics = await res.json();
+        setValueMetrics(data);
+        setValueMetricsError(false);
+      } catch (err) {
+        console.warn('Failed to load value monitored metrics', err);
+        setValueMetricsError(true);
+      }
+    };
+
+    fetchValueMetrics();
+    const interval = window.setInterval(fetchValueMetrics, 30000);
     return () => window.clearInterval(interval);
   }, []);
 
@@ -483,7 +524,7 @@ export default function Dashboard() {
       <motion.section 
         initial={false}
         animate={{ opacity: 1, y: 0 }}
-        className="relative grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8"
+        className="relative grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8"
       >
         <div className="sci-fi-panel p-4 flex flex-col justify-between relative overflow-hidden">
           <div className="flex items-center justify-between mb-2">
@@ -513,6 +554,22 @@ export default function Dashboard() {
           <div className="text-2xl md:text-3xl font-black text-white font-mono tracking-tighter">
             <Counter value={liveWorkerChecks || blocksScanned} suffix=" checks" />
           </div>
+        </div>
+
+        <div className="sci-fi-panel p-4 flex flex-col justify-between relative overflow-hidden">
+          <div className="flex items-center justify-between mb-2">
+            <h3 className="text-gray-400 text-xs font-bold tracking-widest">Value Monitored</h3>
+            <span className="text-[#10B981] text-[10px] font-bold uppercase">RPC</span>
+          </div>
+          <div className="text-2xl md:text-3xl font-black text-white font-mono tracking-tighter">
+            {valueMetrics ? `$${valueMetrics.totalUsd.toLocaleString(undefined, { maximumFractionDigits: 2 })}` : valueMetricsError ? 'N/A' : '...' }
+          </div>
+          <p className="mt-2 text-[9px] leading-relaxed text-gray-500 font-sans">
+            {valueMetrics ? summarizeValueMetrics(valueMetrics) : 'Mantle Sepolia RPC, read-only'}
+          </p>
+          <p className="mt-1 text-[8px] uppercase tracking-widest text-[#10B981]/80">
+            Mantle Sepolia RPC, read-only
+          </p>
         </div>
 
         <div className="sci-fi-panel p-4 flex flex-col justify-between relative overflow-hidden">
