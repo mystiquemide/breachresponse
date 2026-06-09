@@ -16,7 +16,7 @@ const payloadLines = [
   "> Analyzing attack vector...",
   "> Signature Match: REENTRANCY_0x89A",
   "> Target: MantleSwap Vault (0x5e8c...1a2f)",
-  "> Estimated Loss: 1,420 mETH",
+  "> On-chain value exposure: not available from current monitor feed",
   "> Formulating scoped response proposal...",
   "> function pause() external;",
   "> Estimating execution route and priority fee...",
