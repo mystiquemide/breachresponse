@@ -1,4 +1,4 @@
-# Architecture Diagram Guide for Hackathon Judges
+# Architecture Diagram Guide for Technical Reviewers
 
 ## Recommendation
 
@@ -52,7 +52,7 @@ Use it to answer:
 
 ### 3. Trust boundary diagram
 
-Best for Web3/security projects. Judges look for safety boundaries and overclaiming.
+Best for Web3/security projects. Technical reviewers look for safety boundaries and overclaiming.
 
 Use it to answer:
 
