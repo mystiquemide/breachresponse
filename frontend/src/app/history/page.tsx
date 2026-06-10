@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { mantleSepoliaTestnet } from 'wagmi/chains';
 import { createPublicClient, http, type Transaction as ViemTransaction } from 'viem';
@@ -59,7 +59,19 @@ const initialLogs: TransactionLog[] = [
   },
 ];
 
-export default function ThreatHistory() {
+export default function ThreatHistoryPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#050507] text-white font-mono flex items-center justify-center">
+        <div className="text-gray-500 text-sm">Loading threat history...</div>
+      </div>
+    }>
+      <ThreatHistory />
+    </Suspense>
+  );
+}
+
+function ThreatHistory() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const filterProtocol = searchParams.get('protocol');
