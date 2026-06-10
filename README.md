@@ -8,7 +8,7 @@ Mantle runtime audit assistance for suspicious smart contract activity.
 ![Solidity](https://img.shields.io/badge/Solidity-0.8.24-363636?style=flat-square&logo=solidity)
 ![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)
 
-Live Command Center: https://breachresponse.vercel.app
+Live Command Center: https://breachresponse.xyz
 
 BreachResponse is a Mantle-specific runtime audit assistant. It watches suspicious contract activity, turns raw signals into structured incident context, and keeps high-risk response actions behind operator approval. The system combines a Mantle-aware monitoring agent, Solidity review contracts, an external consensus guard, and a Command Center UI built for security teams that need controlled response paths instead of panic buttons.
 
