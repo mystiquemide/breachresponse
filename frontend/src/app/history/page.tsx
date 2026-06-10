@@ -115,27 +115,44 @@ export default function ThreatHistory() {
 
     const fetchLogs = async () => {
       try {
-        const block = await Promise.race([
-          publicClient.getBlock({ includeTransactions: true }),
+        const latestBlock = await Promise.race([
+          publicClient.getBlockNumber(),
           new Promise<null>((resolve) => setTimeout(() => resolve(null), 2200)),
         ]);
-        if (cancelled || !block || !block.transactions || block.transactions.length === 0) return;
+        if (cancelled || latestBlock === null || latestBlock === undefined) return;
 
-        const liveTxs: TransactionLog[] = block.transactions.slice(0, 25).map((tx: ViemTransaction) => {
-          const hashInt = parseInt(tx.hash.slice(2, 10), 16);
-          const isThreat = hashInt % 15 === 0;
+        // Fetch last 5 blocks for a richer feed
+        const blockNumbers = Array.from({ length: 5 }, (_, i) => latestBlock - BigInt(i));
+        const blocks = await Promise.all(
+          blockNumbers.map((num) =>
+            Promise.race([
+              publicClient.getBlock({ blockNumber: num, includeTransactions: true }),
+              new Promise<null>((resolve) => setTimeout(() => resolve(null), 1500)),
+            ])
+          )
+        );
 
-          return {
-            id: tx.hash,
-            txHash: tx.hash,
-            protocol: protocols[hashInt % protocols.length],
-            type: isThreat ? threatTypes[hashInt % threatTypes.length] : 'Normal Transfer',
-            gasSaved: isThreat ? 'response proposal ready' : '-',
-            status: isThreat ? 'PROPOSED' : 'SAFE',
-            timestamp: new Date(Number(block.timestamp) * 1000).toISOString()
-          };
-        });
-        setLogs(liveTxs);
+        const allTxs: TransactionLog[] = [];
+        for (const block of blocks) {
+          if (!block || !block.transactions) continue;
+          for (const tx of block.transactions.slice(0, 10)) {
+            const hashInt = parseInt(tx.hash.slice(2, 10), 16);
+            const isThreat = hashInt % 15 === 0;
+            allTxs.push({
+              id: tx.hash,
+              txHash: tx.hash,
+              protocol: protocols[hashInt % protocols.length],
+              type: isThreat ? threatTypes[hashInt % threatTypes.length] : 'Normal Transfer',
+              gasSaved: isThreat ? 'response proposal ready' : '-',
+              status: isThreat ? 'PROPOSED' : 'SAFE' as const,
+              timestamp: new Date(Number(block.timestamp) * 1000).toISOString(),
+            });
+          }
+        }
+
+        if (allTxs.length > 0) {
+          setLogs(allTxs.slice(0, 25));
+        }
       } catch (err) {
         console.error("Failed to fetch logs", err);
       } finally {
