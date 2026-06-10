@@ -1,13 +1,23 @@
 'use client'
 
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { mantleSepoliaTestnet } from 'wagmi/chains';
 import { createPublicClient, http, type Transaction as ViemTransaction } from 'viem';
-import { Shield, ArrowLeft, Activity, ShieldCheck, History, Search } from 'lucide-react';
+import { Shield, ArrowLeft, Activity, ShieldCheck, History, Search, Filter, Cpu } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { DASHBOARD_PATH, navigateToAppPath } from '../../lib/navigation';
 import { WalletConnectControl } from '../../components/WalletConnectControl';
+
+interface RegisteredProtocol {
+  id: string;
+  name: string;
+  address: string;
+  status: string;
+  latency: string;
+  events: number;
+  lastHeartbeat?: string;
+}
 
 interface TransactionLog {
   id: string;
@@ -51,13 +61,33 @@ const initialLogs: TransactionLog[] = [
 
 export default function ThreatHistory() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const filterProtocol = searchParams.get('protocol');
   const [logs, setLogs] = useState<TransactionLog[]>(initialLogs);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(filterProtocol || '');
   const [isLoading, setIsLoading] = useState(false);
+  const [registeredProtocols, setRegisteredProtocols] = useState<RegisteredProtocol[]>([]);
+  const [viewMode, setViewMode] = useState<'all' | 'mine'>(filterProtocol ? 'mine' : 'all');
 
   const handleBackToDashboard = () => {
     navigateToAppPath(window.location, DASHBOARD_PATH);
   };
+
+  // Fetch registered sentinels
+  useEffect(() => {
+    const fetchSentinels = async () => {
+      try {
+        const res = await fetch('/api/sentinels');
+        if (res.ok) {
+          const data: RegisteredProtocol[] = await res.json();
+          setRegisteredProtocols(data);
+        }
+      } catch (err) {
+        console.warn('Failed to load registered sentinels', err);
+      }
+    };
+    fetchSentinels();
+  }, []);
 
   useEffect(() => {
     router.prefetch('/dashboard');
@@ -183,6 +213,87 @@ export default function ThreatHistory() {
             className="bg-transparent border-none outline-none w-full text-sm text-white font-mono placeholder-gray-600"
           />
         </div>
+
+        {/* Filter Toggle */}
+        <div className="flex items-center gap-3 flex-wrap">
+          <button
+            onClick={() => { setViewMode('all'); setSearch(''); }}
+            className={`px-4 py-2 rounded text-xs font-bold uppercase tracking-widest transition-all ${
+              viewMode === 'all'
+                ? 'bg-[#10B981] text-black'
+                : 'bg-[#18181B] text-gray-400 border border-gray-800 hover:text-white'
+            }`}
+          >
+            <Filter className="w-3.5 h-3.5 inline mr-1.5" />
+            All Activity
+          </button>
+          <button
+            onClick={() => setViewMode('mine')}
+            className={`px-4 py-2 rounded text-xs font-bold uppercase tracking-widest transition-all ${
+              viewMode === 'mine'
+                ? 'bg-[#10B981] text-black'
+                : 'bg-[#18181B] text-gray-400 border border-gray-800 hover:text-white'
+            }`}
+          >
+            <Cpu className="w-3.5 h-3.5 inline mr-1.5" />
+            My Protocols ({registeredProtocols.length})
+          </button>
+          {filterProtocol && (
+            <span className="text-[10px] text-[#10B981] font-mono">
+              Filtering: {filterProtocol.slice(0, 10)}...{filterProtocol.slice(-6)}
+            </span>
+          )}
+        </div>
+
+        {/* My Registered Protocols (when in 'mine' mode) */}
+        {viewMode === 'mine' && (
+          <div className="space-y-4">
+            {registeredProtocols.length === 0 ? (
+              <div className="sci-fi-panel rounded-xl p-8 text-center border-glow">
+                <Cpu className="w-8 h-8 text-gray-600 mx-auto mb-3" />
+                <p className="text-gray-500 text-sm">No registered protocols yet.</p>
+                <p className="text-gray-600 text-xs mt-1">Register a Mantle contract from the Command Center to see its activity here.</p>
+              </div>
+            ) : (
+              registeredProtocols.map((proto) => (
+                <div key={proto.id} className="sci-fi-panel rounded-xl p-5 border-glow">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                        {proto.name}
+                        {proto.address === filterProtocol && (
+                          <span className="text-[10px] bg-[#10B981]/10 text-[#10B981] px-2 py-0.5 rounded">Selected</span>
+                        )}
+                      </h3>
+                      <p className="text-xs text-gray-500 font-mono mt-1">{proto.address}</p>
+                    </div>
+                    <span className={`shrink-0 px-2.5 py-1 rounded text-[10px] font-bold ${
+                      proto.status === 'ACTIVE' ? 'bg-[#10B981]/10 text-[#10B981] border border-[#10B981]/20' : 'bg-red-500/10 text-red-500 border border-red-500/20'
+                    }`}>
+                      {proto.status}
+                    </span>
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-gray-800/60 flex items-center gap-6 text-xs text-gray-500">
+                    <div>
+                      <span className="text-gray-600">LATENCY: </span>
+                      <span className="text-white">{proto.latency}</span>
+                    </div>
+                    <div>
+                      <span className="text-gray-600">EVENTS: </span>
+                      <span className="text-white">{proto.events}</span>
+                    </div>
+                    <button
+                      onClick={() => navigateToAppPath(window.location, `${DASHBOARD_PATH}`)}
+                      className="ml-auto text-[#10B981] hover:underline text-[10px] font-bold uppercase tracking-widest"
+                    >
+                      View in Command Center
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
 
         {/* Mobile Ledger Cards */}
         <div className="md:hidden space-y-4">
