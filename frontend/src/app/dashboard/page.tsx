@@ -756,16 +756,24 @@ export default function Dashboard() {
                       <span>SCANS: </span>
                       <span className="text-white">{asset.events}</span>
                     </div>
-                    {asset.id.startsWith('d') ? (
-                      <span className="text-[8px] text-gray-600 uppercase">System</span>
-                    ) : (
-                      <button 
-                        onClick={() => toggleAssetStatus(asset.id, asset.name)}
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => navigateToAppPath(window.location, `${HISTORY_PATH}?protocol=${encodeURIComponent(asset.address)}`)}
                         className="text-[#10B981] hover:underline"
                       >
-                        {asset.status === 'ACTIVE' ? 'Pause' : 'Activate'}
+                        View Activity
                       </button>
-                    )}
+                      {asset.id.startsWith('d') ? (
+                        <span className="text-[8px] text-gray-600 uppercase">System</span>
+                      ) : (
+                        <button 
+                          onClick={() => toggleAssetStatus(asset.id, asset.name)}
+                          className="text-[#10B981] hover:underline"
+                        >
+                          {asset.status === 'ACTIVE' ? 'Pause' : 'Activate'}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
