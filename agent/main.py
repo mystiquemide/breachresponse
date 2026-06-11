@@ -6,7 +6,7 @@ import urllib.request
 from dotenv import load_dotenv
 from web3 import Web3
 from incident_analyzer import IncidentAnalyzer
-from reporter import Reporter, frontend_api_url
+from reporter import Reporter, frontend_api_url, ingest_headers
 import builtins
 
 _original_print = builtins.print
@@ -63,7 +63,7 @@ def post_log_to_frontend(tx_hash: str, protocol: str, exploit_type: str, gas_sav
         req = urllib.request.Request(
             url,
             data=data,
-            headers={'Content-Type': 'application/json'},
+            headers=ingest_headers(),
             method='POST'
         )
         with urllib.request.urlopen(req, timeout=3) as res:
