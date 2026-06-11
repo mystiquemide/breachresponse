@@ -2,8 +2,11 @@ import { NextResponse } from 'next/server';
 import { sseEmitter } from '@/lib/eventEmitter';
 import { recordTelemetryLog } from '@/lib/db';
 import { publishTelemetryEvent } from '@/lib/telemetry';
+import { isAuthorizedIngest } from '@/lib/ingestAuth';
 
 export const runtime = 'nodejs';
+
+const MAX_FIELD_LENGTH = 2000;
 
 type AgentLogPayload = {
   text?: string;
@@ -15,9 +18,24 @@ type AgentLogPayload = {
   status?: string;
 };
 
+function withinLimits(body: AgentLogPayload): boolean {
+  return Object.values(body).every(
+    (value) =>
+      value === undefined || value === null || (typeof value === 'string' && value.length <= MAX_FIELD_LENGTH)
+  );
+}
+
 export async function POST(request: Request) {
+  if (!isAuthorizedIngest(request)) {
+    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+  }
   try {
     const body = (await request.json()) as AgentLogPayload;
+
+    if (typeof body !== 'object' || body === null || !withinLimits(body)) {
+      return NextResponse.json({ success: false, error: 'Invalid log payload' }, { status: 400 });
+    }
+
     const timestamp = new Date().toISOString();
 
     if (body.text) {

@@ -22,6 +22,7 @@ contract SentinelRegistry {
 
     event ProtocolRegistered(address indexed protocolAddress, address indexed admin);
     event ProtocolDeregistered(address indexed protocolAddress);
+    event ProtocolAdminTransferred(address indexed protocolAddress, address indexed newAdmin);
     event SentinelAgentUpdated(address indexed newAgent);
 
     modifier onlyOwner() {
@@ -59,9 +60,46 @@ contract SentinelRegistry {
 
     function deregisterProtocol(address protocolAddress) external onlyProtocolAdmin(protocolAddress) {
         require(registeredProtocols[protocolAddress].isActive, "Not registered");
-        
+
         registeredProtocols[protocolAddress].isActive = false;
-        
+
+        emit ProtocolDeregistered(protocolAddress);
+    }
+
+    /**
+     * @dev Lets the current protocol admin hand registration to a new admin
+     * (e.g. a multisig). Allows a legitimate owner to take over a slot from a
+     * cooperating registrant without the registry owner intervening.
+     */
+    function transferProtocolAdmin(address protocolAddress, address newAdmin)
+        external
+        onlyProtocolAdmin(protocolAddress)
+    {
+        require(newAdmin != address(0), "Invalid admin");
+        registeredProtocols[protocolAddress].admin = newAdmin;
+        emit ProtocolAdminTransferred(protocolAddress, newAdmin);
+    }
+
+    /**
+     * @dev Remediation path for front-running / squatting: because anyone can
+     * call registerProtocol(), a griefer could register a contract they do not
+     * control and lock the real admin out. The registry owner can reassign a
+     * registered slot to the rightful admin to resolve such disputes.
+     */
+    function reassignProtocolAdmin(address protocolAddress, address newAdmin) external onlyOwner {
+        require(registeredProtocols[protocolAddress].isActive, "Not registered");
+        require(newAdmin != address(0), "Invalid admin");
+        registeredProtocols[protocolAddress].admin = newAdmin;
+        emit ProtocolAdminTransferred(protocolAddress, newAdmin);
+    }
+
+    /**
+     * @dev Registry owner can clear a squatted/abandoned slot so the rightful
+     * owner can re-register it.
+     */
+    function forceDeregisterProtocol(address protocolAddress) external onlyOwner {
+        require(registeredProtocols[protocolAddress].isActive, "Not registered");
+        registeredProtocols[protocolAddress].isActive = false;
         emit ProtocolDeregistered(protocolAddress);
     }
 

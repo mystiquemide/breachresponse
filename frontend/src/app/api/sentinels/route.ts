@@ -21,8 +21,14 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    if (!body.address || !body.address.startsWith('0x')) {
+    if (typeof body?.address !== 'string' || !/^0x[a-fA-F0-9]{40}$/.test(body.address)) {
       return NextResponse.json({ error: 'Invalid contract address' }, { status: 400 });
+    }
+    if (body.name !== undefined && (typeof body.name !== 'string' || body.name.length > 200)) {
+      return NextResponse.json({ error: 'Invalid sentinel name' }, { status: 400 });
+    }
+    if (body.owner !== undefined && body.owner !== null && (typeof body.owner !== 'string' || body.owner.length > 100)) {
+      return NextResponse.json({ error: 'Invalid owner' }, { status: 400 });
     }
 
     const node = await prisma.sentinelNode.create({
