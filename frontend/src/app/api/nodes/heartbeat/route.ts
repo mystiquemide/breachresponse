@@ -1,12 +1,23 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { isAuthorizedIngest } from '@/lib/ingestAuth';
 
 export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
+  if (!isAuthorizedIngest(request)) {
+    return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
+  }
   try {
     const body = await request.json();
     const { address, name } = body;
+
+    if (typeof address !== 'string' || !/^0x[a-fA-F0-9]{40}$/.test(address)) {
+      return NextResponse.json({ success: false, error: 'Invalid address' }, { status: 400 });
+    }
+    if (name !== undefined && (typeof name !== 'string' || name.length > 200)) {
+      return NextResponse.json({ success: false, error: 'Invalid name' }, { status: 400 });
+    }
 
     const existing = await prisma.sentinelNode.findUnique({ where: { address } });
     const node = existing

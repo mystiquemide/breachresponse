@@ -78,6 +78,61 @@ describe("SentinelRegistry", function () {
     });
   });
 
+  describe("Admin transfer and squat remediation", function () {
+    it("Should let the protocol admin transfer admin rights", async function () {
+      const targetAddress = randomUser.address;
+      await registry.connect(admin).registerProtocol(targetAddress);
+
+      await expect(registry.connect(admin).transferProtocolAdmin(targetAddress, newAgent.address))
+        .to.emit(registry, "ProtocolAdminTransferred")
+        .withArgs(targetAddress, newAgent.address);
+
+      const protocol = await registry.registeredProtocols(targetAddress);
+      expect(protocol.admin).to.equal(newAgent.address);
+    });
+
+    it("Should prevent non-admins from transferring admin rights", async function () {
+      const targetAddress = randomUser.address;
+      await registry.connect(admin).registerProtocol(targetAddress);
+
+      await expect(registry.connect(randomUser).transferProtocolAdmin(targetAddress, newAgent.address))
+        .to.be.revertedWith("Not protocol admin");
+    });
+
+    it("Should let the registry owner reassign a squatted slot to the rightful admin", async function () {
+      const targetAddress = randomUser.address;
+      // A griefer registers a contract they do not control.
+      await registry.connect(agent).registerProtocol(targetAddress);
+
+      await expect(registry.connect(owner).reassignProtocolAdmin(targetAddress, admin.address))
+        .to.emit(registry, "ProtocolAdminTransferred")
+        .withArgs(targetAddress, admin.address);
+
+      const protocol = await registry.registeredProtocols(targetAddress);
+      expect(protocol.admin).to.equal(admin.address);
+    });
+
+    it("Should prevent non-owners from reassigning a slot", async function () {
+      const targetAddress = randomUser.address;
+      await registry.connect(agent).registerProtocol(targetAddress);
+
+      await expect(registry.connect(randomUser).reassignProtocolAdmin(targetAddress, admin.address))
+        .to.be.revertedWith("Not registry owner");
+    });
+
+    it("Should let the registry owner force-deregister a squatted slot so it can be re-registered", async function () {
+      const targetAddress = randomUser.address;
+      await registry.connect(agent).registerProtocol(targetAddress);
+
+      await registry.connect(owner).forceDeregisterProtocol(targetAddress);
+      expect((await registry.registeredProtocols(targetAddress)).isActive).to.be.false;
+
+      // The rightful owner can now claim the slot.
+      await registry.connect(admin).registerProtocol(targetAddress);
+      expect((await registry.registeredProtocols(targetAddress)).admin).to.equal(admin.address);
+    });
+  });
+
   describe("Sentinel Agent Management", function () {
     it("Should allow the owner to update the sentinel agent address", async function () {
       await expect(registry.connect(owner).setSentinelAgent(newAgent.address))
