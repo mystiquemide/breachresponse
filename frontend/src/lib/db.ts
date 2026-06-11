@@ -70,13 +70,19 @@ const seedNodes: SentinelNode[] = [
 
 const databaseUrl = process.env.DATABASE_URL;
 
+// Verify the database server certificate by default. Managed providers whose
+// chain is not in the system trust store can opt out with
+// DATABASE_SSL_REJECT_UNAUTHORIZED=false, keeping the insecure path explicit.
+const rejectUnauthorized =
+  (process.env.DATABASE_SSL_REJECT_UNAUTHORIZED ?? 'true').toLowerCase() !== 'false';
+
 function getPool() {
   if (!databaseUrl) return undefined;
 
   if (!globalStore.breachResponsePgPool) {
     globalStore.breachResponsePgPool = new Pool({
       connectionString: databaseUrl,
-      ssl: { rejectUnauthorized: false },
+      ssl: { rejectUnauthorized },
       max: 3
     });
   }
