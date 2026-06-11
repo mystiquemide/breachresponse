@@ -3,10 +3,14 @@ import { prisma } from '@/lib/db';
 
 export const runtime = 'nodejs';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const owner = searchParams.get('owner');
+
     const nodes = await prisma.sentinelNode.findMany({
-      orderBy: { registeredAt: 'desc' }
+      orderBy: { registeredAt: 'desc' },
+      ...(owner ? { where: { owner } } : {})
     });
     return NextResponse.json(nodes);
   } catch {
@@ -25,6 +29,7 @@ export async function POST(request: Request) {
       data: {
         name: body.name || 'Custom Sentinel',
         address: body.address,
+        owner: body.owner || null,
         status: 'ACTIVE',
         latency: '6.4ms',
         events: 0

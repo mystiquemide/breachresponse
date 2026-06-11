@@ -7,6 +7,7 @@ export type SentinelNode = {
   id: string;
   name: string;
   address: string;
+  owner: string | null;
   status: SentinelStatus;
   latency: string;
   events: number;
@@ -16,6 +17,7 @@ export type SentinelNode = {
 
 type SentinelCreateInput = Partial<Omit<SentinelNode, 'id' | 'registeredAt'>> & {
   address: string;
+  owner?: string | null;
 };
 
 type SentinelUpdateInput = Partial<Omit<SentinelNode, 'id' | 'registeredAt'>>;
@@ -35,6 +37,7 @@ const seedNodes: SentinelNode[] = [
     id: 'sentinel-ax-node',
     name: 'Sentinel.ax Node',
     address: '0x9f758be3ae3D985713964339E2f0bD783fC6015c',
+    owner: null,
     status: 'ACTIVE',
     latency: '8ms',
     events: 939,
@@ -45,6 +48,7 @@ const seedNodes: SentinelNode[] = [
     id: 'mantleswap-sentinel',
     name: 'MantleSwap Sentinel',
     address: '0x5e8c000000000000000000000000000000001a2f',
+    owner: null,
     status: 'ACTIVE',
     latency: '6.4ms',
     events: 128,
@@ -55,6 +59,7 @@ const seedNodes: SentinelNode[] = [
     id: 'lendx-sentinel',
     name: 'LendX Sentinel',
     address: '0x8b3f000000000000000000000000000000009c4d',
+    owner: null,
     status: 'ACTIVE',
     latency: '7.1ms',
     events: 93,
@@ -96,6 +101,7 @@ function createSentinelNode(data: SentinelCreateInput): SentinelNode {
     id: randomUUID(),
     name: data.name ?? 'Custom Sentinel',
     address: data.address,
+    owner: data.owner ?? null,
     status: data.status ?? 'ACTIVE',
     latency: data.latency ?? '6.4ms',
     events: data.events ?? 0,
@@ -109,6 +115,7 @@ function mapNode(row: QueryResultRow): SentinelNode {
     id: row.id,
     name: row.name,
     address: row.address,
+    owner: row.owner ?? null,
     status: row.status,
     latency: row.latency,
     events: Number(row.events ?? 0),
@@ -128,6 +135,7 @@ async function ensureSchema() {
           id TEXT PRIMARY KEY,
           name TEXT NOT NULL,
           address TEXT NOT NULL UNIQUE,
+          owner TEXT,
           status TEXT NOT NULL CHECK (status IN ('ACTIVE', 'PAUSED', 'OFFLINE')),
           latency TEXT NOT NULL DEFAULT '6.4ms',
           events INTEGER NOT NULL DEFAULT 0,
@@ -150,14 +158,17 @@ async function ensureSchema() {
         )
       `);
 
+      // Migration: add owner column if it doesn't exist yet
+      await pool.query(`ALTER TABLE sentinel_nodes ADD COLUMN IF NOT EXISTS owner TEXT`);
+
       const count = await pool.query<{ count: string }>('SELECT COUNT(*)::text AS count FROM sentinel_nodes');
       if (Number(count.rows[0]?.count ?? 0) === 0) {
         for (const node of seedNodes) {
           await pool.query(
-            `INSERT INTO sentinel_nodes (id, name, address, status, latency, events, last_heartbeat, registered_at)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            `INSERT INTO sentinel_nodes (id, name, address, owner, status, latency, events, last_heartbeat, registered_at)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
              ON CONFLICT (address) DO NOTHING`,
-            [node.id, node.name, node.address, node.status, node.latency, node.events, node.lastHeartbeat, node.registeredAt]
+            [node.id, node.name, node.address, node.owner, node.status, node.latency, node.events, node.lastHeartbeat, node.registeredAt]
           );
         }
       }
@@ -204,19 +215,24 @@ export async function recordTelemetryLog(data: {
 
 export const prisma = {
   sentinelNode: {
-    async findMany(options?: { orderBy?: { registeredAt?: 'asc' | 'desc' } }) {
+    async findMany(options?: { orderBy?: { registeredAt?: 'asc' | 'desc' }; where?: { owner?: string } }) {
       const direction = options?.orderBy?.registeredAt ?? 'desc';
+      const ownerFilter = options?.where?.owner;
       const pool = getPool();
 
       if (pool) {
         await ensureSchema();
-        const result = await pool.query(
-          `SELECT * FROM sentinel_nodes ORDER BY registered_at ${direction === 'asc' ? 'ASC' : 'DESC'}`
-        );
+        const query = ownerFilter
+          ? `SELECT * FROM sentinel_nodes WHERE LOWER(owner) = LOWER($1) ORDER BY registered_at ${direction === 'asc' ? 'ASC' : 'DESC'}`
+          : `SELECT * FROM sentinel_nodes ORDER BY registered_at ${direction === 'asc' ? 'ASC' : 'DESC'}`;
+        const params = ownerFilter ? [ownerFilter] : [];
+        const result = await pool.query(query, params);
         return result.rows.map(mapNode);
       }
 
-      return [...getMemoryStore().sentinelNodes].sort(
+      return [...getMemoryStore().sentinelNodes]
+        .filter((n) => !ownerFilter || n.owner?.toLowerCase() === ownerFilter.toLowerCase())
+        .sort(
         (a, b) => direction === 'desc'
           ? b.registeredAt.getTime() - a.registeredAt.getTime()
           : a.registeredAt.getTime() - b.registeredAt.getTime()
@@ -231,10 +247,10 @@ export const prisma = {
         await ensureSchema();
         try {
           const result = await pool.query(
-            `INSERT INTO sentinel_nodes (id, name, address, status, latency, events, last_heartbeat, registered_at)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+            `INSERT INTO sentinel_nodes (id, name, address, owner, status, latency, events, last_heartbeat, registered_at)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
              RETURNING *`,
-            [node.id, node.name, node.address, node.status, node.latency, node.events, node.lastHeartbeat, node.registeredAt]
+            [node.id, node.name, node.address, node.owner, node.status, node.latency, node.events, node.lastHeartbeat, node.registeredAt]
           );
           return mapNode(result.rows[0]);
         } catch (error) {
@@ -293,10 +309,10 @@ export const prisma = {
         const merged = { ...existing, ...data };
         const result = await pool.query(
           `UPDATE sentinel_nodes
-           SET name = $2, address = $3, status = $4, latency = $5, events = $6, last_heartbeat = $7
+           SET name = $2, address = $3, owner = $4, status = $5, latency = $6, events = $7, last_heartbeat = $8
            WHERE id = $1
            RETURNING *`,
-          [where.id, merged.name, merged.address, merged.status, merged.latency, merged.events, merged.lastHeartbeat]
+          [where.id, merged.name, merged.address, merged.owner, merged.status, merged.latency, merged.events, merged.lastHeartbeat]
         );
         return mapNode(result.rows[0]);
       }

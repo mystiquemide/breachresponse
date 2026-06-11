@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { mantleSepoliaTestnet } from 'wagmi/chains';
 import { createPublicClient, http, type Transaction as ViemTransaction } from 'viem';
+import { useAccount } from 'wagmi';
 import { Shield, ArrowLeft, Activity, ShieldCheck, History, Search, Filter, Cpu } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { DASHBOARD_PATH, navigateToAppPath } from '../../lib/navigation';
@@ -74,6 +75,7 @@ export default function ThreatHistoryPage() {
 function ThreatHistory() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { address: walletAddress } = useAccount();
   const filterProtocol = searchParams.get('protocol');
   const [logs, setLogs] = useState<TransactionLog[]>(initialLogs);
   const [search, setSearch] = useState(filterProtocol || '');
@@ -85,11 +87,14 @@ function ThreatHistory() {
     navigateToAppPath(window.location, DASHBOARD_PATH);
   };
 
-  // Fetch registered sentinels
+  // Fetch registered sentinels for connected wallet
   useEffect(() => {
     const fetchSentinels = async () => {
       try {
-        const res = await fetch('/api/sentinels');
+        const url = walletAddress
+          ? `/api/sentinels?owner=${encodeURIComponent(walletAddress)}`
+          : '/api/sentinels';
+        const res = await fetch(url);
         if (res.ok) {
           const data: RegisteredProtocol[] = await res.json();
           setRegisteredProtocols(data);
@@ -99,7 +104,7 @@ function ThreatHistory() {
       }
     };
     fetchSentinels();
-  }, []);
+  }, [walletAddress]);
 
   useEffect(() => {
     router.prefetch('/dashboard');
