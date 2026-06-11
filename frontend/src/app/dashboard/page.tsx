@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { useWriteContract } from 'wagmi';
+import { useWriteContract, useAccount } from 'wagmi';
 import { ShieldAlert, Radio, Activity, ShieldCheck, Cpu, HelpCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Counter from './Counter';
@@ -82,6 +82,7 @@ const BootSequence = () => {
 export default function Dashboard() {
   const router = useRouter();
   const { writeContract, isPending, isSuccess } = useWriteContract();
+  const { address: walletAddress } = useAccount();
   
   const [protocolAddress, setProtocolAddress] = useState('');
   const [customAssets, setCustomAssets] = useState<Asset[]>([]);
@@ -360,7 +361,8 @@ export default function Dashboard() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               address: protocolAddress,
-              name: "Custom Sentinel"
+              name: "Custom Sentinel",
+              owner: walletAddress
             })
           });
           if (res.ok) {
@@ -378,7 +380,7 @@ export default function Dashboard() {
       };
       saveSentinel();
     }
-  }, [isSuccess, protocolAddress]);
+  }, [isSuccess, protocolAddress, walletAddress]);
 
   // Terminal commands interpreter
   const handleCommandSubmit = (e: React.FormEvent) => {
