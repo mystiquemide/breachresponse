@@ -86,6 +86,7 @@ export default function Dashboard() {
   const { isLoading: isConfirming, isSuccess: isConfirmed, data: receipt } = useWaitForTransactionReceipt({ hash: txHash });
   const { address: walletAddress } = useAccount();
   const pendingAddressRef = useRef('');
+  const pendingNameRef = useRef('');
   
   const [protocolAddress, setProtocolAddress] = useState('');
   const [customAssets, setCustomAssets] = useState<Asset[]>([]);
@@ -352,6 +353,7 @@ export default function Dashboard() {
   };
 
   const [writeErrorMsg, setWriteErrorMsg] = useState<string | null>(null);
+  const [sentinelName, setSentinelName] = useState('');
   const [selectedAction, setSelectedAction] = useState<string | null>(null);
   const [actionQueued, setActionQueued] = useState(false);
 
@@ -379,6 +381,7 @@ export default function Dashboard() {
     }
     setWriteErrorMsg(null);
     pendingAddressRef.current = clean;
+    pendingNameRef.current = sentinelName.trim() || 'Sentinel Guard';
     resetWrite();
 
     writeContract({
@@ -414,7 +417,7 @@ export default function Dashboard() {
           const res = await fetch('/api/sentinels', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ address: addr, name: 'Custom Sentinel', owner: walletAddress })
+            body: JSON.stringify({ address: addr, name: pendingNameRef.current || 'Sentinel Guard', owner: walletAddress })
           });
           if (res.ok) {
             const newNode = await res.json();
@@ -424,6 +427,7 @@ export default function Dashboard() {
               `[SYS] Sentinel confirmed on-chain and registered: ${addr}`
             ]));
             setProtocolAddress('');
+            setSentinelName('');
           } else {
             const err = await res.json();
             setWriteErrorMsg(err.error || 'Sentinel saved on-chain but failed to record in database');
@@ -657,11 +661,18 @@ export default function Dashboard() {
             <p className="text-gray-400 text-xs mb-4 leading-relaxed font-sans">
               Register a Mantle Sepolia contract for sentinel monitoring and operator-reviewed response proposals.
             </p>
-            <input 
-              type="text" 
+            <input
+              type="text"
+              value={sentinelName}
+              onChange={(e) => setSentinelName(e.target.value)}
+              placeholder="Sentinel name (e.g. MNT Vault Guard)"
+              className="w-full bg-[#09090B] border border-gray-700 rounded p-3 text-xs text-white outline-none focus:border-[#10B981] mb-3 transition-colors font-sans"
+            />
+            <input
+              type="text"
               value={protocolAddress}
               onChange={(e) => setProtocolAddress(e.target.value)}
-              placeholder="0x... (Contract Address)" 
+              placeholder="0x... (Contract Address)"
               className="w-full bg-[#09090B] border border-gray-700 rounded p-3 text-xs text-white outline-none focus:border-[#10B981] mb-4 transition-colors font-mono"
             />
             <WalletStatusGate>
