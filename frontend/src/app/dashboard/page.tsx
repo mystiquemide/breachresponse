@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { useWriteContract, useAccount } from 'wagmi';
+import { useWriteContract, useWaitForTransactionReceipt, useAccount } from 'wagmi';
 import { getAddress } from 'viem';
 import { ShieldAlert, Radio, Activity, ShieldCheck, Cpu, HelpCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -82,8 +82,10 @@ const BootSequence = () => {
 
 export default function Dashboard() {
   const router = useRouter();
-  const { writeContract, isPending, isSuccess, isError, error: writeError, reset: resetWrite } = useWriteContract();
+  const { writeContract, data: txHash, isPending, isSuccess, isError, error: writeError, reset: resetWrite } = useWriteContract();
+  const { isLoading: isConfirming, isSuccess: isConfirmed, data: receipt } = useWaitForTransactionReceipt({ hash: txHash });
   const { address: walletAddress } = useAccount();
+  const pendingAddressRef = useRef('');
   
   const [protocolAddress, setProtocolAddress] = useState('');
   const [customAssets, setCustomAssets] = useState<Asset[]>([]);
@@ -366,8 +368,9 @@ export default function Dashboard() {
       setProtocolAddress(clean);
     }
     setWriteErrorMsg(null);
+    pendingAddressRef.current = clean;
     resetWrite();
-    
+
     writeContract({
       address: REGISTRY_ADDRESS,
       abi: REGISTRY_ABI,
@@ -380,48 +383,50 @@ export default function Dashboard() {
   useEffect(() => {
     if (isError && writeError) {
       const msg = writeError instanceof Error ? writeError.message : String(writeError);
-      // Extract the useful part from common wallet errors
-      const short = msg.includes('User rejected')
-        ? 'Transaction rejected in wallet'
-        : msg.includes('insufficient funds')
-        ? 'Insufficient MNT for gas'
-        : msg.length > 200
-        ? msg.slice(0, 200) + '...'
+      const short = msg.includes('User rejected') ? 'Transaction rejected in wallet'
+        : msg.includes('insufficient funds') ? 'Insufficient MNT for gas'
+        : msg.includes('Already registered') ? 'This address is already registered on-chain'
+        : msg.length > 200 ? msg.slice(0, 200) + '...'
         : msg;
       setWriteErrorMsg(short);
+      pendingAddressRef.current = '';
     }
   }, [isError, writeError]);
 
-  // Save registered protocol to database when contract success is detected
+  // Save registered protocol to database only after on-chain confirmation
   useEffect(() => {
-    if (isSuccess && protocolAddress) {
+    if (isConfirmed && receipt?.status === 'success' && pendingAddressRef.current) {
+      const addr = pendingAddressRef.current;
+      pendingAddressRef.current = '';
       const saveSentinel = async () => {
         try {
           const res = await fetch('/api/sentinels', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              address: protocolAddress,
-              name: "Custom Sentinel",
-              owner: walletAddress
-            })
+            body: JSON.stringify({ address: addr, name: 'Custom Sentinel', owner: walletAddress })
           });
           if (res.ok) {
             const newNode = await res.json();
             setCustomAssets((prev) => [newNode, ...prev]);
             setTerminalLines((prev) => capTerminal([
               ...prev,
-              `[SYS] Successfully registered sentinel node at ${protocolAddress}`
+              `[SYS] Sentinel confirmed on-chain and registered: ${addr}`
             ]));
             setProtocolAddress('');
+          } else {
+            const err = await res.json();
+            setWriteErrorMsg(err.error || 'Sentinel saved on-chain but failed to record in database');
           }
         } catch (err) {
           console.warn("Failed to save sentinel to DB", err);
         }
       };
       saveSentinel();
+    } else if (isConfirmed && receipt?.status === 'reverted') {
+      pendingAddressRef.current = '';
+      setWriteErrorMsg('Transaction reverted on-chain. This address may already be registered.');
     }
-  }, [isSuccess, protocolAddress, walletAddress]);
+  }, [isConfirmed, receipt, walletAddress]);
 
   // Terminal commands interpreter
   const handleCommandSubmit = (e: React.FormEvent) => {
@@ -464,15 +469,10 @@ export default function Dashboard() {
           break;
         case 'sentinels':
           setTerminalLines((prev) => {
-            const list = [
-              "Active sentinels:",
-              "  [ACTIVE] ID: 01 | Name: MantleSwap Sentinel | Target: 0x5e8c...1a2f",
-              "  [ACTIVE] ID: 02 | Name: LendX Sentinel      | Target: 0x8b3f...9c4d"
-            ];
-            customAssets.forEach((asset, i) => {
-              list.push(`  [${asset.status}] ID: ${10 + i} | Name: ${asset.name} | Target: ${asset.address}`);
-            });
-            return capTerminal([...prev, ...list]);
+            const list: string[] = allAssets.length > 0
+              ? allAssets.map((a, i) => `  [${a.status}] ID: ${i + 1} | Name: ${a.name} | Target: ${a.address}`)
+              : ['  No sentinels registered yet. Use the form to add a contract address.'];
+            return capTerminal([...prev, 'Registered sentinels:', ...list]);
           });
           break;
         case 'clear':
@@ -654,18 +654,18 @@ export default function Dashboard() {
             />
             <WalletStatusGate>
               {({ ready, connected, wrongNetwork }) => {
-                const canRegister = ready && connected && !wrongNetwork && !isPending;
+                const canRegister = ready && connected && !wrongNetwork && !isPending && !isConfirming;
 
                 return (
                   <>
-                    <button 
-              onClick={handleRegister}
+                    <button
+                      onClick={handleRegister}
                       disabled={!canRegister}
                       className={`w-full bg-[#10B981] text-black font-bold py-3 rounded text-xs transition-all ${!canRegister ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-400 hover:shadow-[0_0_15px_rgba(16,185,129,0.3)]'}`}
                     >
-                      {isPending ? 'Submitting registration...' : 'Register sentinel guard'}
+                      {isPending ? 'Waiting for wallet...' : isConfirming ? 'Confirming on-chain...' : 'Register sentinel guard'}
                     </button>
-                    {isSuccess && !writeErrorMsg && <p className="text-[#10B981] mt-3 text-[10px] text-center">Sentinel registered on Mantle Sepolia</p>}
+                    {isConfirmed && receipt?.status === 'success' && !writeErrorMsg && <p className="text-[#10B981] mt-3 text-[10px] text-center">Sentinel confirmed and registered on Mantle Sepolia</p>}
                     {writeErrorMsg && <p className="text-red-500 mt-3 text-[10px] text-center font-sans">{writeErrorMsg}</p>}
                     {!ready && <p className="text-gray-500 mt-3 text-[10px] text-center font-sans">Restoring wallet session...</p>}
                     {ready && !connected && <p className="text-red-500 mt-3 text-[10px] text-center font-sans">Connect a Mantle wallet to initialize guards</p>}

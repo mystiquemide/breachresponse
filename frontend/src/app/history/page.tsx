@@ -14,10 +14,11 @@ interface RegisteredProtocol {
   id: string;
   name: string;
   address: string;
+  owner?: string | null;
   status: string;
   latency: string;
   events: number;
-  lastHeartbeat?: string;
+  registeredAt?: string;
 }
 
 interface TransactionLog {
@@ -30,35 +31,7 @@ interface TransactionLog {
   timestamp: string;
 }
 
-const initialLogs: TransactionLog[] = [
-  {
-    id: 'incident-1',
-    txHash: '0x8f2a9aac22df9917c90a54dbd04f4716d98fe78d76400400cc091bf46dabe9aac',
-    protocol: 'MantleSwap',
-    type: 'Reentrancy',
-    gasSaved: 'response package ready',
-    status: 'PROPOSED',
-    timestamp: new Date(Date.now() - 120000).toISOString(),
-  },
-  {
-    id: 'incident-2',
-    txHash: '0x1b4d3bcf34a23ca729de9b19c0efb0102e0e334d9176fb7642821be043cc2ccf',
-    protocol: 'LendX Protocol',
-    type: 'Normal Transfer',
-    gasSaved: '-',
-    status: 'SAFE',
-    timestamp: new Date(Date.now() - 300000).toISOString(),
-  },
-  {
-    id: 'incident-3',
-    txHash: '0x48ce12ca0f943d803f414e12dbe66701e2b7721d4edb6134ef4e7e112aeceb7a',
-    protocol: 'YieldFlow',
-    type: 'Oracle Manipulation',
-    gasSaved: 'multisig review queued',
-    status: 'PROPOSED',
-    timestamp: new Date(Date.now() - 720000).toISOString(),
-  },
-];
+// No hardcoded demo logs — real data comes from the DB (/api/logs) and Mantle RPC
 
 export default function ThreatHistoryPage() {
   return (
@@ -77,9 +50,9 @@ function ThreatHistory() {
   const searchParams = useSearchParams();
   const { address: walletAddress } = useAccount();
   const filterProtocol = searchParams.get('protocol');
-  const [logs, setLogs] = useState<TransactionLog[]>(initialLogs);
+  const [logs, setLogs] = useState<TransactionLog[]>([]);
   const [search, setSearch] = useState(filterProtocol || '');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [registeredProtocols, setRegisteredProtocols] = useState<RegisteredProtocol[]>([]);
   const [viewMode, setViewMode] = useState<'all' | 'mine'>(filterProtocol ? 'mine' : 'all');
 
@@ -110,6 +83,26 @@ function ThreatHistory() {
     router.prefetch('/dashboard');
     router.prefetch('/');
   }, [router]);
+
+  // Fetch real alerts from DB first, then fall through to live chain scan
+  useEffect(() => {
+    const fetchDbLogs = async () => {
+      try {
+        const res = await fetch('/api/logs');
+        if (res.ok) {
+          const data: TransactionLog[] = await res.json();
+          if (data.length > 0) setLogs(data);
+        }
+      } catch (err) {
+        console.warn('Failed to fetch DB alerts', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchDbLogs();
+    const interval = setInterval(fetchDbLogs, 15000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     const publicClient = createPublicClient({
@@ -168,10 +161,11 @@ function ThreatHistory() {
         }
 
         if (allTxs.length > 0) {
-          setLogs(allTxs.slice(0, 25));
+          // Only use chain data if we have no real DB alerts yet
+          setLogs(prev => prev.length === 0 ? allTxs.slice(0, 25) : prev);
         }
       } catch (err) {
-        console.error("Failed to fetch logs", err);
+        console.error("Failed to fetch chain logs", err);
       } finally {
         if (!cancelled) setIsLoading(false);
       }
@@ -307,7 +301,7 @@ function ThreatHistory() {
                       {proto.status}
                     </span>
                   </div>
-                  <div className="mt-4 pt-4 border-t border-gray-800/60 flex items-center gap-6 text-xs text-gray-500">
+                  <div className="mt-4 pt-4 border-t border-gray-800/60 flex items-center gap-6 text-xs text-gray-500 flex-wrap">
                     <div>
                       <span className="text-gray-600">LATENCY: </span>
                       <span className="text-white">{proto.latency}</span>
@@ -316,6 +310,20 @@ function ThreatHistory() {
                       <span className="text-gray-600">EVENTS: </span>
                       <span className="text-white">{proto.events}</span>
                     </div>
+                    {proto.registeredAt && (
+                      <div>
+                        <span className="text-gray-600">REGISTERED: </span>
+                        <span className="text-white">{new Date(proto.registeredAt).toLocaleString()}</span>
+                      </div>
+                    )}
+                    <a
+                      href={`https://sepolia.mantlescan.xyz/address/${proto.address}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[#10B981] hover:underline text-[10px]"
+                    >
+                      Explorer ↗
+                    </a>
                     <button
                       onClick={() => navigateToAppPath(window.location, `${DASHBOARD_PATH}`)}
                       className="ml-auto text-[#10B981] hover:underline text-[10px] font-bold uppercase tracking-widest"
