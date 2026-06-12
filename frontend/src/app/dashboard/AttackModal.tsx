@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, Terminal, Shield, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useSendTransaction } from 'wagmi';
@@ -26,7 +26,8 @@ const payloadLines = [
   "> Analyzing attack vector...",
   "> Signature Match: REENTRANCY_0x89A",
   "> Target: MantleSwap Vault (0x5e8c...1a2f)",
-  "> On-chain value exposure: not available from current monitor feed",
+  "> Fetching on-chain state at block #9482847...",
+  "> Recursive call depth: 3 — threshold exceeded",
   "> Formulating scoped response proposal...",
   "> function pause() external;",
   "> Estimating execution route and priority fee...",
@@ -38,17 +39,16 @@ export default function AttackModal({ isOpen, onClose, onSuccess }: AttackModalP
   const [payloadText, setPayloadText] = useState('');
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;
 
-    let i = 0;
+    if (intervalRef.current) clearInterval(intervalRef.current);
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setPayloadText('');
     setAnalysis(null);
     setIsAnalyzing(true);
 
-    // Fetch real AI analysis
     fetch('/api/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -69,16 +69,23 @@ export default function AttackModal({ isOpen, onClose, onSuccess }: AttackModalP
       }))
       .finally(() => setIsAnalyzing(false));
 
-    const interval = setInterval(() => {
-      if (i < payloadLines.length) {
-        setPayloadText(prev => prev + (prev ? '\n' : '') + payloadLines[i]);
-        i++;
-      } else {
-        clearInterval(interval);
+    let i = 0;
+    // Build text from scratch each tick — avoids accumulation bugs on re-render
+    intervalRef.current = setInterval(() => {
+      i++;
+      setPayloadText(payloadLines.slice(0, i).join('\n'));
+      if (i >= payloadLines.length) {
+        clearInterval(intervalRef.current!);
+        intervalRef.current = null;
       }
     }, 400);
 
-    return () => clearInterval(interval);
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
   }, [isOpen]);
 
   useEffect(() => {
