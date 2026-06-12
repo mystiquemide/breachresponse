@@ -64,28 +64,6 @@ const seedNodes: SentinelNode[] = [
     events: 939,
     lastHeartbeat: new Date(),
     registeredAt: new Date('2026-01-03T00:00:00.000Z')
-  },
-  {
-    id: 'mantleswap-sentinel',
-    name: 'MantleSwap Sentinel',
-    address: '0x5e8c000000000000000000000000000000001a2f',
-    owner: null,
-    status: 'ACTIVE',
-    latency: '6.4ms',
-    events: 128,
-    lastHeartbeat: new Date(),
-    registeredAt: new Date('2026-01-01T00:00:00.000Z')
-  },
-  {
-    id: 'lendx-sentinel',
-    name: 'LendX Sentinel',
-    address: '0x8b3f000000000000000000000000000000009c4d',
-    owner: null,
-    status: 'ACTIVE',
-    latency: '7.1ms',
-    events: 93,
-    lastHeartbeat: new Date(),
-    registeredAt: new Date('2026-01-02T00:00:00.000Z')
   }
 ];
 
