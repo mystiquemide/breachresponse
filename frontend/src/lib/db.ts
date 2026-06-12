@@ -3,6 +3,26 @@ import { Pool, type QueryResultRow } from 'pg';
 
 type SentinelStatus = 'ACTIVE' | 'PAUSED' | 'OFFLINE';
 
+export type Alert = {
+  id: string;
+  txHash: string;
+  protocol: string | null;
+  type: string | null;
+  gasSaved: string | null;
+  status: string | null;
+  timestamp: string;
+  createdAt: Date;
+};
+
+type AlertCreateInput = {
+  txHash?: string;
+  protocol?: string;
+  type?: string;
+  gasSaved?: string;
+  status?: string;
+  timestamp?: string;
+};
+
 export type SentinelNode = {
   id: string;
   name: string;
@@ -24,6 +44,7 @@ type SentinelUpdateInput = Partial<Omit<SentinelNode, 'id' | 'registeredAt'>>;
 
 type Store = {
   sentinelNodes: SentinelNode[];
+  alerts: Alert[];
 };
 
 const globalStore = globalThis as unknown as {
@@ -93,7 +114,8 @@ function getPool() {
 function getMemoryStore(): Store {
   if (!globalStore.breachResponseStore) {
     globalStore.breachResponseStore = {
-      sentinelNodes: [...seedNodes]
+      sentinelNodes: [...seedNodes],
+      alerts: []
     };
   }
 
@@ -127,6 +149,20 @@ function mapNode(row: QueryResultRow): SentinelNode {
     events: Number(row.events ?? 0),
     lastHeartbeat: new Date(row.last_heartbeat),
     registeredAt: new Date(row.registered_at)
+  };
+}
+
+function mapAlert(row: QueryResultRow): Alert {
+  const createdAt = new Date(row.created_at || Date.now());
+  return {
+    id: row.id,
+    txHash: row.tx_hash ?? '0x...',
+    protocol: row.protocol ?? null,
+    type: row.verification_type ?? null,
+    gasSaved: row.gas_saved ?? null,
+    status: row.status ?? null,
+    timestamp: createdAt.toISOString(),
+    createdAt
   };
 }
 
@@ -350,6 +386,91 @@ export const prisma = {
       }
 
       return this.create({ data: create });
+    },
+
+    async updateMany({
+      where,
+      data
+    }: {
+      where: { address?: { contains?: string } };
+      data: { events?: { increment?: number } };
+    }) {
+      const contains = where?.address?.contains;
+      const increment = data?.events?.increment ?? 0;
+      const pool = getPool();
+
+      if (pool) {
+        await ensureSchema();
+        const query = contains
+          ? `UPDATE sentinel_nodes SET events = events + $1 WHERE LOWER(address) LIKE LOWER($2)`
+          : `UPDATE sentinel_nodes SET events = events + $1`;
+        const params = contains ? [increment, `%${contains}%`] : [increment];
+        const result = await pool.query(query, params);
+        return { count: result.rowCount ?? 0 };
+      }
+
+      let count = 0;
+      for (const node of getMemoryStore().sentinelNodes) {
+        if (!contains || node.address.toLowerCase().includes(contains.toLowerCase())) {
+          node.events += increment;
+          count++;
+        }
+      }
+      return { count };
+    }
+  },
+
+  alert: {
+    async findMany(options?: { orderBy?: { createdAt?: 'asc' | 'desc' }; take?: number }) {
+      const direction = options?.orderBy?.createdAt ?? 'desc';
+      const limit = options?.take ?? 100;
+      const pool = getPool();
+
+      if (pool) {
+        await ensureSchema();
+        const result = await pool.query(
+          `SELECT * FROM telemetry_logs ORDER BY created_at ${direction === 'asc' ? 'ASC' : 'DESC'} LIMIT $1`,
+          [limit]
+        );
+        return result.rows.map(mapAlert);
+      }
+
+      const sorted = [...getMemoryStore().alerts].sort((a, b) =>
+        direction === 'desc'
+          ? b.createdAt.getTime() - a.createdAt.getTime()
+          : a.createdAt.getTime() - b.createdAt.getTime()
+      );
+      return sorted.slice(0, limit);
+    },
+
+    async create({ data }: { data: AlertCreateInput }) {
+      const id = randomUUID();
+      const createdAt = new Date();
+      const pool = getPool();
+
+      if (pool) {
+        await ensureSchema();
+        const result = await pool.query(
+          `INSERT INTO telemetry_logs (id, tx_hash, protocol, verification_type, gas_saved, status, created_at)
+           VALUES ($1, $2, $3, $4, $5, $6, $7)
+           RETURNING *`,
+          [id, data.txHash ?? null, data.protocol ?? null, data.type ?? null, data.gasSaved ?? null, data.status ?? null, createdAt]
+        );
+        return mapAlert(result.rows[0]);
+      }
+
+      const alert: Alert = {
+        id,
+        txHash: data.txHash ?? '0x...',
+        protocol: data.protocol ?? null,
+        type: data.type ?? null,
+        gasSaved: data.gasSaved ?? null,
+        status: data.status ?? null,
+        timestamp: createdAt.toISOString(),
+        createdAt
+      };
+      getMemoryStore().alerts.unshift(alert);
+      return alert;
     }
   }
 };

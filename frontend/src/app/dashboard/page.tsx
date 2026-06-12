@@ -388,6 +388,7 @@ export default function Dashboard() {
         : msg.includes('Already registered') ? 'This address is already registered on-chain'
         : msg.length > 200 ? msg.slice(0, 200) + '...'
         : msg;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setWriteErrorMsg(short);
       pendingAddressRef.current = '';
     }
@@ -424,6 +425,7 @@ export default function Dashboard() {
       saveSentinel();
     } else if (isConfirmed && receipt?.status === 'reverted') {
       pendingAddressRef.current = '';
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setWriteErrorMsg('Transaction reverted on-chain. This address may already be registered.');
     }
   }, [isConfirmed, receipt, walletAddress]);
