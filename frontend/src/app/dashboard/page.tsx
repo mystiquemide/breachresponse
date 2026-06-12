@@ -342,8 +342,22 @@ export default function Dashboard() {
 
   const [writeErrorMsg, setWriteErrorMsg] = useState<string | null>(null);
 
+  const sanitizeAddress = (raw: string): string | null => {
+    const trimmed = raw.trim();
+    // Extract first valid 0x hex address from whatever was pasted
+    const match = trimmed.match(/0x[0-9a-fA-F]{40}/);
+    return match ? match[0] : null;
+  };
+
   const handleRegister = () => {
-    if (!protocolAddress || !protocolAddress.startsWith('0x')) return;
+    const clean = sanitizeAddress(protocolAddress);
+    if (!clean) {
+      setWriteErrorMsg('Invalid address. Enter a valid 0x contract address (42 hex chars).');
+      return;
+    }
+    if (clean !== protocolAddress) {
+      setProtocolAddress(clean);
+    }
     setWriteErrorMsg(null);
     resetWrite();
     
@@ -351,7 +365,7 @@ export default function Dashboard() {
       address: REGISTRY_ADDRESS,
       abi: REGISTRY_ABI,
       functionName: 'registerProtocol',
-      args: [protocolAddress as `0x${string}`],
+      args: [clean as `0x${string}`],
     });
   };
 
