@@ -733,6 +733,50 @@ export default function Dashboard() {
               </div>
             </div>
 
+            {/* Consensus Validators */}
+            <div className="mb-4 pt-3 border-t border-gray-800/60">
+              <h3 className="text-[9px] uppercase tracking-widest text-gray-500 mb-2">Consensus Validators</h3>
+              <div className="space-y-1.5">
+                {[
+                  { addr: '0x7f2a...3e1c', weight: '20%' },
+                  { addr: '0x4b8d...9f2a', weight: '20%' },
+                  { addr: '0x1e5c...7a4b', weight: '20%' },
+                  { addr: '0x9d3f...2c8e', weight: '20%' },
+                  { addr: '0x3a6e...5d1f', weight: '20%' },
+                ].map((v, i) => {
+                  const voted = !isConsensusBusy && consensusIncidents.length > 0;
+                  const validating = isConsensusBusy && i < 3;
+                  const dotColor = voted ? 'bg-[#10B981]' : validating ? 'bg-yellow-400 animate-pulse' : 'bg-gray-700';
+                  const label = voted ? 'Approved' : validating ? 'Validating...' : 'Idle';
+                  const labelColor = voted ? 'text-[#10B981]' : validating ? 'text-yellow-400' : 'text-gray-600';
+                  return (
+                    <div key={v.addr} className="flex items-center justify-between bg-black/30 border border-gray-800/50 rounded px-3 py-1.5">
+                      <div className="flex items-center gap-2">
+                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotColor}`} />
+                        <span className="text-[9px] font-mono text-gray-400">{v.addr}</span>
+                      </div>
+                      <div className="flex items-center gap-3 text-[9px]">
+                        <span className="text-gray-600">{v.weight}</span>
+                        <span className={`font-bold uppercase tracking-widest ${labelColor}`}>{label}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Allowlisted Response Actions */}
+            <div className="mb-4">
+              <h3 className="text-[9px] uppercase tracking-widest text-gray-500 mb-2">Allowlisted Response Actions</h3>
+              <div className="flex flex-wrap gap-1.5">
+                {['Pause', 'Quarantine', 'Monitor', 'Alert', 'Multisig'].map((action) => (
+                  <span key={action} className="text-[9px] font-bold uppercase tracking-widest bg-[#10B981]/10 border border-[#10B981]/20 text-[#10B981] rounded px-2 py-1">
+                    {action}
+                  </span>
+                ))}
+              </div>
+            </div>
+
             <p className="min-h-8 text-[10px] text-gray-500 font-sans mb-4">{consensusStatus}</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <button

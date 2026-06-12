@@ -102,12 +102,20 @@ export default function AttackModal({ isOpen, onClose, onSuccess }: AttackModalP
               {/* Threat Details */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-[#18181B] p-4 rounded-lg border border-red-500/30">
-                  <span className="text-gray-500 text-xs font-bold uppercase tracking-widest block mb-1">Target Protocol</span>
-                  <span className="text-white font-mono font-bold">MantleSwap Vault</span>
+                  <span className="text-gray-500 text-xs font-bold uppercase tracking-widest block mb-1">Threat Type</span>
+                  <span className="text-red-400 font-mono font-bold">Reentrancy (0x89A)</span>
                 </div>
                 <div className="bg-[#18181B] p-4 rounded-lg border border-red-500/30">
-                  <span className="text-gray-500 text-xs font-bold uppercase tracking-widest block mb-1">Attack Vector</span>
-                  <span className="text-red-400 font-mono font-bold">Reentrancy (0x89A)</span>
+                  <span className="text-gray-500 text-xs font-bold uppercase tracking-widest block mb-1">Confidence Score</span>
+                  <span className="text-white font-mono font-bold">0.94 <span className="text-[#10B981] text-[10px]">HIGH</span></span>
+                </div>
+                <div className="bg-[#18181B] p-4 rounded-lg border border-red-500/30">
+                  <span className="text-gray-500 text-xs font-bold uppercase tracking-widest block mb-1">Evidence Found</span>
+                  <span className="text-white font-mono font-bold text-xs">3 recursive calls</span>
+                </div>
+                <div className="bg-[#18181B] p-4 rounded-lg border border-red-500/30">
+                  <span className="text-gray-500 text-xs font-bold uppercase tracking-widest block mb-1">Recommendation</span>
+                  <span className="text-[#10B981] font-mono font-bold text-xs">Pause protocol</span>
                 </div>
               </div>
 
