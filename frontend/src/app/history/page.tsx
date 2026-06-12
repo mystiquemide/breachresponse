@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { mantleSepoliaTestnet } from 'wagmi/chains';
-import { createPublicClient, http, type Transaction as ViemTransaction } from 'viem';
+import { createPublicClient, http } from 'viem';
 import { useAccount } from 'wagmi';
 import { Shield, ArrowLeft, Activity, ShieldCheck, History, Search, Filter, Cpu } from 'lucide-react';
 import { motion } from 'framer-motion';

@@ -82,7 +82,7 @@ const BootSequence = () => {
 
 export default function Dashboard() {
   const router = useRouter();
-  const { writeContract, data: txHash, isPending, isSuccess, isError, error: writeError, reset: resetWrite } = useWriteContract();
+  const { writeContract, data: txHash, isPending, isError, error: writeError, reset: resetWrite } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed, data: receipt } = useWaitForTransactionReceipt({ hash: txHash });
   const { address: walletAddress } = useAccount();
   const pendingAddressRef = useRef('');
