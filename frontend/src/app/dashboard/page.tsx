@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWriteContract, useAccount } from 'wagmi';
+import { getAddress } from 'viem';
 import { ShieldAlert, Radio, Activity, ShieldCheck, Cpu, HelpCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Counter from './Counter';
@@ -346,7 +347,13 @@ export default function Dashboard() {
     const trimmed = raw.trim();
     // Extract first valid 0x hex address from whatever was pasted
     const match = trimmed.match(/0x[0-9a-fA-F]{40}/);
-    return match ? match[0] : null;
+    if (!match) return null;
+    try {
+      // Auto-checksum to proper EIP-55 format that viem requires
+      return getAddress(match[0]);
+    } catch {
+      return null;
+    }
   };
 
   const handleRegister = () => {
