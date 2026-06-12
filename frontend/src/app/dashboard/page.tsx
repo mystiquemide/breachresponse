@@ -81,7 +81,7 @@ const BootSequence = () => {
 
 export default function Dashboard() {
   const router = useRouter();
-  const { writeContract, isPending, isSuccess } = useWriteContract();
+  const { writeContract, isPending, isSuccess, isError, error: writeError, reset: resetWrite } = useWriteContract();
   const { address: walletAddress } = useAccount();
   
   const [protocolAddress, setProtocolAddress] = useState('');
@@ -340,8 +340,12 @@ export default function Dashboard() {
     isAutoScrollEnabled.current = Math.ceil(scrollTop + clientHeight) >= scrollHeight - 20;
   };
 
+  const [writeErrorMsg, setWriteErrorMsg] = useState<string | null>(null);
+
   const handleRegister = () => {
     if (!protocolAddress || !protocolAddress.startsWith('0x')) return;
+    setWriteErrorMsg(null);
+    resetWrite();
     
     writeContract({
       address: REGISTRY_ADDRESS,
@@ -350,6 +354,22 @@ export default function Dashboard() {
       args: [protocolAddress as `0x${string}`],
     });
   };
+
+  // Surface write errors to the UI
+  useEffect(() => {
+    if (isError && writeError) {
+      const msg = writeError instanceof Error ? writeError.message : String(writeError);
+      // Extract the useful part from common wallet errors
+      const short = msg.includes('User rejected')
+        ? 'Transaction rejected in wallet'
+        : msg.includes('insufficient funds')
+        ? 'Insufficient MNT for gas'
+        : msg.length > 200
+        ? msg.slice(0, 200) + '...'
+        : msg;
+      setWriteErrorMsg(short);
+    }
+  }, [isError, writeError]);
 
   // Save registered protocol to database when contract success is detected
   useEffect(() => {
@@ -624,7 +644,8 @@ export default function Dashboard() {
                     >
                       {isPending ? 'Submitting registration...' : 'Register sentinel guard'}
                     </button>
-                    {isSuccess && <p className="text-[#10B981] mt-3 text-[10px] text-center">Sentinel registered on Mantle Sepolia</p>}
+                    {isSuccess && !writeErrorMsg && <p className="text-[#10B981] mt-3 text-[10px] text-center">Sentinel registered on Mantle Sepolia</p>}
+                    {writeErrorMsg && <p className="text-red-500 mt-3 text-[10px] text-center font-sans">{writeErrorMsg}</p>}
                     {!ready && <p className="text-gray-500 mt-3 text-[10px] text-center font-sans">Restoring wallet session...</p>}
                     {ready && !connected && <p className="text-red-500 mt-3 text-[10px] text-center font-sans">Connect a Mantle wallet to initialize guards</p>}
                     {ready && connected && wrongNetwork && <p className="text-yellow-400 mt-3 text-[10px] text-center font-sans">Switch to Mantle Sepolia to initialize guards</p>}
