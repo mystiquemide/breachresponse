@@ -344,6 +344,8 @@ export default function Dashboard() {
   };
 
   const [writeErrorMsg, setWriteErrorMsg] = useState<string | null>(null);
+  const [selectedAction, setSelectedAction] = useState<string | null>(null);
+  const [actionQueued, setActionQueued] = useState(false);
 
   const sanitizeAddress = (raw: string): string | null => {
     const trimmed = raw.trim();
@@ -768,13 +770,34 @@ export default function Dashboard() {
             {/* Allowlisted Response Actions */}
             <div className="mb-4">
               <h3 className="text-[9px] uppercase tracking-widest text-gray-500 mb-2">Allowlisted Response Actions</h3>
-              <div className="flex flex-wrap gap-1.5">
-                {['Pause', 'Quarantine', 'Monitor', 'Alert', 'Multisig'].map((action) => (
-                  <span key={action} className="text-[9px] font-bold uppercase tracking-widest bg-[#10B981]/10 border border-[#10B981]/20 text-[#10B981] rounded px-2 py-1">
-                    {action}
-                  </span>
-                ))}
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {['Pause', 'Quarantine', 'Monitor', 'Alert', 'Multisig'].map((action) => {
+                  const active = selectedAction === action;
+                  return (
+                    <button
+                      key={action}
+                      type="button"
+                      onClick={() => {
+                        setSelectedAction(action);
+                        setActionQueued(false);
+                        setTimeout(() => setActionQueued(true), 600);
+                      }}
+                      className={`text-[9px] font-bold uppercase tracking-widest rounded px-2 py-1 border transition-all ${
+                        active
+                          ? 'bg-[#10B981] border-[#10B981] text-black shadow-[0_0_10px_rgba(16,185,129,0.4)]'
+                          : 'bg-[#10B981]/10 border-[#10B981]/20 text-[#10B981] hover:bg-[#10B981]/20 hover:border-[#10B981]/40'
+                      }`}
+                    >
+                      {action}
+                    </button>
+                  );
+                })}
               </div>
+              {selectedAction && actionQueued && (
+                <p className="text-[9px] text-[#10B981] font-mono">
+                  Action queued: <span className="font-bold">{selectedAction}</span> — pending GenLayer consensus approval
+                </p>
+              )}
             </div>
 
             <p className="min-h-8 text-[10px] text-gray-500 font-sans mb-4">{consensusStatus}</p>
