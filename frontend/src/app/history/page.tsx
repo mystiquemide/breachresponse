@@ -172,7 +172,10 @@ function ThreatHistory() {
     };
 
     runWhenIdle(fetchLogs);
-    const interval = setInterval(() => runWhenIdle(fetchLogs), 30000);
+    const interval = setInterval(() => {
+      if (document.hidden) return;
+      runWhenIdle(fetchLogs);
+    }, 120000);
     return () => {
       cancelled = true;
       clearInterval(interval);
