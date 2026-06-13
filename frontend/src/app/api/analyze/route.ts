@@ -7,7 +7,12 @@ const FALLBACK = {
   severity: 'CRITICAL',
   evidencePoints: ['Recursive external call detected', 'State mutation after external transfer', 'Gas pattern matches known reentrancy exploit'],
   recommendation: 'Pause protocol',
-  reasoning: 'Transaction exhibits classic reentrancy pattern with recursive calls preceding state updates in the vault withdrawal path.'
+  reasoning: 'Transaction exhibits classic reentrancy pattern with recursive calls preceding state updates in the vault withdrawal path.',
+  gasUsed: 187420,
+  expectedGas: 45000,
+  gasAnomalyFactor: 4.2,
+  gasAnomalyFlag: true,
+  gasAnomalyReason: 'Gas consumption is 4.2x above the baseline for a standard vault withdrawal, consistent with recursive call overhead.',
 };
 
 export async function POST(request: Request) {
@@ -46,7 +51,12 @@ Return this exact JSON (no other text):
   "severity": "<CRITICAL|HIGH|MEDIUM>",
   "evidencePoints": ["<evidence 1>", "<evidence 2>", "<evidence 3>"],
   "recommendation": "<Pause protocol|Alert operators|Monitor only|Multisig review>",
-  "reasoning": "<1-2 sentences explaining the threat>"
+  "reasoning": "<1-2 sentences explaining the threat>",
+  "gasUsed": <estimated integer gas units for this exploit type>,
+  "expectedGas": <integer baseline gas for a normal operation of this type>,
+  "gasAnomalyFactor": <float, gasUsed/expectedGas>,
+  "gasAnomalyFlag": <true|false>,
+  "gasAnomalyReason": "<1 sentence explaining the gas anomaly>"
 }`
           }
         ],
@@ -67,6 +77,11 @@ Return this exact JSON (no other text):
       evidencePoints: Array.isArray(parsed.evidencePoints) ? parsed.evidencePoints.slice(0, 3) : FALLBACK.evidencePoints,
       recommendation: parsed.recommendation ?? FALLBACK.recommendation,
       reasoning: parsed.reasoning ?? FALLBACK.reasoning,
+      gasUsed: parsed.gasUsed ?? FALLBACK.gasUsed,
+      expectedGas: parsed.expectedGas ?? FALLBACK.expectedGas,
+      gasAnomalyFactor: parsed.gasAnomalyFactor ?? FALLBACK.gasAnomalyFactor,
+      gasAnomalyFlag: parsed.gasAnomalyFlag ?? FALLBACK.gasAnomalyFlag,
+      gasAnomalyReason: parsed.gasAnomalyReason ?? FALLBACK.gasAnomalyReason,
     });
   } catch (err) {
     console.error('AI analysis error', err);

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertTriangle, Terminal, Shield, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { AlertTriangle, Terminal, Shield, ArrowRight, CheckCircle2, Zap } from 'lucide-react';
 import { useSendTransaction } from 'wagmi';
 import { parseEther } from 'viem';
 
@@ -18,6 +18,11 @@ interface Analysis {
   evidencePoints: string[];
   recommendation: string;
   reasoning: string;
+  gasUsed?: number;
+  expectedGas?: number;
+  gasAnomalyFactor?: number;
+  gasAnomalyFlag?: boolean;
+  gasAnomalyReason?: string;
 }
 
 const DEMO_TX = '0x8f2a9aac22df9917c90a54dbd04f4716d98fe78d76400400cc091bf46dabe9aac';
@@ -171,6 +176,39 @@ export default function AttackModal({ isOpen, onClose, onSuccess }: AttackModalP
                 <div className="bg-[#18181B]/60 border border-gray-800 rounded-lg px-4 py-3">
                   <span className="text-[9px] uppercase tracking-widest text-gray-500 block mb-1">AI Reasoning</span>
                   <p className="text-gray-300 text-xs font-sans leading-relaxed">{analysis.reasoning}</p>
+                </div>
+              )}
+
+              {/* Gas Anomaly Card */}
+              {analysis?.gasAnomalyFlag && (
+                <div className="bg-yellow-950/20 border border-yellow-500/30 rounded-lg px-4 py-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Zap className="w-4 h-4 text-yellow-400" />
+                    <span className="text-[10px] uppercase tracking-widest text-yellow-400 font-bold">Gas Anomaly Detected</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3 mb-2">
+                    <div>
+                      <span className="text-[8px] uppercase tracking-widest text-gray-500 block mb-0.5">Gas Used</span>
+                      <span className="text-white font-mono text-xs font-bold">
+                        {isAnalyzing ? '...' : (analysis.gasUsed?.toLocaleString() ?? '—')}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[8px] uppercase tracking-widest text-gray-500 block mb-0.5">Expected</span>
+                      <span className="text-[#10B981] font-mono text-xs font-bold">
+                        {isAnalyzing ? '...' : (analysis.expectedGas?.toLocaleString() ?? '—')}
+                      </span>
+                    </div>
+                    <div>
+                      <span className="text-[8px] uppercase tracking-widest text-gray-500 block mb-0.5">Anomaly Factor</span>
+                      <span className="text-yellow-400 font-mono text-xs font-bold">
+                        {isAnalyzing ? '...' : `${analysis.gasAnomalyFactor?.toFixed(1) ?? '—'}x`}
+                      </span>
+                    </div>
+                  </div>
+                  {analysis.gasAnomalyReason && (
+                    <p className="text-[9px] text-yellow-200/70 font-sans leading-relaxed">{analysis.gasAnomalyReason}</p>
+                  )}
                 </div>
               )}
 
