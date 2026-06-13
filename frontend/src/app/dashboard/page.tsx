@@ -290,6 +290,7 @@ export default function Dashboard() {
 
   // Fetch initial registered sentinels from database
   useEffect(() => {
+    if (!walletAddress) return;
     const fetchSentinels = async () => {
       try {
         const res = await fetch('/api/sentinels');
@@ -306,12 +307,16 @@ export default function Dashboard() {
       }
     };
     fetchSentinels();
-    const interval = window.setInterval(fetchSentinels, 15000);
+    const interval = window.setInterval(() => {
+      if (document.hidden) return;
+      fetchSentinels();
+    }, 60000);
     return () => window.clearInterval(interval);
-  }, []);
+  }, [walletAddress]);
 
   // Fetch read-only value monitored metrics from Mantle RPC
   useEffect(() => {
+    if (!walletAddress) return;
     const fetchValueMetrics = async () => {
       try {
         const res = await fetch('/api/metrics/value-monitored');
@@ -326,9 +331,12 @@ export default function Dashboard() {
     };
 
     fetchValueMetrics();
-    const interval = window.setInterval(fetchValueMetrics, 30000);
+    const interval = window.setInterval(() => {
+      if (document.hidden) return;
+      fetchValueMetrics();
+    }, 120000);
     return () => window.clearInterval(interval);
-  }, []);
+  }, [walletAddress]);
 
   // Update live waveform oscilloscope
   useEffect(() => {

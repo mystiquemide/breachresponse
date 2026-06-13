@@ -193,7 +193,10 @@ export default function LandingPage() {
     };
 
     runWhenIdle(fetchRealScans);
-    const interval = setInterval(() => runWhenIdle(fetchRealScans), 30000);
+    const interval = setInterval(() => {
+      if (document.hidden) return;
+      runWhenIdle(fetchRealScans);
+    }, 120000);
     return () => {
       cancelled = true;
       clearInterval(interval);
