@@ -11,6 +11,8 @@ import Onboarding from './Onboarding';
 import AttackModal from './AttackModal';
 import { REGISTRY_ADDRESS, REGISTRY_ABI } from '../constants';
 import { DASHBOARD_PATH, HISTORY_PATH, LANDING_PATH, clearCommandCenterNavigationState, navigateToAppPath, replaceWithAppPath } from '../../lib/navigation';
+import AuditScanner from '../../components/AuditScanner';
+import GasEstimator from '../../components/GasEstimator';
 import { summarizeValueMetrics } from '../../lib/valueMonitored';
 import { WalletConnectControl, WalletStatusGate } from '../../components/WalletConnectControl';
 import {
@@ -467,11 +469,13 @@ export default function Dashboard() {
           setTerminalLines((prev) => capTerminal([
             ...prev,
             "Available commands:",
-            "  help        - Display command options",
+            "  help             - Display command options",
             "  trigger incident - Open incident response workflow",
-            "  status      - Display connection telemetry details",
-            "  sentinels   - List all active security sentinels",
-            "  clear       - Clear the console outputs"
+            "  status           - Display connection telemetry details",
+            "  sentinels        - List all active security sentinels",
+            "  audit <address>              - Run AI security audit on a contract",
+            "  gas <address> <calldata>     - Estimate gas cost for a contract call",
+            "  clear                        - Clear the console outputs"
           ]));
           break;
         case 'status':
@@ -495,6 +499,68 @@ export default function Dashboard() {
           setTerminalLines([]);
           break;
         default:
+          if (cmd.startsWith('gas ')) {
+            const parts = cmd.slice(4).trim().split(/\s+/);
+            const gasAddr = parts[0] ?? '';
+            const gasCalldata = parts[1] ?? '0x';
+            if (!/^0x[0-9a-f]{40}$/i.test(gasAddr)) {
+              setTerminalLines((prev) => capTerminal([...prev, '[ERR] Usage: gas 0x<address> 0x<calldata>']));
+              return;
+            }
+            setTerminalLines((prev) => capTerminal([...prev, `[SYS] Estimating gas for ${gasAddr} on Mantle Sepolia...`]));
+            fetch('/api/gas-estimate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ address: gasAddr, calldata: gasCalldata }),
+            })
+              .then(r => r.json())
+              .then(data => {
+                if (data.error) {
+                  setTerminalLines((prev) => capTerminal([...prev, `[ERR] Gas estimate: ${data.error}`]));
+                  return;
+                }
+                setTerminalLines((prev) => capTerminal([
+                  ...prev,
+                  `[SYS] Gas estimate complete`,
+                  `[LOG] Units: ${data.estimatedGas?.toLocaleString()} — Price: ${data.gasPriceGwei} Gwei — Cost: ${parseFloat(data.estimatedCostMNT ?? '0').toFixed(8)} MNT`,
+                  `[SYS] See Gas Estimator panel for optimization suggestions.`,
+                ]));
+              })
+              .catch(() => setTerminalLines((prev) => capTerminal([...prev, '[ERR] Gas estimate request failed.'])));
+            return;
+          }
+
+          if (cmd.startsWith('audit ')) {
+            const addr = cmd.slice(6).trim();
+            if (!/^0x[0-9a-f]{40}$/i.test(addr)) {
+              setTerminalLines((prev) => capTerminal([...prev, '[ERR] Usage: audit 0x<40 hex chars>']));
+              return;
+            }
+            setTerminalLines((prev) => capTerminal([...prev, `[SYS] Starting audit scan for ${addr}...`]));
+            fetch('/api/audit', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ address: addr }),
+            })
+              .then(r => r.json())
+              .then(data => {
+                if (data.error) {
+                  setTerminalLines((prev) => capTerminal([...prev, `[ERR] Audit failed: ${data.error}`]));
+                  return;
+                }
+                setTerminalLines((prev) => capTerminal([
+                  ...prev,
+                  `[SYS] Audit complete for ${addr}`,
+                  `[SYS] Risk Score: ${data.riskScore}/100 — ${data.riskLabel}`,
+                  `[SYS] Bytecode: ${data.metadata?.bytecodeSize ?? '?'} bytes, ${data.metadata?.selectorsFound ?? '?'} selectors`,
+                  ...(data.vulnerabilities ?? []).map((v: { name: string; severity: string }) => `[ALERT] Vuln: ${v.name} (${v.severity})`),
+                  ...(data.gasFlags ?? []).map((f: string) => `[LOG] Gas: ${f}`),
+                  `[SYS] See Audit Scanner panel for full results.`,
+                ]));
+              })
+              .catch(() => setTerminalLines((prev) => capTerminal([...prev, '[ERR] Audit request failed. Check connection.'])));
+            return;
+          }
           setTerminalLines((prev) => capTerminal([
             ...prev,
             `[ERR] Command not recognized: '${cmd}' Type 'help' for instructions`
@@ -698,6 +764,12 @@ export default function Dashboard() {
               }}
             </WalletStatusGate>
           </div>
+
+          {/* Contract Audit Scanner */}
+          <AuditScanner />
+
+          {/* Gas Estimator */}
+          <GasEstimator />
 
           {/* Mantle Faucet Card */}
           <div className="sci-fi-panel p-6 relative overflow-hidden transition-all duration-500 border border-[#10B981]/20">
