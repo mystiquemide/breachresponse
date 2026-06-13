@@ -1,5 +1,5 @@
 # BreachResponse - Demo Video Script
-## Mantle Turing Test Hackathon 2026 | Target: 2:30 - 3:00 min
+## Mantle Turing Test Hackathon 2026 | Target: 3:00 - 3:45 min
 
 ---
 
@@ -61,7 +61,47 @@
 
 ---
 
-## SCENE 5 - Connect Wallet (1:05 - 1:20)
+## SCENE 5 - Contract Audit Scanner (1:05 - 1:30)
+
+**Screen:** Scroll to the **Contract Audit Scanner** card in the dashboard left column. No wallet connected - the scanner works for anyone.
+
+> "Before you even connect a wallet, you can audit any Mantle Sepolia contract on the spot. BreachResponse fetches verified Solidity source from Sourcify, or falls back to bytecode if source isn't available."
+
+**Action:** Paste the registry address (`0xea3C039795B5b04105B795c8B0cB85e0a42Cc85C`) into the scanner input and click **Scan**.
+
+**Screen:** Loading spinner appears for 2-3 seconds. Results render:
+- Risk score badge (e.g. 23 / LOW)
+- "Source verified" badge in green
+- Vulnerability list (empty or low-severity)
+- Gas flags section
+- AI summary paragraph
+- Recommendations list
+
+> "Risk score zero to one hundred, vulnerability classes with severity ratings, dangerous opcode detection, gas optimization flags, and a developer recommendation summary - all from a single contract address. No API key on your end, no wallet required."
+
+---
+
+## SCENE 6 - Gas Estimator (1:30 - 1:50)
+
+**Screen:** Scroll to the **Gas Estimator** card just below the Audit Scanner.
+
+> "The gas estimator calls `eth_estimateGas` directly against the Mantle Sepolia RPC. Paste a contract address and function calldata and you get a live cost breakdown - gas units, gas price in Gwei, and cost in MNT and USD."
+
+**Action:** Paste the registry address into the first field. Type `0x8456cb59` (pause selector) into the calldata field. Press Ctrl+Enter or click **Estimate Gas**.
+
+**Screen:** Four metric cards populate:
+- Gas Units
+- Gas Price (Gwei)
+- Cost (MNT)
+- Cost (USD ~)
+
+Then AI optimization suggestions appear numbered below.
+
+> "Three AI suggestions on how to reduce gas for this operation, generated live from the Groq model. This runs from Mantle's own RPC - not a simulation."
+
+---
+
+## SCENE 7 - Connect Wallet (1:50 - 2:05)
 
 **Action:** Click "Connect Wallet" in the header. RainbowKit modal appears. Select MetaMask. Approve connection. Network switches to Mantle Sepolia.
 
@@ -71,7 +111,7 @@
 
 ---
 
-## SCENE 6 - Register a Sentinel (1:20 - 1:45)
+## SCENE 8 - Register a Sentinel (2:05 - 2:25)
 
 **Action:** In "Register Sentinel Guard":
 - Type in the name field: `MNT Vault Guard`
@@ -87,7 +127,7 @@
 
 ---
 
-## SCENE 7 - GenLayer Consensus Guard (1:45 - 2:15)
+## SCENE 9 - GenLayer Consensus Guard (2:25 - 2:55)
 
 **Screen:** Scroll to "GenLayer Consensus Guard" panel on the left.
 
@@ -119,7 +159,7 @@
 
 ---
 
-## SCENE 8 - Trigger Incident + AI Analysis (2:15 - 2:40)
+## SCENE 10 - Trigger Incident + AI Analysis (2:55 - 3:20)
 
 **Action:** In the terminal, type `trigger incident` and press Enter.
 
@@ -149,7 +189,7 @@ After 1.5s, the Attack Modal opens.
 
 ---
 
-## SCENE 9 - Threat History (2:40 - 2:50)
+## SCENE 11 - Threat History (3:20 - 3:30)
 
 **Action:** Click "Threat History" in the nav.
 
@@ -159,7 +199,7 @@ After 1.5s, the Attack Modal opens.
 
 ---
 
-## SCENE 10 - Closing (2:50 - 3:00)
+## SCENE 12 - Closing (3:30 - 3:45)
 
 **Action:** Click "Back" to return to the landing page.
 

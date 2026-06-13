@@ -2,7 +2,7 @@
 
 ## Track
 
-**AI DevTools** - Mantle-specific smart contract audit assistant and runtime security tooling (Tencent Cloud track)
+**AI DevTools** - Mantle-specific smart contract audit assistant and runtime security tooling
 
 ---
 
@@ -143,7 +143,7 @@ BreachResponse is the first Mantle-native tool that combines on-demand contract 
 ### Technical Execution
 
 - Working Next.js frontend with real wallet integration on Mantle Sepolia.
-- Contract audit scanner: Sourcify source fetch, bytecode analysis, dangerous opcode detection, Tencent Cloud Hunyuan analysis.
+- Contract audit scanner: Sourcify source fetch, bytecode analysis, dangerous opcode detection, Groq LLM analysis.
 - Gas estimator: `eth_estimateGas` against Mantle RPC, current gas price, AI optimization report.
 - Python sentinel agent with live Mantle RPC telemetry.
 - Real AI incident classification with gas anomaly detection.
@@ -173,7 +173,7 @@ Every protocol deploying serious capital on Mantle is a potential customer. The 
 
 1. Open https://breachresponse.xyz and scroll to **Features** - lands on the Pipeline Execution section showing the audit, monitor, detect, propose, approve, execute flow.
 2. Click **Enter Command Center**. The operator dashboard opens showing live Mantle metrics: Blocks Scanned, Active Sentinels, Value Monitored, Response Proposals.
-3. Use the **Contract Audit Scanner** - paste any Mantle Sepolia contract address and click Scan. No wallet required. Results show risk score, vulnerabilities, gas flags, and AI recommendations powered by Tencent Cloud Hunyuan.
+3. Use the **Contract Audit Scanner** - paste any Mantle Sepolia contract address and click Scan. No wallet required. Results show risk score, vulnerabilities, gas flags, and AI recommendations powered by Groq.
 4. Use the **Gas Estimator** - paste a contract address and function calldata to get `eth_estimateGas` results from Mantle Sepolia with AI optimization suggestions.
 5. Connect a Mantle Sepolia wallet. Guard actions unlock. The Register Sentinel form accepts a contract address and sentinel name.
 6. Register a sentinel. The on-chain transaction goes to the Mantle registry. Confirmation and history update.
