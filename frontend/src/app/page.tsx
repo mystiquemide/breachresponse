@@ -27,11 +27,13 @@ import { WalletConnectControl } from '../components/WalletConnectControl';
 
 // ─── Variants ────────────────────────────────────────────────────────────────
 
+const EASE = [0.16, 1, 0.3, 1] as [number, number, number, number];
+
 const fadeUp = {
   hidden: { opacity: 0, y: 60, filter: 'blur(8px)' },
   visible: {
     opacity: 1, y: 0, filter: 'blur(0px)',
-    transition: { duration: 1.0, ease: [0.16, 1, 0.3, 1] },
+    transition: { duration: 1.0, ease: EASE },
   },
 };
 
@@ -39,7 +41,7 @@ const fadeUpB = {
   hidden: { opacity: 0, y: 50, filter: 'blur(6px)' },
   visible: {
     opacity: 1, y: 0, filter: 'blur(0px)',
-    transition: { duration: 1.0, ease: [0.16, 1, 0.3, 1], delay: 0.15 },
+    transition: { duration: 1.0, ease: EASE, delay: 0.15 },
   },
 };
 
@@ -47,7 +49,7 @@ const fadeUpC = {
   hidden: { opacity: 0, y: 40, filter: 'blur(4px)' },
   visible: {
     opacity: 1, y: 0, filter: 'blur(0px)',
-    transition: { duration: 1.1, ease: [0.16, 1, 0.3, 1], delay: 0.3 },
+    transition: { duration: 1.1, ease: EASE, delay: 0.3 },
   },
 };
 
@@ -60,7 +62,7 @@ const reveal = {
   hidden: { opacity: 0, scale: 1.06, filter: 'blur(12px)' },
   visible: {
     opacity: 1, scale: 1, filter: 'blur(0px)',
-    transition: { duration: 1.2, ease: [0.16, 1, 0.3, 1] },
+    transition: { duration: 1.2, ease: EASE },
   },
 };
 
@@ -273,7 +275,7 @@ export default function LandingPage() {
       <motion.nav
         initial={{ opacity: 0, y: -24 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.0, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 1.0, ease: EASE }}
         className="absolute w-full flex justify-between items-center py-6 px-8 md:px-16 z-50"
       >
         <div className="flex items-center gap-3">
@@ -353,7 +355,7 @@ export default function LandingPage() {
             <motion.div
               className="relative bg-[#09090B]/95 border border-[#10B981]/20 rounded-2xl shadow-2xl overflow-hidden flex flex-col"
               whileHover={{ scale: 1.008, borderColor: 'rgba(16,185,129,0.4)', boxShadow: '0 0 60px rgba(16,185,129,0.1)' }}
-              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.6, ease: EASE }}
               style={{ transformStyle: 'preserve-3d' }}
             >
               <div className="bg-white/5 border-b border-white/10 px-6 py-4 flex items-center justify-between">
@@ -515,7 +517,7 @@ export default function LandingPage() {
               <motion.div
                 className="p-8 rounded-2xl bg-[#09090B] border border-gray-800 cursor-default"
                 whileHover={{ y: -8, scale: 1.02, borderColor: 'rgba(16,185,129,0.5)', boxShadow: '0 0 40px rgba(16,185,129,0.12)' }}
-                transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.5, ease: EASE }}
               >
                 <div className="w-12 h-12 bg-gray-900 rounded-xl flex items-center justify-center mb-6 border border-gray-800 text-[#10B981]">{card.icon}</div>
                 <h3 className="text-xl font-bold text-white mb-3">{card.title}</h3>
@@ -571,7 +573,7 @@ export default function LandingPage() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 0.4, ease: EASE }}
                   className="space-y-1"
                 >
                   {codeTab === 'python' ? (
