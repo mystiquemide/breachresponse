@@ -283,7 +283,7 @@ export default function LandingPage() {
               Breach Response
             </h1>
             <p className="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] font-sans">
-              Monitor Mantle contracts, detect suspicious behavior, and prepare scoped response proposals behind human approval
+              Audit Mantle contracts, detect vulnerabilities, and run AI-powered incident tooling with human approval built in
             </p>
           </motion.div>
 
@@ -464,7 +464,7 @@ export default function LandingPage() {
         <motion.div initial={false} animate="animate" variants={fadeInUp} className="container mx-auto px-6 relative z-10">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Built for scale</h2>
           <p className="text-xl text-gray-400 mb-16 max-w-2xl font-sans text-sm">
-            Most tools stop at alerting. BreachResponse turns suspicious activity into a scoped response proposal while operators still have time to act.
+            Most tools stop at alerting. BreachResponse gives developers the audit scanner, gas estimator, and incident tooling to act before damage spreads.
           </p>
         </motion.div>
         <motion.div variants={staggerContainer} initial={false} animate="animate" className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -663,10 +663,10 @@ export default function LandingPage() {
       <section className="py-20 px-8 md:px-16 max-w-6xl mx-auto relative z-40 bg-transparent border-t border-gray-900/30">
         <div className="relative py-16 px-8 md:px-16 flex flex-col items-center text-center">
           <h2 className="text-3xl md:text-5xl font-bold text-white mb-6 tracking-tight">
-            Review suspicious activity before response windows close
+            Developer security tooling for Mantle - audit, estimate, respond
           </h2>
           <p className="text-base text-gray-400 max-w-xl mx-auto mb-10 font-sans leading-relaxed">
-            Attach sentinels to monitor Mantle contracts, prepare scoped responses, and keep high-risk actions behind approval.
+            Audit any Mantle contract, estimate gas costs, register sentinels, and keep response actions behind human approval.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto items-center justify-center">
@@ -698,7 +698,7 @@ export default function LandingPage() {
               <span className="text-lg font-bold tracking-widest text-white">BREACH RESPONSE</span>
             </div>
             <p className="text-gray-500 text-sm leading-relaxed font-sans max-w-xs">
-              Mantle contract monitoring, anomaly detection, and human-approved response routing
+              AI-powered contract auditing, gas estimation, and incident response tooling for Mantle developers
             </p>
           </div>
           
