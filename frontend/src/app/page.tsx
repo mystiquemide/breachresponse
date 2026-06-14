@@ -462,7 +462,7 @@ export default function LandingPage() {
 
       <section className="py-20 px-8 md:px-16 max-w-6xl mx-auto relative z-40 bg-transparent">
         <motion.div initial={false} animate="animate" variants={fadeInUp} className="container mx-auto px-6 relative z-10">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Built for scale</h2>
+          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Built for developers</h2>
           <p className="text-xl text-gray-400 mb-16 max-w-2xl font-sans text-sm">
             Most tools stop at alerting. BreachResponse gives developers the audit scanner, gas estimator, and incident tooling to act before damage spreads.
           </p>
@@ -490,7 +490,7 @@ export default function LandingPage() {
               <p className="text-sm text-gray-400 leading-relaxed font-sans">Converts anomaly evidence into a threat class, confidence score, and scoped response proposal</p>
             </div>
             <div className="mt-8 pt-6 border-t border-gray-800/60 font-mono text-[10px] space-y-2 text-gray-500">
-              <div className="flex justify-between"><span>MODEL</span> <span className="text-gray-400">OpenAI-compatible</span></div>
+              <div className="flex justify-between"><span>MODEL</span> <span className="text-gray-400">Groq / Llama 3.1</span></div>
               <div className="flex justify-between"><span>GUARD</span> <span className="text-[#10B981]">GenLayer consensus</span></div>
             </div>
           </motion.div>
