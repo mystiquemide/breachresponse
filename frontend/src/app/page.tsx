@@ -192,6 +192,7 @@ export default function LandingPage() {
   const { isConnected, chainId } = useAccount();
   const isCorrectNetwork = chainId === mantleSepoliaTestnet.id;
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setMounted(true); }, []);
   useEffect(() => { router.prefetch('/dashboard'); router.prefetch('/history'); }, [router]);
 
@@ -230,7 +231,8 @@ export default function LandingPage() {
 
     const runWhenIdle = (cb: () => void) => {
       const w = window as Window & { requestIdleCallback?: (cb: IdleRequestCallback, o?: IdleRequestOptions) => number };
-      w.requestIdleCallback ? w.requestIdleCallback(cb, { timeout: 1500 }) : setTimeout(cb, 250);
+      if (w.requestIdleCallback) w.requestIdleCallback(cb, { timeout: 1500 });
+      else setTimeout(cb, 250);
     };
 
     const fetchRealScans = async () => {
