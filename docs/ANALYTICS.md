@@ -1,4 +1,4 @@
-# ANALYTICS: Sentinel.ax
+# Analytics
 
 ## Metric Schemas (On-Chain / Agent)
 - `mempool_scan_rate`: Txs processed per second.

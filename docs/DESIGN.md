@@ -1,4 +1,4 @@
-# DESIGN SYSTEM: Sentinel.ax
+# Design System
 
 ## Visual Core
 - **Theme**: Dark Mode only. "Command Center" / "Submarine Radar" aesthetic.
