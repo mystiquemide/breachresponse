@@ -5,7 +5,7 @@ description: Configure Neon serverless PostgreSQL for BreachResponse telemetry a
 
 # Neon PostgreSQL Setup
 
-BreachResponse uses [Neon](https://neon.tech) for serverless PostgreSQL — storing sentinel node state, telemetry logs, and providing a durable backend that survives deployments and restarts.
+BreachResponse uses [Neon](https://neon.tech) for serverless PostgreSQL -- storing sentinel node state, telemetry logs, and providing a durable backend that survives deployments and restarts.
 
 ---
 
@@ -13,8 +13,8 @@ BreachResponse uses [Neon](https://neon.tech) for serverless PostgreSQL — stor
 
 | Feature | Benefit for BreachResponse |
 |---|---|
-| **Serverless** | No server to manage — database scales to zero when idle |
-| **Free tier** | 0.5 GB storage, 1 compute unit — sufficient for development and small production |
+| **Serverless** | No server to manage -- database scales to zero when idle |
+| **Free tier** | 0.5 GB storage, 1 compute unit -- sufficient for development and small production |
 | **Branching** | Create database branches for testing schema changes safely |
 | **Connection pooling** | Built-in PgBouncer for efficient connection management |
 | **SSL enforced** | Secure connections by default |
@@ -169,7 +169,7 @@ CREATE TABLE IF NOT EXISTS sentinel_nodes (
 );
 ```
 
-The `address` column has a `UNIQUE` constraint — each contract can only be registered once.
+The `address` column has a `UNIQUE` constraint -- each contract can only be registered once.
 
 ### `telemetry_logs`
 
@@ -189,9 +189,9 @@ CREATE TABLE IF NOT EXISTS telemetry_logs (
 
 This table grows unbounded. For production with high event volume, consider:
 
-1. **Time-based partitioning** — Partition by `created_at` month
-2. **Retention policy** — Delete logs older than 30 days
-3. **Analytics pipeline** — Archive to data warehouse for long-term analysis
+1. **Time-based partitioning** -- Partition by `created_at` month
+2. **Retention policy** -- Delete logs older than 30 days
+3. **Analytics pipeline** -- Archive to data warehouse for long-term analysis
 
 ---
 
@@ -268,5 +268,5 @@ The Neon dashboard provides:
 
 ## Next Steps
 
-- **[Environment Variables](/deployment/environment-variables)** — Complete reference for all configuration
-- **[Vercel Deployment](/deployment/vercel)** — Frontend deployment guide
+- **[Environment Variables](/deployment/environment-variables)** -- Complete reference for all configuration
+- **[Vercel Deployment](/deployment/vercel)** -- Frontend deployment guide

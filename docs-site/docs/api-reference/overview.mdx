@@ -60,7 +60,7 @@ if (a.length !== b.length) return false;
 return timingSafeEqual(a, b);
 ```
 
-If `INGEST_TOKEN` is **not** set, these endpoints are open — suitable for local development.
+If `INGEST_TOKEN` is **not** set, these endpoints are open -- suitable for local development.
 
 The agent sends the token via `reporter.py`:
 
@@ -100,11 +100,11 @@ HTTP status codes:
 | Code | Meaning |
 |---|---|
 | `200` | Success |
-| `400` | Bad request — invalid input parameters |
-| `401` | Unauthorized — missing or invalid `INGEST_TOKEN` |
-| `404` | Not found — resource doesn't exist |
-| `422` | Unprocessable — valid request but operation failed |
-| `500` | Internal server error — unexpected failure |
+| `400` | Bad request -- invalid input parameters |
+| `401` | Unauthorized -- missing or invalid `INGEST_TOKEN` |
+| `404` | Not found -- resource doesn't exist |
+| `422` | Unprocessable -- valid request but operation failed |
+| `500` | Internal server error -- unexpected failure |
 
 ### Fallback Behavior
 
@@ -172,6 +172,6 @@ All API routes run in the **Node.js runtime** (`runtime = 'nodejs'`), not Edge. 
 
 ## Next Steps
 
-- **[Audit Contract](/api-reference/audit)** — AI-powered bytecode analysis endpoint
-- **[Analyze Threat](/api-reference/analyze)** — Single-model threat classification
-- **[Compare Models](/api-reference/compare)** — Dual-model parallel analysis
+- **[Audit Contract](/api-reference/audit)** -- AI-powered bytecode analysis endpoint
+- **[Analyze Threat](/api-reference/analyze)** -- Single-model threat classification
+- **[Compare Models](/api-reference/compare)** -- Dual-model parallel analysis

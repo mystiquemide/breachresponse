@@ -73,17 +73,17 @@ Key libraries from `package.json`:
 
 ```
 src/app/api/
-├── audit/route.ts           POST — AI contract auditing
-├── analyze/route.ts         POST — AI threat classification
-├── compare/route.ts         POST — Groq vs Hunyuan parallel analysis
-├── gas-estimate/route.ts    POST — Gas cost estimation
-├── sentinels/route.ts       GET/POST/PUT — Sentinel node CRUD
-├── nodes/heartbeat/route.ts POST — Agent heartbeat
-├── vault/status/route.ts    GET — TargetVault pause status
-├── metrics/value-monitored/route.ts GET — Total value monitored
+├── audit/route.ts           POST -- AI contract auditing
+├── analyze/route.ts         POST -- AI threat classification
+├── compare/route.ts         POST -- Groq vs Hunyuan parallel analysis
+├── gas-estimate/route.ts    POST -- Gas cost estimation
+├── sentinels/route.ts       GET/POST/PUT -- Sentinel node CRUD
+├── nodes/heartbeat/route.ts POST -- Agent heartbeat
+├── vault/status/route.ts    GET -- TargetVault pause status
+├── metrics/value-monitored/route.ts GET -- Total value monitored
 └── logs/
-    ├── ingest/route.ts      POST — Agent telemetry ingestion
-    └── stream/route.ts      GET — SSE telemetry stream
+    ├── ingest/route.ts      POST -- Agent telemetry ingestion
+    └── stream/route.ts      GET -- SSE telemetry stream
 ```
 
 Each route runs in the `nodejs` runtime (not Edge) because it accesses `process.env`, PostgreSQL via `pg`, and the Node.js crypto module.
@@ -103,10 +103,10 @@ The agent is a single-process Python application with three core modules:
 #### Dependencies
 
 ```
-web3          — Ethereum/Mantle RPC interaction
-requests      — (transitive, used by web3)
-python-dotenv — Environment variable loading
-openai        — LLM API client (Groq, Hunyuan, OpenAI-compatible)
+web3          -- Ethereum/Mantle RPC interaction
+requests      -- (transitive, used by web3)
+python-dotenv -- Environment variable loading
+openai        -- LLM API client (Groq, Hunyuan, OpenAI-compatible)
 ```
 
 #### Entry Points
@@ -207,7 +207,7 @@ export const prisma = {
 };
 ```
 
-This is not actual Prisma — it's a hand-written adapter that works with both PostgreSQL and in-memory storage. The naming convention matches Prisma so the code reads naturally.
+This is not actual Prisma -- it's a hand-written adapter that works with both PostgreSQL and in-memory storage. The naming convention matches Prisma so the code reads naturally.
 
 ---
 
@@ -267,7 +267,7 @@ export function createGenLayerClient(account?: GenLayerAccount) {
 
 | Component | Threat | Mitigation |
 |---|---|---|
-| Agent private key | Key exposure → unauthorized pause tx | Minimal wallet balance, manual mode default |
+| Agent private key | Key exposure -> unauthorized pause tx | Minimal wallet balance, manual mode default |
 | RPC endpoint | Man-in-the-middle, data tampering | HTTPS, verify tx receipts on-chain |
 | Frontend API | Unauthenticated telemetry injection | `INGEST_TOKEN` bearer auth, `timingSafeEqual` comparison |
 | Database | SQL injection, data exfiltration | Parameterized queries, SSL connections |
@@ -324,15 +324,15 @@ def ingest_headers() -> dict:
 
 Refer to the [Deployment](/deployment/vercel) section for detailed deployment guides. The recommended production topology is:
 
-- **Vercel** — Next.js frontend (static export or serverless)
-- **Railway** — Python agent (always-on worker)
-- **Neon** — PostgreSQL (serverless, autoscaling)
-- **Upstash** — Redis (optional, for cross-instance SSE)
+- **Vercel** -- Next.js frontend (static export or serverless)
+- **Railway** -- Python agent (always-on worker)
+- **Neon** -- PostgreSQL (serverless, autoscaling)
+- **Upstash** -- Redis (optional, for cross-instance SSE)
 
 ---
 
 ## Next Steps
 
-- **[Monitor Pipeline](/architecture/monitor-pipeline)** — Deep dive into block scanning and event monitoring
-- **[Detect Pipeline](/architecture/detect-pipeline)** — AI classification and consensus validation
-- **[Respond Pipeline](/architecture/respond-pipeline)** — Human-gated emergency response
+- **[Monitor Pipeline](/architecture/monitor-pipeline)** -- Deep dive into block scanning and event monitoring
+- **[Detect Pipeline](/architecture/detect-pipeline)** -- AI classification and consensus validation
+- **[Respond Pipeline](/architecture/respond-pipeline)** -- Human-gated emergency response

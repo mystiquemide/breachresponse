@@ -85,7 +85,7 @@ MANTLE_TOKEN_ALLOWLIST=
 | `OPENAI_BASE_URL` | _(none)_ | Base URL for OpenAI-compatible API. For Groq: `https://api.groq.com/openai/v1`. For Hunyuan: `https://api.hunyuan.cloud.tencent.com/v1`. For OpenAI: leave unset. |
 | `LLM_MODEL` | `gpt-4o-mini` | Model name passed to the API. For Groq: `llama-3.1-8b-instant`. For Hunyuan: `hunyuan-lite`. For OpenAI: any supported model. |
 
-> **Note:** The agent's `IncidentAnalyzer` uses `OPENAI_API_KEY` / `OPENAI_BASE_URL` / `LLM_MODEL`. The frontend API routes use `GROQ_API_KEY` and `HUNYUAN_API_KEY` separately. These are different clients — configure both for the full pipeline.
+> **Note:** The agent's `IncidentAnalyzer` uses `OPENAI_API_KEY` / `OPENAI_BASE_URL` / `LLM_MODEL`. The frontend API routes use `GROQ_API_KEY` and `HUNYUAN_API_KEY` separately. These are different clients -- configure both for the full pipeline.
 
 ### Alternative AI Providers (Frontend API Routes)
 
@@ -98,11 +98,11 @@ MANTLE_TOKEN_ALLOWLIST=
 
 | Endpoint | Priority |
 |---|---|
-| `/api/audit` | Hunyuan → Groq → Fallback |
-| `/api/analyze` | Groq only → Fallback |
-| `/api/compare` | Both in parallel → Fallback |
-| `/api/gas-estimate` | Hunyuan → Groq → Fallback |
-| Agent `IncidentAnalyzer` | Configured via `OPENAI_API_KEY` → Fallback |
+| `/api/audit` | Hunyuan -> Groq -> Fallback |
+| `/api/analyze` | Groq only -> Fallback |
+| `/api/compare` | Both in parallel -> Fallback |
+| `/api/gas-estimate` | Hunyuan -> Groq -> Fallback |
+| Agent `IncidentAnalyzer` | Configured via `OPENAI_API_KEY` -> Fallback |
 
 ### Frontend Bridge
 
@@ -158,9 +158,9 @@ If `PRICE_ID` is empty, the token balance is reported without USD value.
 ```bash
 # Minimal setup for local development
 MANTLE_RPC_URL=https://rpc.sepolia.mantle.xyz
-# No PRIVATE_KEY — agent monitors only
-# No database — in-memory storage
-# No API keys — falls back to deterministic analysis
+# No PRIVATE_KEY -- agent monitors only
+# No database -- in-memory storage
+# No API keys -- falls back to deterministic analysis
 FRONTEND_API_BASE_URL=http://localhost:3000/api
 ```
 
@@ -219,7 +219,7 @@ if not w3.is_connected():
     print(f"[SENTINEL] Warning: Could not connect to Web3 provider: {MANTLE_RPC_URL}")
 ```
 
-The agent never crashes due to missing configuration — it degrades gracefully:
+The agent never crashes due to missing configuration -- it degrades gracefully:
 - Without `PRIVATE_KEY`: monitors blocks, cannot execute transactions
 - Without `OPENAI_API_KEY`: uses keyword-based fallback detection
 - Without `DATABASE_URL`: uses in-memory storage
@@ -239,5 +239,5 @@ The agent never crashes due to missing configuration — it degrades gracefully:
 
 ## Next Steps
 
-- **[Response Modes](/agent/response-modes)** — Understanding manual vs autonomous response
-- **[Deployment: Environment Variables](/deployment/environment-variables)** — Platform-specific env var setup
+- **[Response Modes](/agent/response-modes)** -- Understanding manual vs autonomous response
+- **[Deployment: Environment Variables](/deployment/environment-variables)** -- Platform-specific env var setup

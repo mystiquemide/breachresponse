@@ -28,7 +28,7 @@ The Monitor Pipeline is the first stage of BreachResponse. It continuously watch
 │                      │      Log Grouper            │   │
 │                      │                             │   │
 │                      │  tx_to_logs[tx_hash] = logs │   │
-│                      │  len(logs) > 1 → REENTRANCY│   │
+│                      │  len(logs) > 1 -> REENTRANCY│   │
 │                      └─────────────┬───────────────┘   │
 │                                    │                   │
 │                                    ▼                   │
@@ -158,9 +158,9 @@ function withdraw(uint256 amount) external whenNotPaused {
 
 When exploited:
 
-1. **First call:** `Attacker.attack(amount)` → `TargetVault.withdraw(amount)`
-2. ETH sent to `Attacker` → `Attacker.receive()` → `TargetVault.withdraw(amount)` again
-3. **Second call:** `TargetVault.withdraw(amount)` — state not yet updated, balance check passes
+1. **First call:** `Attacker.attack(amount)` -> `TargetVault.withdraw(amount)`
+2. ETH sent to `Attacker` -> `Attacker.receive()` -> `TargetVault.withdraw(amount)` again
+3. **Second call:** `TargetVault.withdraw(amount)` -- state not yet updated, balance check passes
 4. Two `Withdrawn` events emitted in the same transaction
 
 The log grouper catches both events and flags the transaction.
@@ -202,7 +202,7 @@ This includes:
 1. All sentinels registered in the PostgreSQL database via `GET /api/sentinels`
 2. A hardcoded local simulation vault address for development/testing
 
-Registrations update in real time — the agent fetches the latest list on every scan iteration.
+Registrations update in real time -- the agent fetches the latest list on every scan iteration.
 
 ---
 
@@ -290,7 +290,7 @@ Every 12 iterations, a controlled anomaly scenario is also generated:
 ```python
 if step % 12 == 0:
     # Controlled reentrancy detection scenario
-    # Marked as CONTROLLED SCENARIO — never broadcasts real transactions
+    # Marked as CONTROLLED SCENARIO -- never broadcasts real transactions
     post_log_to_frontend(
         tx_hash=sim_exploit_hash,
         protocol="TargetVault",
@@ -314,7 +314,7 @@ try:
     ...
 except Exception as block_err:
     print(f"[SENTINEL] Error during block scan iteration: {block_err}")
-    # Loop continues — next iteration will catch up
+    # Loop continues -- next iteration will catch up
 
 try:
     # Log querying
@@ -334,7 +334,7 @@ try:
     ...
 except Exception as e:
     print(f"[FRONTEND-BRIDGE] Warning: Failed to sync log to Next.js dashboard: {e}")
-    # Agent continues without frontend — telemetry is best-effort
+    # Agent continues without frontend -- telemetry is best-effort
 ```
 
 - RPC failures do not crash the agent
@@ -352,7 +352,7 @@ except Exception as e:
 |---|---|---|
 | `eth_blockNumber` | Every 3 seconds | Lightweight (1 RPC) |
 | `eth_getLogs` (per block) | Per new block | Moderate (filtered server-side) |
-| `eth_getBlock(full)` | Per new block | Heavy (full tx data) — only when registered protocols exist |
+| `eth_getBlock(full)` | Per new block | Heavy (full tx data) -- only when registered protocols exist |
 | `GET /api/sentinels` | Every 3 seconds | Lightweight (DB query) |
 | `POST /api/logs/ingest` | Per event | Lightweight (DB insert) |
 | `POST /api/nodes/heartbeat` | Every 3 seconds | Lightweight (DB upsert) |
@@ -365,5 +365,5 @@ Mantle Sepolia produces blocks approximately every 2 seconds. The 3-second scan 
 
 ## Next Steps
 
-- **[Detect Pipeline](/architecture/detect-pipeline)** — How suspicious transactions are classified by AI
-- **[Sentinel Registry](/smart-contracts/sentinel-registry)** — The on-chain contract that governs protocol registration
+- **[Detect Pipeline](/architecture/detect-pipeline)** -- How suspicious transactions are classified by AI
+- **[Sentinel Registry](/smart-contracts/sentinel-registry)** -- The on-chain contract that governs protocol registration

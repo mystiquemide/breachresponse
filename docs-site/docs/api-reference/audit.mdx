@@ -1,6 +1,6 @@
 ---
 title: Audit Contract
-description: POST /api/audit — AI-powered smart contract security auditing
+description: POST /api/audit -- AI-powered smart contract security auditing
 ---
 
 # POST /api/audit
@@ -69,8 +69,8 @@ Content-Type: application/json
     }
   ],
   "gasFlags": [
-    "Unbounded loop pattern detected — potential gas exhaustion",
-    "Repeated SLOAD in hot path — cache in memory variable"
+    "Unbounded loop pattern detected -- potential gas exhaustion",
+    "Repeated SLOAD in hot path -- cache in memory variable"
   ],
   "recommendations": "Add reentrancy guards (ReentrancyGuard) and validate all external call return values. Use checks-effects-interactions pattern throughout.",
   "summary": "Static analysis identified patterns consistent with common EVM vulnerabilities. Manual review recommended before deploying significant value.",
@@ -105,14 +105,14 @@ Content-Type: application/json
 
 ### Error Responses
 
-**400 — Invalid Address**
+**400 -- Invalid Address**
 ```json
 {
   "error": "Invalid address. Must be a 42-char 0x hex address."
 }
 ```
 
-**404 — No Contract Found**
+**404 -- No Contract Found**
 ```json
 {
   "error": "No contract bytecode found at this address on Mantle Sepolia. Verify the address is a deployed contract."
@@ -176,7 +176,7 @@ If source is found, the largest `.sol` file (up to 6000 chars) is included in th
 
 ### Step 4: AI Analysis
 
-**Provider priority:** Hunyuan → Groq → Fallback
+**Provider priority:** Hunyuan -> Groq -> Fallback
 
 ```typescript
 async function callAI(prompt: string): Promise<string | null> {
@@ -202,7 +202,7 @@ async function callAI(prompt: string): Promise<string | null> {
     // ...
   }
 
-  return null; // No AI provider available → fallback
+  return null; // No AI provider available -> fallback
 }
 ```
 
@@ -264,5 +264,5 @@ curl -X POST http://localhost:3000/api/audit \
 
 ## Next Steps
 
-- **[Analyze Threat](/api-reference/analyze)** — Real-time transaction threat classification
-- **[Compare Models](/api-reference/compare)** — Dual-model parallel analysis
+- **[Analyze Threat](/api-reference/analyze)** -- Real-time transaction threat classification
+- **[Compare Models](/api-reference/compare)** -- Dual-model parallel analysis

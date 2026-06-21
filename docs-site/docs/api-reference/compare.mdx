@@ -1,6 +1,6 @@
 ---
 title: Compare Models
-description: POST /api/compare — Dual-model threat classification with Groq and Hunyuan side by side
+description: POST /api/compare -- Dual-model threat classification with Groq and Hunyuan side by side
 ---
 
 # POST /api/compare
@@ -106,7 +106,7 @@ export async function POST(request: Request) {
   const { txHash, protocol, threatType } = await request.json();
   const prompt = buildUserPrompt(protocol, txHash, threatType);
 
-  // Parallel — total latency is max(groq, hunyuan), not sum
+  // Parallel -- total latency is max(groq, hunyuan), not sum
   const [groq, hunyuan] = await Promise.all([
     callGroq(prompt),
     callHunyuan(prompt)
@@ -159,7 +159,7 @@ async function callHunyuan(prompt: string): Promise<ModelVerdict> {
       ],
       temperature: 0.2,
       max_tokens: 250,
-      // No response_format — Hunyuan may wrap output in ```json fences
+      // No response_format -- Hunyuan may wrap output in ```json fences
     }),
   });
   const parsed = safeParse(data.choices?.[0]?.message?.content ?? '{}');
@@ -213,10 +213,10 @@ If both models fall back, `agreement` is `true` and `consensusConfidence` is `0.
 
 | Scenario | `agreement` | Interpretation |
 |---|---|---|
-| Both CRITICAL, high confidence | `true` | Strong signal — both AIs independently agree |
-| One CRITICAL, one HIGH | `false` | Models disagree on severity — investigate further |
-| One CRITICAL, one MEDIUM | `false` | Significant disagreement — likely false positive |
-| Both fallback | `true` | No AI keys configured — fallback data only |
+| Both CRITICAL, high confidence | `true` | Strong signal -- both AIs independently agree |
+| One CRITICAL, one HIGH | `false` | Models disagree on severity -- investigate further |
+| One CRITICAL, one MEDIUM | `false` | Significant disagreement -- likely false positive |
+| Both fallback | `true` | No AI keys configured -- fallback data only |
 
 **Guideline:** Only act on incidents where both models agree on `CRITICAL` severity with confidence > 0.85. When models disagree, treat the incident as requiring manual investigation.
 
@@ -250,5 +250,5 @@ curl -X POST http://localhost:3000/api/compare \
 
 ## Next Steps
 
-- **[Analyze Threat](/api-reference/analyze)** — Single-model classification (faster, simpler)
-- **[Audit Contract](/api-reference/audit)** — Bytecode-level security analysis
+- **[Analyze Threat](/api-reference/analyze)** -- Single-model classification (faster, simpler)
+- **[Audit Contract](/api-reference/audit)** -- Bytecode-level security analysis

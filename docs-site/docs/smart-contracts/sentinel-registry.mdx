@@ -40,9 +40,9 @@ address public owner;          // Registry administrator
 ### Storage Layout
 
 ```
-registeredProtocols: mapping(address → Protocol)
-  0x596F... → { admin: 0xABC..., isActive: true, registeredAt: 1719000000 }
-  0x9d9b... → { admin: 0xDEF..., isActive: true, registeredAt: 1719000100 }
+registeredProtocols: mapping(address -> Protocol)
+  0x596F... -> { admin: 0xABC..., isActive: true, registeredAt: 1719000000 }
+  0x9d9b... -> { admin: 0xDEF..., isActive: true, registeredAt: 1719000100 }
 
 sentinelAgent: 0x9f758be3ae3D985713964339E2f0bD783fC6015c
 owner:          0x... (deployer address)
@@ -74,7 +74,7 @@ constructor(address _sentinelAgent) {
 }
 ```
 
-The deployer becomes the registry `owner`. The initial sentinel agent address is set by the deployer — typically this is the agent's funded wallet.
+The deployer becomes the registry `owner`. The initial sentinel agent address is set by the deployer -- typically this is the agent's funded wallet.
 
 ---
 
@@ -95,7 +95,7 @@ function registerProtocol(address protocolAddress) external {
 }
 ```
 
-**Anyone** can call `registerProtocol()` to register a contract for monitoring. The caller becomes the protocol's `admin`. This open registration model is intentional — it allows any protocol team to onboard without registry owner approval.
+**Anyone** can call `registerProtocol()` to register a contract for monitoring. The caller becomes the protocol's `admin`. This open registration model is intentional -- it allows any protocol team to onboard without registry owner approval.
 
 > **Important:** Registration alone does NOT grant the sentinel agent pause authority. The protocol contract must independently grant `PAUSER_ROLE` (or equivalent) to the `sentinelAgent` address. Registration is a **declaration of intent** to be monitored; the actual permission model lives in each protocol's own contract.
 
@@ -162,7 +162,7 @@ function reassignProtocolAdmin(address protocolAddress, address newAdmin)
 }
 ```
 
-**Registry owner only.** This is the remediation path for address squatting — because `registerProtocol()` is open to anyone, a griefer could register a contract they don't control and lock the real admin out. The owner can reassign the slot to the rightful admin.
+**Registry owner only.** This is the remediation path for address squatting -- because `registerProtocol()` is open to anyone, a griefer could register a contract they don't control and lock the real admin out. The owner can reassign the slot to the rightful admin.
 
 ---
 
@@ -248,7 +248,7 @@ contract TargetVault {
 }
 ```
 
-The vault calls `registry.sentinelAgent()` at transaction time — so if the registry owner updates the agent address, the vault automatically uses the new address without needing its own upgrade.
+The vault calls `registry.sentinelAgent()` at transaction time -- so if the registry owner updates the agent address, the vault automatically uses the new address without needing its own upgrade.
 
 ---
 
@@ -337,7 +337,7 @@ Since `registerProtocol()` is permissionless, a malicious actor could register a
 
 1. The registry owner can call `reassignProtocolAdmin()` to transfer the slot to the rightful admin
 2. The registry owner can call `forceDeregisterProtocol()` to clear the slot
-3. Registration alone does not grant the sentinel agent any authority — the protocol contract must independently grant permissions
+3. Registration alone does not grant the sentinel agent any authority -- the protocol contract must independently grant permissions
 
 ### Agent Address Rotation
 
@@ -377,5 +377,5 @@ The registry has a comprehensive test suite:
 
 ## Next Steps
 
-- **[GenLayer Consensus Guard](/smart-contracts/genlayer-consensus)** — Decentralized incident validation
-- **[Agent Configuration](/agent/configuration)** — Setting up the sentinel agent
+- **[GenLayer Consensus Guard](/smart-contracts/genlayer-consensus)** -- Decentralized incident validation
+- **[Agent Configuration](/agent/configuration)** -- Setting up the sentinel agent

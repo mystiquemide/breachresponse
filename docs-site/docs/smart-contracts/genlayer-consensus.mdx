@@ -24,10 +24,10 @@ The `IncidentConsensusGuard` is a **Python smart contract** deployed on GenLayer
 
 ## Why GenLayer?
 
-Traditional EVM smart contracts cannot run AI models — all computation must be deterministic and reproducible. GenLayer extends this model with **nondeterministic execution**:
+Traditional EVM smart contracts cannot run AI models -- all computation must be deterministic and reproducible. GenLayer extends this model with **nondeterministic execution**:
 
-- **`gl.nondet.exec_prompt(prompt, response_format)`** — Runs an LLM prompt inside the validator
-- **`gl.vm.run_nondet_unsafe(leader_fn, validator_fn)`** — Leader runs LLM, validators re-run and verify
+- **`gl.nondet.exec_prompt(prompt, response_format)`** -- Runs an LLM prompt inside the validator
+- **`gl.vm.run_nondet_unsafe(leader_fn, validator_fn)`** -- Leader runs LLM, validators re-run and verify
 
 This enables the consensus guard to:
 1. Have each validator independently evaluate the incident with an LLM
@@ -43,8 +43,8 @@ This enables the consensus guard to:
 class IncidentConsensusGuard(gl.Contract):
     owner: Address
     operator: Address
-    incidents: TreeMap[str, str]       # incident_id → JSON string
-    incident_ids: TreeMap[str, str]    # index → incident_id
+    incidents: TreeMap[str, str]       # incident_id -> JSON string
+    incident_ids: TreeMap[str, str]    # index -> incident_id
     incident_count: u256
 ```
 
@@ -120,7 +120,7 @@ ERROR_TRANSIENT = "[TRANSIENT]"  # Temporary errors (network, timeout)
 
 ## Functions
 
-### `__init__()` — Constructor
+### `__init__()` -- Constructor
 
 ```python
 def __init__(self):
@@ -251,7 +251,7 @@ Return JSON with:
 
 | Check | Tolerance | Rationale |
 |---|---|---|
-| `approved` boolean | Must match exactly | Binary decision — no room for ambiguity |
+| `approved` boolean | Must match exactly | Binary decision -- no room for ambiguity |
 | `action` string | Must match exactly | Wrong action could be dangerous |
 | Severity level | Within 1 level | Some subjectivity in severity assessment |
 | Confidence score | Within 20 points | LLM confidence has inherent variance |
@@ -283,9 +283,9 @@ def _normalize_assessment(self, raw, proposed_action):
 ```
 
 Key safety features:
-1. **Action "reject" → always disapproved**
-2. **Confidence < 70 → escalated to multisig** (overrides leader's approval)
-3. **Non-allowlisted action → downgraded to multisig**
+1. **Action "reject" -> always disapproved**
+2. **Confidence < 70 -> escalated to multisig** (overrides leader's approval)
+3. **Non-allowlisted action -> downgraded to multisig**
 
 ---
 
@@ -310,7 +310,7 @@ Only approved incidents can be marked executed. This creates an immutable record
 
 ### View Functions
 
-#### `get_incident(incident_id: str) → dict`
+#### `get_incident(incident_id: str) -> dict`
 
 ```python
 @gl.public.view
@@ -320,7 +320,7 @@ def get_incident(self, incident_id: str) -> dict:
     return json.loads(self.incidents[incident_id])
 ```
 
-#### `list_incidents(limit: int = 20) → list`
+#### `list_incidents(limit: int = 20) -> list`
 
 ```python
 @gl.public.view
@@ -337,7 +337,7 @@ def list_incidents(self, limit: int = 20) -> list:
 
 Returns the most recent incidents (up to `limit`).
 
-#### `get_stats() → dict`
+#### `get_stats() -> dict`
 
 ```python
 @gl.public.view
@@ -463,13 +463,13 @@ The consensus guard has an extensive test suite (`tests/direct/test_incident_con
 | Test | Description |
 |---|---|
 | `test_submit_and_read_incident` | Submit incident, verify storage |
-| `test_rejects_non_allowlisted_action` | `transfer_funds` → revert |
+| `test_rejects_non_allowlisted_action` | `transfer_funds` -> revert |
 | `test_evaluate_approved_incident` | Consensus approves, status = `approved` |
-| `test_low_confidence_llm_escalates` | Confidence < 70 → `escalated` |
+| `test_low_confidence_llm_escalates` | Confidence < 70 -> `escalated` |
 | `test_llm_rejection_is_stored` | Consensus rejects, reason stored |
 | `test_mark_executed_requires_approval` | Cannot execute unapproved |
-| `test_mark_executed_after_approval` | Full lifecycle: submit → evaluate → execute |
-| `test_unknown_incident_reverts` | Missing incident → revert |
+| `test_mark_executed_after_approval` | Full lifecycle: submit -> evaluate -> execute |
+| `test_unknown_incident_reverts` | Missing incident -> revert |
 
 Tests use GenLayer's `direct_vm` fixture for local simulation and `mock_llm` to inject controlled LLM responses:
 
@@ -519,7 +519,7 @@ if confidence < 70:
 
 ### Validator Disagreement
 
-If validators disagree on any consensus dimension, the incident is **rejected** (not approved). There is no "majority vote" — consensus requires unanimous agreement on key dimensions.
+If validators disagree on any consensus dimension, the incident is **rejected** (not approved). There is no "majority vote" -- consensus requires unanimous agreement on key dimensions.
 
 ### Execution Gating
 
@@ -534,5 +534,5 @@ if not bool(incident.get("approved", False)):
 
 ## Next Steps
 
-- **[Detect Pipeline](/architecture/detect-pipeline)** — How incidents reach the consensus guard
-- **[Agent Response Modes](/agent/response-modes)** — Manual vs autonomous response configuration
+- **[Detect Pipeline](/architecture/detect-pipeline)** -- How incidents reach the consensus guard
+- **[Agent Response Modes](/agent/response-modes)** -- Manual vs autonomous response configuration

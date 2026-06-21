@@ -5,7 +5,7 @@ description: AI classification, dual-model comparison, heuristic scanning, and G
 
 # Detect Pipeline
 
-The Detect Pipeline is the intelligence layer of BreachResponse. It takes raw on-chain activity from the Monitor Pipeline and determines whether each transaction represents a genuine threat — using heuristic scanning, AI classification, dual-model comparison, and decentralized consensus validation.
+The Detect Pipeline is the intelligence layer of BreachResponse. It takes raw on-chain activity from the Monitor Pipeline and determines whether each transaction represents a genuine threat -- using heuristic scanning, AI classification, dual-model comparison, and decentralized consensus validation.
 
 ---
 
@@ -20,7 +20,7 @@ Suspicious Transaction
 │                                         │
 │  Checks: calldata, gas, value, opcodes  │
 │  Output: score (0-7), threatType        │
-│  Threshold: score ≥ 3 → suspicious      │
+│  Threshold: score ≥ 3 -> suspicious      │
 └─────────────────┬───────────────────────┘
                   │ score ≥ 3
                   ▼
@@ -30,7 +30,7 @@ Suspicious Transaction
 │  IncidentAnalyzer (agent Python)        │
 │  Model: GPT-4o-mini (or configured)     │
 │  Output: confidence (0.0-1.0)           │
-│  Threshold: > 0.9 → verified threat     │
+│  Threshold: > 0.9 -> verified threat     │
 └─────────────────┬───────────────────────┘
                   │ optional parallel path
                   ▼
@@ -110,9 +110,9 @@ export function detectThreatHeuristic(tx: HeuristicTx): {
 |---|---|---|
 | **Reentrancy signature** (`2e1a7d4d`, `8456cb59`) | +3 | Known exploit function selectors in calldata |
 | **DELEGATECALL pattern** (`f4` opcode) | +2 | Potential proxy manipulation |
-| **Long calldata** (>200 chars) | +2 | Complex encoded calls — possible exploit |
-| **Non-zero value** | +1 | Value transfer — potential drain |
-| **High gas** (>200,000) | +1 | Expensive execution — possible loop/recursion |
+| **Long calldata** (>200 chars) | +2 | Complex encoded calls -- possible exploit |
+| **Non-zero value** | +1 | Value transfer -- potential drain |
+| **High gas** (>200,000) | +1 | Expensive execution -- possible loop/recursion |
 | **Deterministic variance** | 0-2 | Demo variety (hash-based, not security-relevant) |
 
 ### Threshold
@@ -249,9 +249,9 @@ Return this exact JSON:
 ```
 
 Key parameters:
-- **temperature: 0.2** — Low creativity for consistent threat assessment
-- **response_format: json_object** — Structured output, no markdown parsing needed
-- **max_tokens: 350** — Compact responses for low latency
+- **temperature: 0.2** -- Low creativity for consistent threat assessment
+- **response_format: json_object** -- Structured output, no markdown parsing needed
+- **max_tokens: 350** -- Compact responses for low latency
 
 ### Dual-Model Comparison (`POST /api/compare`)
 
@@ -263,7 +263,7 @@ export async function POST(request: Request) {
   const { txHash, protocol, threatType } = await request.json();
   const prompt = buildUserPrompt(protocol, txHash, threatType);
 
-  // Parallel execution — both models respond simultaneously
+  // Parallel execution -- both models respond simultaneously
   const [groq, hunyuan] = await Promise.all([
     callGroq(prompt),
     callHunyuan(prompt)
@@ -319,10 +319,10 @@ const foundOpcodes = DANGEROUS_OPCODES.filter(op => {
   return regex.test(hex);
 });
 // DANGEROUS_OPCODES:
-//   ff — SELFDESTRUCT (CRITICAL)
-//   f4 — DELEGATECALL (HIGH)
-//   f0 — CREATE (MEDIUM)
-//   f5 — CREATE2 (MEDIUM)
+//   ff -- SELFDESTRUCT (CRITICAL)
+//   f4 -- DELEGATECALL (HIGH)
+//   f0 -- CREATE (MEDIUM)
+//   f5 -- CREATE2 (MEDIUM)
 
 // 3. Extract PUSH4 function selectors (opcode 0x63)
 for (let i = 0; i < hex.length - 10; i += 2) {
@@ -362,23 +362,23 @@ class IncidentConsensusGuard(gl.Contract):
     owner: Address
     operator: Address
     incidents: TreeMap[str, str]       # JSON-serialized incidents
-    incident_ids: TreeMap[str, str]    # Index → ID mapping
+    incident_ids: TreeMap[str, str]    # Index -> ID mapping
     incident_count: u256
 ```
 
 ### Incident Lifecycle
 
 ```
-submit_incident()       → status: pending_consensus
+submit_incident()       -> status: pending_consensus
        │
        ▼
-evaluate_incident()     → leader runs LLM
+evaluate_incident()     -> leader runs LLM
        │                  validator re-runs LLM
-       ├─ consensus YES → status: approved (or escalated if low confidence)
-       └─ consensus NO  → status: rejected
+       ├─ consensus YES -> status: approved (or escalated if low confidence)
+       └─ consensus NO  -> status: rejected
        │
        ▼
-mark_executed()         → status: executed
+mark_executed()         -> status: executed
 ```
 
 ### Consensus Mechanism
@@ -414,7 +414,7 @@ def evaluate_incident(self, incident_id: str) -> dict:
         # Must agree on:
         # - approved boolean
         # - action string
-        # - severity (within 1 level: high→critical ok, high→low not ok)
+        # - severity (within 1 level: high->critical ok, high->low not ok)
         # - confidence (within 20 points)
         if leader_data["approved"] != validator_data["approved"]:
             return False
@@ -488,7 +488,7 @@ export class IncidentConsensusGuardClient {
 | ≥ 70% | ≥ 70% | `approved` | Execute approved action |
 | ≥ 70% | < 70% | `escalated` | Multisig proposal |
 | < 70% | any | `escalated` | Multisig proposal |
-| any | rejected | `rejected` | False positive — monitor only |
+| any | rejected | `rejected` | False positive -- monitor only |
 
 ---
 
@@ -501,13 +501,13 @@ Every AI endpoint has a deterministic fallback for when API keys are not configu
 | `/api/analyze` | Fixed verdict: 0.91 confidence, CRITICAL severity, reentrancy evidence |
 | `/api/compare` | Both models return identical fallback verdicts, `agreement: true` |
 | `/api/audit` | Static analysis result: HIGH risk, reentrancy + unchecked returns |
-| Agent `IncidentAnalyzer` | Keyword matching: `reentrant` → 0.98, otherwise 0.01 |
+| Agent `IncidentAnalyzer` | Keyword matching: `reentrant` -> 0.98, otherwise 0.01 |
 
-This ensures the system always produces output — the dashboard never shows errors — but the `source` field (`live` vs `fallback`) lets operators know whether the result came from a real AI or the fallback.
+This ensures the system always produces output -- the dashboard never shows errors -- but the `source` field (`live` vs `fallback`) lets operators know whether the result came from a real AI or the fallback.
 
 ---
 
 ## Next Steps
 
-- **[Respond Pipeline](/architecture/respond-pipeline)** — How verified threats trigger emergency responses
-- **[GenLayer Consensus](/smart-contracts/genlayer-consensus)** — Deep dive into the consensus guard contract
+- **[Respond Pipeline](/architecture/respond-pipeline)** -- How verified threats trigger emergency responses
+- **[GenLayer Consensus](/smart-contracts/genlayer-consensus)** -- Deep dive into the consensus guard contract

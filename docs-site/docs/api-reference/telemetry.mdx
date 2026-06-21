@@ -14,7 +14,7 @@ BreachResponse provides real-time telemetry streaming via Server-Sent Events (SS
 | Method | Path | Auth | Description |
 |---|---|---|---|
 | **POST** | `/api/logs/ingest` | Optional | Ingest telemetry from agent |
-| **GET** | `/api/logs/stream` | — | SSE stream of telemetry events |
+| **GET** | `/api/logs/stream` | -- | SSE stream of telemetry events |
 | **POST** | `/api/nodes/heartbeat` | Optional | Agent heartbeat ping |
 
 ---
@@ -340,5 +340,5 @@ const recentAlerts = await prisma.alert.findMany({
 
 ## Next Steps
 
-- **[Sentinels API](/api-reference/sentinels)** — Manage monitored protocol contracts
-- **[Deployment](/deployment/vercel)** — Production deployment guides
+- **[Sentinels API](/api-reference/sentinels)** -- Manage monitored protocol contracts
+- **[Deployment](/deployment/vercel)** -- Production deployment guides

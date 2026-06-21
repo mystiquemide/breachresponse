@@ -1,6 +1,6 @@
 ---
 title: Response Modes
-description: Manual approval vs autonomous execution — configuring BreachResponse incident response behavior
+description: Manual approval vs autonomous execution -- configuring BreachResponse incident response behavior
 ---
 
 # Response Modes
@@ -15,10 +15,10 @@ BreachResponse supports two response modes that control how the sentinel agent a
 |---|---|---|
 | **Env variable** | `SENTINEL_RESPONSE_MODE=manual` | `SENTINEL_RESPONSE_MODE=autonomous` |
 | **Threat response** | Proposes action, waits for operator | Broadcasts pause tx immediately |
-| **Human in loop** | Yes — operator must approve | No — agent acts on AI verdict |
+| **Human in loop** | Yes -- operator must approve | No -- agent acts on AI verdict |
 | **Latency** | 15-70 seconds (operator dependent) | 5-9 seconds |
-| **Risk of false positive** | Low — operator can reject | Higher — agent may pause unnecessarily |
-| **Risk of missed attack** | Higher — operator may be unavailable | Low — agent acts autonomously |
+| **Risk of false positive** | Low -- operator can reject | Higher -- agent may pause unnecessarily |
+| **Risk of missed attack** | Higher -- operator may be unavailable | Low -- agent acts autonomously |
 | **Use case** | Production, high-value protocols | Testnet, isolated vaults, allowlisted targets |
 
 ---
@@ -63,26 +63,26 @@ if SENTINEL_RESPONSE_MODE != "autonomous":
 
 The operator reviews the proposal in the Command Center:
 
-1. **Check AI verdicts** — Both Groq and Hunyuan classifications, side by side
-2. **Review evidence** — Event log data, gas anomalies, reentrancy indicators
-3. **Assess risk** — Is this a real exploit or a false positive?
+1. **Check AI verdicts** -- Both Groq and Hunyuan classifications, side by side
+2. **Review evidence** -- Event log data, gas anomalies, reentrancy indicators
+3. **Assess risk** -- Is this a real exploit or a false positive?
 4. **Decide:**
-   - **Approve** → Agent broadcasts pause transaction
-   - **Reject** → Incident marked as false positive
-   - **Escalate** → Send to multisig for broader review
+   - **Approve** -> Agent broadcasts pause transaction
+   - **Reject** -> Incident marked as false positive
+   - **Escalate** -> Send to multisig for broader review
 
 ### Advantages
 
-- **Safety first** — No autonomous on-chain actions
-- **Human judgment** — Operator can spot AI hallucinations or false positives
-- **Compliance** — Satisfies regulatory requirements for human oversight
-- **Reversible** — Operator can reject an incorrect proposal before any on-chain action
+- **Safety first** -- No autonomous on-chain actions
+- **Human judgment** -- Operator can spot AI hallucinations or false positives
+- **Compliance** -- Satisfies regulatory requirements for human oversight
+- **Reversible** -- Operator can reject an incorrect proposal before any on-chain action
 
 ### Disadvantages
 
-- **Latency** — Operator may be unavailable, asleep, or slow to react
-- **Attention dependency** — Requires 24/7 monitoring coverage
-- **Manual errors** — Operator may misread the dashboard
+- **Latency** -- Operator may be unavailable, asleep, or slow to react
+- **Attention dependency** -- Requires 24/7 monitoring coverage
+- **Manual errors** -- Operator may misread the dashboard
 
 ---
 
@@ -105,7 +105,7 @@ When the agent detects a threat with high confidence (>0.9), it:
 4. **Posts** the result with status `MITIGATED`
 
 ```python
-# Autonomous path — no operator approval
+# Autonomous path -- no operator approval
 print(f"[SENTINEL] Autonomous mode enabled. "
       f"Broadcasting emergency pause transaction...")
 
@@ -128,23 +128,23 @@ Even in autonomous mode, the system has hard constraints:
 | Constraint | Protection |
 |---|---|
 | **Confidence threshold** | Only acts on confidence > 0.9 (90%) |
-| **Allowlisted actions** | Only `pause()` — never transfers, withdrawals, or ownership changes |
-| **Gas limit cap** | Max 120,000 gas (plus 20% buffer) — prevents infinite loops |
+| **Allowlisted actions** | Only `pause()` -- never transfers, withdrawals, or ownership changes |
+| **Gas limit cap** | Max 120,000 gas (plus 20% buffer) -- prevents infinite loops |
 | **Agent wallet balance** | Agent only holds gas funds, not protocol value |
-| **Unpause restriction** | Only the protocol owner can unpause — not the agent |
+| **Unpause restriction** | Only the protocol owner can unpause -- not the agent |
 
 ### Advantages
 
-- **Speed** — Response in 5-9 seconds instead of minutes
-- **24/7 coverage** — No operator availability dependency
-- **Consistent** — No operator fatigue or inconsistency
-- **Ideal for testnet** — Low stakes, high value for demonstrating the system
+- **Speed** -- Response in 5-9 seconds instead of minutes
+- **24/7 coverage** -- No operator availability dependency
+- **Consistent** -- No operator fatigue or inconsistency
+- **Ideal for testnet** -- Low stakes, high value for demonstrating the system
 
 ### Disadvantages
 
-- **False positives** — Agent could pause a legitimate protocol unnecessarily
-- **AI hallucination risk** — LLM may misclassify benign activity
-- **No human override** — Once broadcast, the pause is on-chain and irreversible by the agent
+- **False positives** -- Agent could pause a legitimate protocol unnecessarily
+- **AI hallucination risk** -- LLM may misclassify benign activity
+- **No human override** -- Once broadcast, the pause is on-chain and irreversible by the agent
 
 > **Warning:** Autonomous mode carries real risk. An overeager or hallucinating AI could pause a protocol at a critical moment (e.g., during a legitimate high-value withdrawal). Always pair autonomous mode with allowlisted contracts and value caps.
 
@@ -208,8 +208,8 @@ The AI confidence score determines the agent's behavior at multiple levels:
 
 | Confidence | Manual Mode | Autonomous Mode |
 |---|---|---|
-| **< 0.5** | Logged only — no proposal | Logged only — no action |
-| **0.5 – 0.9** | Proposal with "review needed" flag | Logged only — no action |
+| **< 0.5** | Logged only -- no proposal | Logged only -- no action |
+| **0.5 – 0.9** | Proposal with "review needed" flag | Logged only -- no action |
 | **> 0.9** | Proposal with "high confidence" flag | **Broadcast pause transaction** |
 
 The 0.9 threshold for autonomous action means the LLM must be at least 90% confident. In practice, the Groq Llama 3.1 model tends to produce bimodal confidence scores (either ~0.3 or ~0.95), providing a clear separation between suspicious and benign activity.
@@ -220,10 +220,10 @@ The 0.9 threshold for autonomous action means the LLM must be at least 90% confi
 
 The GenLayer consensus guard adds an additional layer of validation independent of the response mode:
 
-1. **Submit** — Incident sent to GenLayer validators for consensus
-2. **Evaluate** — Validators independently assess with LLM
-3. **Consensus** — Incident approved only if validators agree
-4. **Execute** — Approved incidents can be marked as executed
+1. **Submit** -- Incident sent to GenLayer validators for consensus
+2. **Evaluate** -- Validators independently assess with LLM
+3. **Consensus** -- Incident approved only if validators agree
+4. **Execute** -- Approved incidents can be marked as executed
 
 The GenLayer consensus operates independently of the agent's response mode. Even in autonomous mode, the consensus guard provides a separate validation check that can reject incidents where validators disagree with the primary AI analysis.
 
@@ -246,7 +246,7 @@ tx_data = {
 }
 ```
 
-The only difference between modes is **when** the transaction is broadcast — immediately (autonomous) or after approval (manual).
+The only difference between modes is **when** the transaction is broadcast -- immediately (autonomous) or after approval (manual).
 
 ---
 
@@ -254,15 +254,15 @@ The only difference between modes is **when** the transaction is broadcast — i
 
 When running in autonomous mode, monitor these signals:
 
-1. **Pause frequency** — If the agent pauses protocols more than once per hour without real attacks, the AI may be over-sensitive. Adjust the confidence threshold or switch to manual mode.
-2. **Gas costs** — Each autonomous pause costs gas. If false positives are frequent, gas costs add up.
-3. **Dashboard alerts** — The dashboard shows all autonomous actions with the agent's reasoning. Review them regularly.
-4. **GenLayer consensus stats** — If validators frequently disagree with the agent, the primary AI may need recalibration.
+1. **Pause frequency** -- If the agent pauses protocols more than once per hour without real attacks, the AI may be over-sensitive. Adjust the confidence threshold or switch to manual mode.
+2. **Gas costs** -- Each autonomous pause costs gas. If false positives are frequent, gas costs add up.
+3. **Dashboard alerts** -- The dashboard shows all autonomous actions with the agent's reasoning. Review them regularly.
+4. **GenLayer consensus stats** -- If validators frequently disagree with the agent, the primary AI may need recalibration.
 
 ---
 
 ## Next Steps
 
-- **[Agent Configuration](/agent/configuration)** — Full environment variable reference
-- **[Respond Pipeline](/architecture/respond-pipeline)** — Detailed response execution flow
-- **[Deployment](/deployment/vercel)** — Production deployment with safe defaults
+- **[Agent Configuration](/agent/configuration)** -- Full environment variable reference
+- **[Respond Pipeline](/architecture/respond-pipeline)** -- Detailed response execution flow
+- **[Deployment](/deployment/vercel)** -- Production deployment with safe defaults

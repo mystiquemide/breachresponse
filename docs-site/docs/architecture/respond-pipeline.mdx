@@ -19,8 +19,8 @@ Classified Incident
 │         1. Response Mode Check          │
 │                                         │
 │  SENTINEL_RESPONSE_MODE env var         │
-│  ├─ "manual" (default) → Stage 2       │
-│  └─ "autonomous"      → Stage 3        │
+│  ├─ "manual" (default) -> Stage 2       │
+│  └─ "autonomous"      -> Stage 3        │
 └─────────────────┬───────────────────────┘
                   │
       ┌───────────┴───────────┐
@@ -127,7 +127,7 @@ if SENTINEL_RESPONSE_MODE != "autonomous":
         gas_saved="pending operator approval",
         status="PROPOSED"
     )
-    continue  # DO NOT broadcast — wait for operator
+    continue  # DO NOT broadcast -- wait for operator
 ```
 
 ### Dashboard Display
@@ -142,9 +142,9 @@ The Command Center shows the proposal with:
 ### Operator Action
 
 The operator reviews the proposal and can:
-1. **Approve** — triggers the pause transaction
-2. **Reject** — marks the incident as a false positive
-3. **Escalate** — submits to multisig for broader review
+1. **Approve** -- triggers the pause transaction
+2. **Reject** -- marks the incident as a false positive
+3. **Escalate** -- submits to multisig for broader review
 
 ---
 
@@ -328,7 +328,7 @@ if receipt['status'] == 1:
         status="MITIGATED"
     )
 else:
-    # Reverted — log failure for operator review
+    # Reverted -- log failure for operator review
     print(f"[SENTINEL] Error: Pause transaction reverted on-chain.")
 ```
 
@@ -373,7 +373,7 @@ function unpause() external onlyOwner {
 }
 ```
 
-Note that `unpause()` is restricted to the owner only — not the sentinel agent. This prevents an attacker who compromises the agent from unpausing a protocol that was legitimately paused.
+Note that `unpause()` is restricted to the owner only -- not the sentinel agent. This prevents an attacker who compromises the agent from unpausing a protocol that was legitimately paused.
 
 ---
 
@@ -398,13 +398,13 @@ If the vault is already paused when the agent tries to pause it:
 - `eth_estimateGas` will revert
 - The agent falls back to the default gas limit
 - The actual transaction will revert with `"Contract is paused"` from the `whenNotPaused` modifier
-- This is a harmless no-op — the vault was already protected
+- This is a harmless no-op -- the vault was already protected
 
 ### Agent Key Compromise
 
 If the agent's private key is compromised:
 - In `manual` mode, the attacker can only **propose** actions, not execute them
-- In `autonomous` mode, the attacker can pause protocols — but cannot unpause (owner-only)
+- In `autonomous` mode, the attacker can pause protocols -- but cannot unpause (owner-only)
 - The registry owner can update `sentinelAgent` to a new address
 - Protocol owners can independently remove the `PAUSER_ROLE` from the old agent
 
@@ -428,6 +428,6 @@ If the agent's private key is compromised:
 
 ## Next Steps
 
-- **[Agent Response Modes](/agent/response-modes)** — Detailed configuration of manual vs autonomous modes
-- **[Sentinel Registry](/smart-contracts/sentinel-registry)** — The on-chain contract infrastructure
-- **[Deployment](/deployment/vercel)** — Production deployment guides
+- **[Agent Response Modes](/agent/response-modes)** -- Detailed configuration of manual vs autonomous modes
+- **[Sentinel Registry](/smart-contracts/sentinel-registry)** -- The on-chain contract infrastructure
+- **[Deployment](/deployment/vercel)** -- Production deployment guides

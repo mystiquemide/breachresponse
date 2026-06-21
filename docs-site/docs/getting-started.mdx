@@ -5,7 +5,7 @@ description: Deploy BreachResponse in 5 minutes
 
 # Getting Started
 
-Set up a complete BreachResponse deployment — frontend dashboard, Python sentinel agent, and database — in under 5 minutes.
+Set up a complete BreachResponse deployment -- frontend dashboard, Python sentinel agent, and database -- in under 5 minutes.
 
 ---
 
@@ -16,8 +16,8 @@ Set up a complete BreachResponse deployment — frontend dashboard, Python senti
 | **Node.js** | 20+ | Frontend build and development |
 | **Python** | 3.11+ | Sentinel agent runtime |
 | **PostgreSQL** | 14+ | Telemetry and sentinel state persistence (Neon recommended) |
-| **Mantle Sepolia RPC** | — | On-chain block scanning and contract interaction |
-| **Groq API Key** | — | AI threat classification (optional but recommended) |
+| **Mantle Sepolia RPC** | -- | On-chain block scanning and contract interaction |
+| **Groq API Key** | -- | AI threat classification (optional but recommended) |
 
 ---
 
@@ -74,11 +74,11 @@ HUNYUAN_API_KEY=your_hunyuan_api_key
 # Agent Wallet (required for on-chain response)
 PRIVATE_KEY=0x_your_agent_wallet_private_key
 
-# Optional — Agent-to-Frontend Security
+# Optional -- Agent-to-Frontend Security
 INGEST_TOKEN=your_shared_secret_token
 FRONTEND_API_BASE_URL=https://your-frontend.vercel.app/api
 
-# Optional — GenLayer Consensus
+# Optional -- GenLayer Consensus
 NEXT_PUBLIC_GENLAYER_CONSENSUS_GUARD_ADDRESS=0x86369EC44fbB5EB682729368557176858aBe0c73
 NEXT_PUBLIC_GENLAYER_STUDIO_URL=https://studio.genlayer.com/api
 ```
@@ -96,11 +96,11 @@ npm run dev
 
 The Command Center dashboard starts at `http://localhost:3000`. You'll see:
 
-- **Threat Scanner** — real-time block scanning results
-- **Sentinel Nodes** — registered monitoring contracts
-- **Threat History** — classified incident timeline
-- **Gas Estimator** — on-chain gas cost estimation
-- **Contract Auditor** — AI-powered bytecode analysis
+- **Threat Scanner** -- real-time block scanning results
+- **Sentinel Nodes** -- registered monitoring contracts
+- **Threat History** -- classified incident timeline
+- **Gas Estimator** -- on-chain gas cost estimation
+- **Contract Auditor** -- AI-powered bytecode analysis
 
 ---
 
@@ -201,10 +201,10 @@ curl -X POST http://localhost:3000/api/gas-estimate \
 
 ## Next Steps
 
-- **[How It Works](/how-it-works)** — Understand the Monitor → Detect → Respond pipeline
-- **[Agent Configuration](/agent/configuration)** — Full environment variable reference
-- **[Response Modes](/agent/response-modes)** — Manual vs autonomous mode setup
-- **[Deployment](/deployment/vercel)** — Production deployment guides
+- **[How It Works](/how-it-works)** -- Understand the Monitor -> Detect -> Respond pipeline
+- **[Agent Configuration](/agent/configuration)** -- Full environment variable reference
+- **[Response Modes](/agent/response-modes)** -- Manual vs autonomous mode setup
+- **[Deployment](/deployment/vercel)** -- Production deployment guides
 
 ---
 

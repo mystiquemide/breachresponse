@@ -25,7 +25,7 @@ Existing solutions fall into two categories that both fail at the critical momen
 
 ## The Solution
 
-BreachResponse introduces **active-defense monitoring** — a real-time pipeline that watches every block on Mantle, classifies suspicious transactions with AI, validates threats through decentralized consensus, and gates emergency responses behind operator approval.
+BreachResponse introduces **active-defense monitoring** -- a real-time pipeline that watches every block on Mantle, classifies suspicious transactions with AI, validates threats through decentralized consensus, and gates emergency responses behind operator approval.
 
 The platform operates as three integrated layers:
 
@@ -54,7 +54,7 @@ The platform operates as three integrated layers:
 ## Key Capabilities
 
 ### ⛓️ Real-Time Block Scanning
-The Python Sentinel Agent connects to Mantle Sepolia RPC and scans every new block. It filters transactions targeting registered protocol contracts, groups event logs by transaction hash to detect reentrancy patterns, and feeds suspicious activity into the AI classification pipeline — all within seconds of block confirmation.
+The Python Sentinel Agent connects to Mantle Sepolia RPC and scans every new block. It filters transactions targeting registered protocol contracts, groups event logs by transaction hash to detect reentrancy patterns, and feeds suspicious activity into the AI classification pipeline -- all within seconds of block confirmation.
 
 ### 🧠 AI-Powered Threat Classification
 Dual-LLM architecture using **Groq** (Llama 3.1-8B-Instant) and **Tencent Hunyuan** running in parallel. Each model independently classifies the threat severity, confidence, and recommended action. Results are compared side-by-side so operators can assess model agreement before acting.
@@ -63,9 +63,9 @@ Dual-LLM architecture using **Groq** (Llama 3.1-8B-Instant) and **Tencent Hunyua
 Incidents that pass AI classification are submitted to a **GenLayer smart contract** deployed at `0x86369EC44fbB5EB682729368557176858aBe0c73` on GenLayer StudioNet. Validators run nondeterministic LLM evaluation in parallel and must reach consensus before an incident is marked as approved.
 
 ###  Human Approval Gate
-All emergency actions — pausing protocols, quarantining addresses — require explicit operator approval through the Next.js Command Center dashboard. Autonomous mode can be enabled for allowlisted contracts and value-capped actions, but the default is always manual approval.
+All emergency actions -- pausing protocols, quarantining addresses -- require explicit operator approval through the Next.js Command Center dashboard. Autonomous mode can be enabled for allowlisted contracts and value-capped actions, but the default is always manual approval.
 
-### 📊 Command Center Dashboard
+###  Command Center Dashboard
 A Next.js single-page application with real-time SSE telemetry, threat history tables, sentinel node management, contract auditing tooling, gas estimation, and value-monitored metrics. Built with RainbowKit wallet integration for Mantle Sepolia chain.
 
 ---
@@ -97,4 +97,4 @@ A Next.js single-page application with real-time SSE telemetry, threat history t
 
 Jump into the [Getting Started](/getting-started) guide for a 5-minute setup, or dive into the [Architecture](/architecture/system-design) section for a deep technical walkthrough of every system component.
 
-> **Warning:** BreachResponse is designed for Mantle Sepolia testnet in its current deployment. Do not point the agent at mainnet without thorough review, additional security measures, and a production multisig setup. Autonomous mode carries inherent risk — always start with manual mode.
+> **Warning:** BreachResponse is designed for Mantle Sepolia testnet in its current deployment. Do not point the agent at mainnet without thorough review, additional security measures, and a production multisig setup. Autonomous mode carries inherent risk -- always start with manual mode.

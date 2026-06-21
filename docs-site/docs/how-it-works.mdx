@@ -1,6 +1,6 @@
 ---
 title: How It Works
-description: Complete walkthrough of the Monitor → Detect → Respond pipeline
+description: Complete walkthrough of the Monitor -> Detect -> Respond pipeline
 ---
 
 # How It Works
@@ -53,7 +53,7 @@ Mantle Block
 
 ---
 
-## Stage 1: Monitor — Real-Time Block Scanning
+## Stage 1: Monitor -- Real-Time Block Scanning
 
 The Python Sentinel Agent (`agent/main.py`) is the system's eyes on the blockchain. It connects to Mantle Sepolia RPC and runs an infinite scanning loop.
 
@@ -82,7 +82,7 @@ logs = w3.eth.get_logs({
 })
 ```
 
-Multiple logs from the same transaction hitting monitored contracts is a **strong signal of reentrancy** — the attacker's fallback function triggers a second call that produces a second event before the first completes.
+Multiple logs from the same transaction hitting monitored contracts is a **strong signal of reentrancy** -- the attacker's fallback function triggers a second call that produces a second event before the first completes.
 
 ```python
 # Group logs by transaction hash
@@ -93,7 +93,7 @@ for log in logs:
 
 for tx_hash, logs_in_tx in tx_to_logs.items():
     if len(logs_in_tx) > 1:
-        # REENTRANCY DETECTED — trigger AI analysis
+        # REENTRANCY DETECTED -- trigger AI analysis
 ```
 
 ### Direct Transaction Inspection
@@ -136,7 +136,7 @@ sseEmitter.emit('log', {
 
 ---
 
-## Stage 2: Detect — AI Classification and Consensus
+## Stage 2: Detect -- AI Classification and Consensus
 
 ### Heuristic Pre-Filtering
 
@@ -262,7 +262,7 @@ Only when consensus is reached does the incident move to `approved` status.
 
 ---
 
-## Stage 3: Respond — Human-Gated Emergency Action
+## Stage 3: Respond -- Human-Gated Emergency Action
 
 ### Manual Mode (Default)
 
@@ -318,13 +318,13 @@ tx_data = {
 ```
 pause_target_vault(vault_address, calldata)
     │
-    ├─► eth_estimateGas() — estimate gas with 20% buffer
+    ├─► eth_estimateGas() -- estimate gas with 20% buffer
     │
-    ├─► eth_account.sign_transaction() — sign with agent private key
+    ├─► eth_account.sign_transaction() -- sign with agent private key
     │
-    ├─► eth_sendRawTransaction() — broadcast to Mantle Sepolia
+    ├─► eth_sendRawTransaction() -- broadcast to Mantle Sepolia
     │
-    ├─► eth_wait_for_transaction_receipt() — wait up to 30s
+    ├─► eth_wait_for_transaction_receipt() -- wait up to 30s
     │
     └─► Return tx_hash or None
 ```
@@ -365,21 +365,21 @@ Here is a complete trace of a reentrancy exploit detection and response:
    │
 6. Python agent polls block N
 7. get_logs() returns 2 events on TargetVault -> tx_to_logs groups them
-8. len(logs_in_tx) > 1 → REENTRANCY DETECTED
+8. len(logs_in_tx) > 1 -> REENTRANCY DETECTED
    │
 9. IncidentAnalyzer.analyze_exploit_payload() sends to LLM
 10. LLM returns confidence 0.98, exploit_type "Reentrancy"
-11. confidence > 0.9 → THREAT VERIFIED
+11. confidence > 0.9 -> THREAT VERIFIED
    │
 12. formulate_rescue_transaction() returns pause calldata 0x8456cb59
 13. Manual mode: status="PROPOSED", wait for operator
-14. POST /api/logs/ingest → SSE → Dashboard shows alert
+14. POST /api/logs/ingest -> SSE -> Dashboard shows alert
    │
 15. Operator reviews in Command Center
 16. Operator approves pause action
 17. pause_target_vault() signs and broadcasts tx
 18. Tx confirmed: TargetVault.isPaused = true
-19. Attacker's receive() loop hits whenNotPaused modifier → reverts
+19. Attacker's receive() loop hits whenNotPaused modifier -> reverts
    │
 20. post_log_to_frontend(status="MITIGATED")
 21. Dashboard updates: "1,420.5 mETH saved"
@@ -399,7 +399,7 @@ A single LLM can hallucinate or misclassify. By running Groq and Hunyuan in para
 
 ### Why GenLayer for Consensus?
 
-On-chain consensus through a traditional EVM contract would be limited to deterministic logic. GenLayer's `gl.vm.run_nondet_unsafe` primitive allows validators to run nondeterministic LLM inference and reach agreement — enabling AI-powered consensus that's cryptographically verifiable.
+On-chain consensus through a traditional EVM contract would be limited to deterministic logic. GenLayer's `gl.vm.run_nondet_unsafe` primitive allows validators to run nondeterministic LLM inference and reach agreement -- enabling AI-powered consensus that's cryptographically verifiable.
 
 ### Why PostgreSQL + Upstash?
 

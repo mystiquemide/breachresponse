@@ -1,6 +1,6 @@
 ---
 title: Analyze Threat
-description: POST /api/analyze — AI-powered threat classification for on-chain transactions
+description: POST /api/analyze -- AI-powered threat classification for on-chain transactions
 ---
 
 # POST /api/analyze
@@ -38,7 +38,7 @@ POST /api/analyze
 | `protocol` | `string` | No | Protocol name (e.g., "TargetVault", "MantleSwap") |
 | `threatType` | `string` | No | Detection signature (e.g., "Reentrancy", "Anomalous pattern") |
 
-All parameters are optional — the endpoint falls back gracefully.
+All parameters are optional -- the endpoint falls back gracefully.
 
 ---
 
@@ -190,8 +190,8 @@ async function classifyBatch(
     entry.aiSeverity = severity;
     entry.aiReasoning = reasoning;
     entry.gasSaved = confidence > 0.85
-      ? `AI verified (${(confidence * 100).toFixed(0)}%) — response ready`
-      : `AI flagged (${(confidence * 100).toFixed(0)}%) — review needed`;
+      ? `AI verified (${(confidence * 100).toFixed(0)}%) -- response ready`
+      : `AI flagged (${(confidence * 100).toFixed(0)}%) -- review needed`;
     entry.status = confidence > 0.85 ? 'PROPOSED' : 'SCANNING';
   }
 }
@@ -226,5 +226,5 @@ curl -X POST http://localhost:3000/api/analyze \
 
 ## Next Steps
 
-- **[Compare Models](/api-reference/compare)** — Run the same analysis against two AI models in parallel
-- **[Gas Estimate](/api-reference/gas-estimate)** — Estimate gas costs for contract interactions
+- **[Compare Models](/api-reference/compare)** -- Run the same analysis against two AI models in parallel
+- **[Gas Estimate](/api-reference/gas-estimate)** -- Estimate gas costs for contract interactions

@@ -18,7 +18,7 @@ The Python Sentinel Agent is the active-defense monitor that scans Mantle Sepoli
 | **OS** | Linux, macOS | Linux (for production) |
 | **Memory** | 256 MB | 512 MB |
 | **Disk** | 100 MB | 200 MB |
-| **Network** | Outbound HTTPS | — |
+| **Network** | Outbound HTTPS | -- |
 
 ---
 
@@ -126,7 +126,7 @@ Block: 12345678
 
 ```
 agent/
-├── main.py                    # Entry point — sentinel monitoring loop
+├── main.py                    # Entry point -- sentinel monitoring loop
 ├── incident_analyzer.py       # LLM-based exploit analysis
 ├── reporter.py                # Frontend API bridge (telemetry + heartbeat)
 ├── requirements.txt           # Python dependencies
@@ -304,6 +304,6 @@ python agent/main.py  # relative imports will fail
 
 ## Next Steps
 
-- **[Agent Configuration](/agent/configuration)** — Full environment variable reference
-- **[Response Modes](/agent/response-modes)** — Manual vs autonomous mode setup
-- **[Deployment: Railway](/deployment/railway-worker)** — Production deployment guide
+- **[Agent Configuration](/agent/configuration)** -- Full environment variable reference
+- **[Response Modes](/agent/response-modes)** -- Manual vs autonomous mode setup
+- **[Deployment: Railway](/deployment/railway-worker)** -- Production deployment guide
