@@ -1,0 +1,338 @@
+---
+title: System Design
+description: Complete system architecture of BreachResponse
+---
+
+# System Design
+
+BreachResponse is a distributed system spanning five runtime environments: a Next.js frontend, a Python sentinel agent, Mantle Sepolia smart contracts, a Neon PostgreSQL database, and GenLayer StudioNet consensus validators.
+
+---
+
+## System Topology
+
+```
+                          ┌──────────────────┐
+                          │  GenLayer Validators│
+                          │  (Nondeterministic │
+                          │   LLM Consensus)   │
+                          └────────┬─────────┘
+                                   │ readContract / writeContract
+                                   │
+┌──────────────┐     HTTP/SSE     ┌──────────────┐     RPC/WS     ┌──────────────┐
+│              │◄───────────────►│              │◄─────────────►│              │
+│   Next.js    │                 │    Python    │                │   Mantle     │
+│   Frontend   │  POST /api/*    │   Sentinel   │  eth_getLogs  │   Sepolia    │
+│   (Vercel)   │  SSE /logs/     │   Agent      │  eth_sendTx   │   RPC Node   │
+│              │  stream         │  (Railway)   │                │              │
+└──────┬───────┘                 └──────────────┘                └──────────────┘
+       │                                                       
+       │ SQL (pg)
+       │
+┌──────┴───────┐     ┌──────────────┐
+│              │     │              │
+│    Neon      │     │   Upstash    │
+│  PostgreSQL  │     │    Redis     │
+│              │     │  (Event Bus) │
+└──────────────┘     └──────────────┘
+```
+
+---
+
+## Component Breakdown
+
+### 1. Next.js Frontend (`frontend/`)
+
+The Command Center is a Next.js 16 App Router application with:
+
+| Layer | Technology | Files |
+|---|---|---|
+| **Routing** | Next.js App Router | `src/app/` |
+| **API Routes** | Route Handlers (Node.js runtime) | `src/app/api/**/route.ts` |
+| **Styling** | Tailwind CSS 4 | Global styles |
+| **Wallet** | RainbowKit + Wagmi + Viem | Wallet connection, Mantle Sepolia |
+| **Charts/UI** | Framer Motion + Lucide React | Dashboard widgets |
+| **Consensus** | genlayer-js SDK | GenLayer contract interaction |
+
+Key libraries from `package.json`:
+
+```json
+{
+  "@rainbow-me/rainbowkit": "^2.2.11",
+  "ethers": "^6.16.0",
+  "framer-motion": "^12.40.0",
+  "genlayer-js": "^0.8.0",
+  "next": "^16.2.7",
+  "pg": "^8.21.0",
+  "viem": "^2.52.2",
+  "wagmi": "^2.19.5"
+}
+```
+
+#### API Route Architecture
+
+```
+src/app/api/
+├── audit/route.ts           POST — AI contract auditing
+├── analyze/route.ts         POST — AI threat classification
+├── compare/route.ts         POST — Groq vs Hunyuan parallel analysis
+├── gas-estimate/route.ts    POST — Gas cost estimation
+├── sentinels/route.ts       GET/POST/PUT — Sentinel node CRUD
+├── nodes/heartbeat/route.ts POST — Agent heartbeat
+├── vault/status/route.ts    GET — TargetVault pause status
+├── metrics/value-monitored/route.ts GET — Total value monitored
+└── logs/
+    ├── ingest/route.ts      POST — Agent telemetry ingestion
+    └── stream/route.ts      GET — SSE telemetry stream
+```
+
+Each route runs in the `nodejs` runtime (not Edge) because it accesses `process.env`, PostgreSQL via `pg`, and the Node.js crypto module.
+
+---
+
+### 2. Python Sentinel Agent (`agent/`)
+
+The agent is a single-process Python application with three core modules:
+
+| Module | File | Purpose |
+|---|---|---|
+| **Main Loop** | `agent/main.py` | Block scanning, threat detection, response execution |
+| **Incident Analyzer** | `agent/incident_analyzer.py` | OpenAI-compatible LLM integration for exploit analysis |
+| **Reporter** | `agent/reporter.py` | HTTP bridge to frontend API for telemetry and heartbeats |
+
+#### Dependencies
+
+```
+web3          — Ethereum/Mantle RPC interaction
+requests      — (transitive, used by web3)
+python-dotenv — Environment variable loading
+openai        — LLM API client (Groq, Hunyuan, OpenAI-compatible)
+```
+
+#### Entry Points
+
+- **Railway deployment:** `railway.json` specifies `python main.py` from the repo root, which shims to `agent/main.py`
+- **Direct execution:** `cd agent && python main.py`
+- **With virtualenv:** `cd agent && source venv/bin/activate && python main.py`
+
+---
+
+### 3. Smart Contracts (`contracts/`)
+
+Four Solidity contracts deployed with Hardhat:
+
+| Contract | File | Network | Address |
+|---|---|---|---|
+| **SentinelRegistry** | `contracts/SentinelRegistry.sol` | Mantle Sepolia | `0xea3C039795B5b04105B795c8B0cB85e0a42Cc85C` |
+| **TargetVault** | `contracts/TargetVault.sol` | Mantle Sepolia | `0x9d9b602CFe69cfF9706EAc399808E84682ce94FB` |
+| **Attacker** | `contracts/Attacker.sol` | Mantle Sepolia | (deployed per simulation) |
+| **TestProtocol** | `contracts/TestProtocol.sol` | Mantle Sepolia | (deployed per test) |
+
+**Hardhat configuration** (`contracts/hardhat.config.ts`):
+
+```typescript
+networks: {
+  mantle_sepolia: {
+    type: "http",
+    chainType: "op",          // Optimism stack (Mantle is OP-derived)
+    url: "https://mantle-sepolia.drpc.org",
+    accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+    timeout: 1000000,
+  }
+}
+```
+
+**GenLayer Consensus Guard** (`contracts/genlayer/IncidentConsensusGuard.py`):
+
+Deployed at `0x86369EC44fbB5EB682729368557176858aBe0c73` on GenLayer StudioNet. This is a Python smart contract (not Solidity) that uses GenLayer's `gl.Contract` base class and `gl.vm.run_nondet_unsafe` for LLM-based consensus.
+
+---
+
+### 4. Database Layer (`frontend/src/lib/db.ts`)
+
+The database module implements a dual-mode storage system:
+
+```typescript
+// Primary: Neon PostgreSQL (when DATABASE_URL is set)
+const pool = new Pool({
+  connectionString: databaseUrl,
+  ssl: { rejectUnauthorized },
+  max: 3
+});
+
+// Fallback: In-memory store (development / no database)
+const globalStore = globalThis as unknown as {
+  breachResponseStore?: Store;
+};
+```
+
+**Database schema** (auto-created on first connection):
+
+```sql
+CREATE TABLE IF NOT EXISTS sentinel_nodes (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  address TEXT NOT NULL UNIQUE,
+  owner TEXT,
+  status TEXT NOT NULL CHECK (status IN ('ACTIVE', 'PAUSED', 'OFFLINE')),
+  latency TEXT NOT NULL DEFAULT '6.4ms',
+  events INTEGER NOT NULL DEFAULT 0,
+  last_heartbeat TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  registered_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS telemetry_logs (
+  id TEXT PRIMARY KEY,
+  text TEXT,
+  level TEXT,
+  tx_hash TEXT,
+  protocol TEXT,
+  verification_type TEXT,
+  gas_saved TEXT,
+  status TEXT,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+```
+
+The `prisma` export provides a Prisma-compatible API surface:
+
+```typescript
+export const prisma = {
+  sentinelNode: {
+    findMany, create, findUnique, update, upsert, updateMany
+  },
+  alert: {
+    findMany, create
+  }
+};
+```
+
+This is not actual Prisma — it's a hand-written adapter that works with both PostgreSQL and in-memory storage. The naming convention matches Prisma so the code reads naturally.
+
+---
+
+### 5. Event Bus / SSE (`frontend/src/lib/eventEmitter.ts`)
+
+A singleton Node.js `EventEmitter` provides in-process event delivery:
+
+```typescript
+const globalForEvents = globalThis as unknown as {
+  sseEmitter: EventEmitter | undefined;
+};
+
+export const sseEmitter = globalForEvents.sseEmitter ?? new EventEmitter();
+```
+
+In production, this should be replaced with Redis Pub/Sub. The code already has Upstash Redis integration for telemetry persistence (`frontend/src/lib/telemetry.ts`):
+
+```typescript
+if (hasRedisEnv()) {
+  await redisCommand(['LPUSH', telemetryKey, JSON.stringify(payload)]);
+  await redisCommand(['LTRIM', telemetryKey, 0, maxTelemetryEvents - 1]);
+}
+```
+
+---
+
+### 6. GenLayer Consensus Client (`frontend/src/lib/genlayerConsensus.ts`)
+
+TypeScript client for interacting with the GenLayer consensus guard:
+
+```typescript
+export class IncidentConsensusGuardClient {
+  async submitIncident(input: ConsensusIncidentInput) { ... }
+  async evaluateIncident(incidentId: string) { ... }
+  async listIncidents() { ... }
+  async getIncident(incidentId: string) { ... }
+}
+```
+
+Uses `genlayer-js` SDK with the GenLayer simulator chain and StudioNet endpoint:
+
+```typescript
+export function createGenLayerClient(account?: GenLayerAccount) {
+  return createClient({
+    chain: simulator,
+    endpoint: GENLAYER_STUDIO_URL, // https://studio.genlayer.com/api
+    ...(account ? { account } : {}),
+  });
+}
+```
+
+---
+
+## Security Model
+
+### Threat Surface
+
+| Component | Threat | Mitigation |
+|---|---|---|
+| Agent private key | Key exposure → unauthorized pause tx | Minimal wallet balance, manual mode default |
+| RPC endpoint | Man-in-the-middle, data tampering | HTTPS, verify tx receipts on-chain |
+| Frontend API | Unauthenticated telemetry injection | `INGEST_TOKEN` bearer auth, `timingSafeEqual` comparison |
+| Database | SQL injection, data exfiltration | Parameterized queries, SSL connections |
+| AI classification | Hallucination, adversarial prompt injection | Dual-model comparison, human approval gate |
+| GenLayer | Validator collusion | `run_nondet_unsafe` enforces re-execution, consensus thresholds |
+
+### Authentication Flow
+
+The `INGEST_TOKEN` system secures agent-to-frontend communication:
+
+```typescript
+// frontend/src/lib/ingestAuth.ts
+export function isAuthorizedIngest(request: Request): boolean {
+  const expected = process.env.INGEST_TOKEN;
+  if (!expected) return true;  // Open when not configured (dev-friendly)
+
+  const header = request.headers.get('authorization') ?? '';
+  const token = header.startsWith('Bearer ') ? header.slice('Bearer '.length).trim() : '';
+  if (!token) return false;
+
+  return timingSafeEqual(Buffer.from(token), Buffer.from(expected));
+}
+```
+
+The agent sends the same token:
+
+```python
+# agent/reporter.py
+def ingest_headers() -> dict:
+    headers = {"Content-Type": "application/json"}
+    token = os.getenv("INGEST_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    return headers
+```
+
+---
+
+## Performance Characteristics
+
+| Metric | Value | Notes |
+|---|---|---|
+| Block scan interval | ~3 seconds | Configurable via `time.sleep()` in main loop |
+| Block catch-up speed | ~50 blocks/sec | Testing on Mantle Sepolia (~1 block/2s) |
+| AI classification latency | 200-800ms | Groq Llama 3.1-8B-Instant, depends on token count |
+| Dual-model comparison | 300-1200ms | Parallel Groq + Hunyuan |
+| Transaction confirmation | ~2-5 seconds | Mantle Sepolia block time |
+| SSE event delivery | <50ms | In-process EventEmitter |
+| Database query | 5-50ms | Neon PostgreSQL, connection pooling (max 3) |
+
+---
+
+## Deployment Architecture
+
+Refer to the [Deployment](/deployment/vercel) section for detailed deployment guides. The recommended production topology is:
+
+- **Vercel** — Next.js frontend (static export or serverless)
+- **Railway** — Python agent (always-on worker)
+- **Neon** — PostgreSQL (serverless, autoscaling)
+- **Upstash** — Redis (optional, for cross-instance SSE)
+
+---
+
+## Next Steps
+
+- **[Monitor Pipeline](/architecture/monitor-pipeline)** — Deep dive into block scanning and event monitoring
+- **[Detect Pipeline](/architecture/detect-pipeline)** — AI classification and consensus validation
+- **[Respond Pipeline](/architecture/respond-pipeline)** — Human-gated emergency response

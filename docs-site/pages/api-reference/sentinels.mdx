@@ -1,0 +1,309 @@
+---
+title: Sentinels API
+description: GET/POST/PUT /api/sentinels — Manage monitored protocol contracts
+---
+
+# /api/sentinels
+
+CRUD operations for sentinel nodes — the protocol contracts that BreachResponse monitors for suspicious activity.
+
+---
+
+## Endpoints
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| **GET** | `/api/sentinels` | No | List all registered sentinel nodes |
+| **POST** | `/api/sentinels` | Optional | Register a new sentinel node |
+| **PUT** | `/api/sentinels` | Optional | Toggle sentinel status (ACTIVE ↔ PAUSED) |
+
+---
+
+## GET /api/sentinels
+
+Lists all registered sentinel nodes.
+
+### Query Parameters
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `owner` | `string` | No | Filter by owner wallet address |
+
+### Response (200)
+
+```json
+[
+  {
+    "id": "sentinel-ax-node",
+    "name": "Sentinel.ax Node",
+    "address": "0x9f758be3ae3D985713964339E2f0bD783fC6015c",
+    "owner": null,
+    "status": "ACTIVE",
+    "latency": "8ms",
+    "events": 939,
+    "lastHeartbeat": "2026-06-21T12:00:00.000Z",
+    "registeredAt": "2026-01-03T00:00:00.000Z"
+  },
+  {
+    "id": "a1b2c3d4-...",
+    "name": "TargetVault",
+    "address": "0x9d9b602CFe69cfF9706EAc399808E84682ce94FB",
+    "owner": "0xabc...",
+    "status": "ACTIVE",
+    "latency": "6.4ms",
+    "events": 42,
+    "lastHeartbeat": "2026-06-21T12:00:03.000Z",
+    "registeredAt": "2026-06-21T10:00:00.000Z"
+  }
+]
+```
+
+### Sentinel Node Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `id` | `string` | Unique identifier (UUID or seed string) |
+| `name` | `string` | Human-readable name |
+| `address` | `string` | Contract address (42-char hex) |
+| `owner` | `string \| null` | Wallet address of the protocol owner |
+| `status` | `string` | `ACTIVE`, `PAUSED`, or `OFFLINE` |
+| `latency` | `string` | Agent-to-contract latency (e.g., "6.4ms") |
+| `events` | `number` | Total monitored events for this node |
+| `lastHeartbeat` | `string` | ISO-8601 timestamp of last agent heartbeat |
+| `registeredAt` | `string` | ISO-8601 timestamp of registration |
+
+### Usage
+
+```bash
+# List all sentinels
+curl http://localhost:3000/api/sentinels
+
+# Filter by owner
+curl "http://localhost:3000/api/sentinels?owner=0xabc..."
+```
+
+---
+
+## POST /api/sentinels
+
+Registers a new sentinel node for monitoring.
+
+### Body
+
+```json
+{
+  "address": "0x9d9b602CFe69cfF9706EAc399808E84682ce94FB",
+  "name": "TargetVault",
+  "owner": "0xabc123..."
+}
+```
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `address` | `string` | Yes | Contract address (42-char hex) |
+| `name` | `string` | No | Human-readable name (max 200 chars, default: "Custom Sentinel") |
+| `owner` | `string` | No | Protocol owner address (max 100 chars) |
+
+### Response (200)
+
+```json
+{
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "name": "TargetVault",
+  "address": "0x9d9b602CFe69cfF9706EAc399808E84682ce94FB",
+  "owner": "0xabc123...",
+  "status": "ACTIVE",
+  "latency": "6.4ms",
+  "events": 0,
+  "lastHeartbeat": "2026-06-21T12:00:00.000Z",
+  "registeredAt": "2026-06-21T12:00:00.000Z"
+}
+```
+
+### Error: Already Registered (400)
+
+```json
+{
+  "error": "Sentinel already registered for this address"
+}
+```
+
+### Error: Invalid Address (400)
+
+```json
+{
+  "error": "Invalid contract address"
+}
+```
+
+### Implementation
+
+```typescript
+export async function POST(request: Request) {
+  const body = await request.json();
+
+  if (typeof body?.address !== 'string' || !/^0x[a-fA-F0-9]{40}$/.test(body.address)) {
+    return NextResponse.json({ error: 'Invalid contract address' }, { status: 400 });
+  }
+
+  const node = await prisma.sentinelNode.create({
+    data: {
+      name: body.name || 'Custom Sentinel',
+      address: body.address,
+      owner: body.owner || null,
+      status: 'ACTIVE',
+      latency: '6.4ms',
+      events: 0
+    }
+  });
+
+  return NextResponse.json(node);
+}
+```
+
+### Usage
+
+```bash
+curl -X POST http://localhost:3000/api/sentinels \
+  -H "Content-Type: application/json" \
+  -d '{
+    "address": "0x9d9b602CFe69cfF9706EAc399808E84682ce94FB",
+    "name": "TargetVault",
+    "owner": "0xabc123..."
+  }'
+```
+
+---
+
+## PUT /api/sentinels
+
+Toggles a sentinel node's status between `ACTIVE` and `PAUSED`.
+
+### Body
+
+```json
+{
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+}
+```
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `id` | `string` | Yes | Sentinel node ID |
+
+### Response (200)
+
+```json
+{
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "name": "TargetVault",
+  "address": "0x9d9b602CFe69cfF9706EAc399808E84682ce94FB",
+  "status": "PAUSED",
+  ...
+}
+```
+
+### Error: Not Found (404)
+
+```json
+{
+  "error": "Sentinel node not found"
+}
+```
+
+### Implementation
+
+```typescript
+export async function PUT(request: Request) {
+  const body = await request.json();
+  const existing = await prisma.sentinelNode.findUnique({ where: { id: body.id } });
+
+  if (!existing) {
+    return NextResponse.json({ error: 'Sentinel node not found' }, { status: 404 });
+  }
+
+  const updated = await prisma.sentinelNode.update({
+    where: { id: body.id },
+    data: {
+      status: existing.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE'
+    }
+  });
+
+  return NextResponse.json(updated);
+}
+```
+
+### Usage
+
+```bash
+curl -X PUT http://localhost:3000/api/sentinels \
+  -H "Content-Type: application/json" \
+  -d '{"id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"}'
+```
+
+---
+
+## Database Backend
+
+The sentinels API uses the `prisma` adapter (`frontend/src/lib/db.ts`) which supports both PostgreSQL and in-memory storage:
+
+### PostgreSQL
+
+When `DATABASE_URL` is set, data persists across restarts in the `sentinel_nodes` table:
+
+```sql
+CREATE TABLE IF NOT EXISTS sentinel_nodes (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  address TEXT NOT NULL UNIQUE,
+  owner TEXT,
+  status TEXT NOT NULL CHECK (status IN ('ACTIVE', 'PAUSED', 'OFFLINE')),
+  latency TEXT NOT NULL DEFAULT '6.4ms',
+  events INTEGER NOT NULL DEFAULT 0,
+  last_heartbeat TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  registered_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+```
+
+### In-Memory
+
+When `DATABASE_URL` is not configured, data is stored in a global variable and lost on restart. A seed node is pre-populated:
+
+```typescript
+const seedNodes: SentinelNode[] = [
+  {
+    id: 'sentinel-ax-node',
+    name: 'Sentinel.ax Node',
+    address: '0x9f758be3ae3D985713964339E2f0bD783fC6015c',
+    owner: null,
+    status: 'ACTIVE',
+    latency: '8ms',
+    events: 939,
+    lastHeartbeat: new Date(),
+    registeredAt: new Date('2026-01-03T00:00:00.000Z')
+  }
+];
+```
+
+---
+
+## Agent Integration
+
+The Python agent fetches the sentinel list on every scan iteration:
+
+```python
+def get_registered_protocols():
+    url = frontend_api_url("sentinels")
+    req = urllib.request.Request(url, method='GET')
+    with urllib.request.urlopen(req, timeout=3) as res:
+        data = json.loads(res.read().decode('utf-8'))
+        db_addrs = [node['address'].lower() for node in data if 'address' in node]
+        return db_addrs + ["0x596Ff2Ca0f781a2CED29EC685cD1ba038378dE02".lower()]
+```
+
+---
+
+## Next Steps
+
+- **[Telemetry API](/api-reference/telemetry)** — SSE streaming and log ingestion
+- **[Agent Configuration](/agent/configuration)** — Setting up the agent to work with registered sentinels

@@ -1,0 +1,538 @@
+---
+title: GenLayer Consensus Guard
+description: Decentralized LLM-based validator consensus for incident evaluation on GenLayer
+---
+
+# GenLayer Consensus Guard
+
+The `IncidentConsensusGuard` is a **Python smart contract** deployed on GenLayer StudioNet that provides decentralized, LLM-based consensus validation for security incidents. Unlike traditional EVM contracts that can only perform deterministic computation, this contract uses GenLayer's nondeterministic execution primitives to run AI inference across multiple validators and reach cryptographically verifiable agreement.
+
+---
+
+## Contract Details
+
+| Property | Value |
+|---|---|
+| **Contract Name** | `IncidentConsensusGuard` |
+| **Network** | GenLayer StudioNet |
+| **Address** | `0x86369EC44fbB5EB682729368557176858aBe0c73` |
+| **Language** | Python (GenLayer SDK) |
+| **SDK Version** | `v0.2.16` |
+| **Base Class** | `gl.Contract` |
+
+---
+
+## Why GenLayer?
+
+Traditional EVM smart contracts cannot run AI models — all computation must be deterministic and reproducible. GenLayer extends this model with **nondeterministic execution**:
+
+- **`gl.nondet.exec_prompt(prompt, response_format)`** — Runs an LLM prompt inside the validator
+- **`gl.vm.run_nondet_unsafe(leader_fn, validator_fn)`** — Leader runs LLM, validators re-run and verify
+
+This enables the consensus guard to:
+1. Have each validator independently evaluate the incident with an LLM
+2. Compare results across validators
+3. Only approve incidents where validators reach agreement
+4. Reject incidents where validators disagree
+
+---
+
+## Data Model
+
+```python
+class IncidentConsensusGuard(gl.Contract):
+    owner: Address
+    operator: Address
+    incidents: TreeMap[str, str]       # incident_id → JSON string
+    incident_ids: TreeMap[str, str]    # index → incident_id
+    incident_count: u256
+```
+
+### Incident Record
+
+Each incident is stored as a JSON-serialized dictionary:
+
+```python
+incident = {
+    "id": "incident-1",
+    "index": "1",
+    "submitter": "0x9f758be3ae3D985713964339E2f0bD783fC6015c",
+    "protocol": "MantleSwap",
+    "tx_hash": "0x8f2a9aac...",
+    "threat_type": "Reentrancy",
+    "proposed_action": "pause_protocol",
+    "llm_reasoning": "Primary LLM detected repeated external call...",
+    "llm_confidence": "82",
+    "status": "pending_consensus",   # pending_consensus | approved | rejected | escalated | executed
+    "approved": False,
+    "consensus_action": "none",
+    "severity": "none",
+    "consensus_confidence": "0",
+    "consensus_reason": "",
+    "executed": False,
+    "created_at": "2026-06-21T12:00:00Z",
+    "evaluated_at": "",
+    "executed_at": "",
+}
+```
+
+---
+
+## Constants and Configuration
+
+### Severity Weights
+
+```python
+SEVERITY_WEIGHTS = {
+    "none": 0,
+    "low": 1,
+    "medium": 2,
+    "high": 3,
+    "critical": 4,
+}
+```
+
+Used to compare severity levels during validator consensus. Validators must be within **1 weight level** of each other.
+
+### Allowlisted Actions
+
+```python
+ALLOWED_ACTIONS = {
+    "monitor_only": True,
+    "alert": True,
+    "pause_protocol": True,
+    "quarantine_address": True,
+    "multisig_proposal": True,
+}
+```
+
+Any action not in this set (`transfer_funds`, `withdraw`, ownership changes) is rejected at the contract level. This ensures the consensus guard can never authorize destructive or irreversible actions.
+
+### Error Constants
+
+```python
+ERROR_EXPECTED = "[EXPECTED]"    # Deterministic validation errors
+ERROR_LLM = "[LLM_ERROR]"       # LLM inference failures
+ERROR_TRANSIENT = "[TRANSIENT]"  # Temporary errors (network, timeout)
+```
+
+---
+
+## Functions
+
+### `__init__()` — Constructor
+
+```python
+def __init__(self):
+    self.owner = gl.message.sender_address
+    self.operator = gl.message.sender_address
+    self.incident_count = u256(0)
+```
+
+The deployer becomes both `owner` and initial `operator`. These roles can diverge via `set_operator()`.
+
+---
+
+### `set_operator(operator: Address)`
+
+```python
+@gl.public.write
+def set_operator(self, operator: Address):
+    if gl.message.sender_address != self.owner:
+        raise gl.vm.UserError(f"{ERROR_EXPECTED} Only owner can set operator")
+    self.operator = operator
+```
+
+Allows the owner to delegate incident submission to a separate operator address (e.g., the BreachResponse frontend or agent).
+
+---
+
+### `submit_incident(...)`
+
+```python
+@gl.public.write
+def submit_incident(
+    self,
+    incident_id: str,
+    protocol: str,
+    tx_hash: str,
+    threat_type: str,
+    proposed_action: str,
+    llm_reasoning: str,
+    confidence: str,
+) -> str:
+    self._require_operator()
+    incident_id = incident_id.strip()
+    if not incident_id:
+        raise gl.vm.UserError(f"{ERROR_EXPECTED} Incident id cannot be empty")
+    if incident_id in self.incidents:
+        raise gl.vm.UserError(f"{ERROR_EXPECTED} Incident already exists")
+
+    action = self._normalize_action(proposed_action)
+    if action == "reject":
+        raise gl.vm.UserError(f"{ERROR_EXPECTED} Proposed action is not allowlisted")
+
+    self.incident_count += u256(1)
+    # ... store incident
+    return incident_id
+```
+
+**Called by the operator** when a suspicious transaction is detected. The incident enters `pending_consensus` status.
+
+#### Input Normalization
+
+All inputs are sanitized before storage:
+- `protocol`, `tx_hash`: truncated to 120 characters
+- `threat_type`: truncated to 80 characters
+- `llm_reasoning`: truncated to 800 characters
+- `confidence`: normalized to integer 0-100
+- `proposed_action`: validated against `ALLOWED_ACTIONS`
+
+---
+
+### `evaluate_incident(incident_id: str)`
+
+The core consensus function:
+
+```python
+@gl.public.write
+def evaluate_incident(self, incident_id: str) -> dict:
+    self._require_operator()
+    incident = self._require_incident(incident_id)
+    if incident["status"] == "executed":
+        raise gl.vm.UserError(f"{ERROR_EXPECTED} Incident already executed")
+
+    def leader_fn():
+        prompt = f"""You are a decentralized incident-response validator.
+
+Incident id: {incident['id']}
+Protocol: {incident['protocol']}
+Suspicious tx hash: {incident['tx_hash']}
+Threat type: {incident['threat_type']}
+Proposed action: {incident['proposed_action']}
+Primary LLM confidence 0-100: {incident['llm_confidence']}
+Primary LLM reasoning: {incident['llm_reasoning']}
+
+Allowed actions: monitor_only, alert, pause_protocol,
+                quarantine_address, multisig_proposal.
+Reject any action outside that list.
+If primary confidence is below 70, do not autonomously approve.
+
+Return JSON with:
+- approved: boolean
+- severity: one of none, low, medium, high, critical
+- confidence: integer 0-100
+- action: one allowed action
+- rationale: short reason"""
+        raw = gl.nondet.exec_prompt(prompt, response_format="json")
+        return self._normalize_assessment(raw, incident["proposed_action"])
+
+    def validator_fn(leaders_res):
+        validator_result = leader_fn()
+        leader_data = leaders_res.calldata
+        validator_data = validator_result
+
+        # Consensus checks
+        if leader_data["approved"] != validator_data["approved"]:
+            return False
+        if leader_data["action"] != validator_data["action"]:
+            return False
+        if abs(severity_weight(leader_data) - severity_weight(validator_data)) > 1:
+            return False
+        if abs(int(leader_data["confidence"]) - int(validator_data["confidence"])) > 20:
+            return False
+        return True
+
+    result = gl.vm.run_nondet_unsafe(leader_fn, validator_fn)
+    # ... store result
+```
+
+#### Consensus Checks
+
+| Check | Tolerance | Rationale |
+|---|---|---|
+| `approved` boolean | Must match exactly | Binary decision — no room for ambiguity |
+| `action` string | Must match exactly | Wrong action could be dangerous |
+| Severity level | Within 1 level | Some subjectivity in severity assessment |
+| Confidence score | Within 20 points | LLM confidence has inherent variance |
+
+#### Assessment Normalization
+
+```python
+def _normalize_assessment(self, raw, proposed_action):
+    approved = bool(raw.get("approved", False))
+    severity = self._normalize_severity(raw.get("severity", "none"))
+    confidence = self._normalize_confidence(raw.get("confidence", "0"))
+    action = self._normalize_action(raw.get("action", proposed_action))
+    rationale = str(raw.get("rationale", ""))[:600]
+
+    # Safety overrides
+    if action == "reject":
+        approved = False
+    if confidence < 70:
+        approved = False
+        action = "multisig_proposal"
+        rationale = "LLM confidence below autonomous threshold. Escalate. " + rationale
+    if approved and action not in ALLOWED_ACTIONS:
+        approved = False
+        action = "multisig_proposal"
+
+    return {"approved": approved, "severity": severity,
+            "confidence": str(confidence), "action": action,
+            "rationale": rationale}
+```
+
+Key safety features:
+1. **Action "reject" → always disapproved**
+2. **Confidence < 70 → escalated to multisig** (overrides leader's approval)
+3. **Non-allowlisted action → downgraded to multisig**
+
+---
+
+### `mark_executed(incident_id: str)`
+
+```python
+@gl.public.write
+def mark_executed(self, incident_id: str) -> bool:
+    self._require_operator()
+    incident = self._require_incident(incident_id)
+    if not bool(incident.get("approved", False)):
+        raise gl.vm.UserError("Cannot execute unapproved incident")
+    incident["executed"] = True
+    incident["status"] = "executed"
+    incident["executed_at"] = gl.message_raw["datetime"]
+    return True
+```
+
+Only approved incidents can be marked executed. This creates an immutable record that the mitigation was applied.
+
+---
+
+### View Functions
+
+#### `get_incident(incident_id: str) → dict`
+
+```python
+@gl.public.view
+def get_incident(self, incident_id: str) -> dict:
+    if incident_id not in self.incidents:
+        return {"error": "not_found"}
+    return json.loads(self.incidents[incident_id])
+```
+
+#### `list_incidents(limit: int = 20) → list`
+
+```python
+@gl.public.view
+def list_incidents(self, limit: int = 20) -> list:
+    results = []
+    count = int(self.incident_count)
+    start = max(1, count - limit + 1)
+    for i in range(start, count + 1):
+        key = str(i)
+        if key in self.incident_ids:
+            results.append(json.loads(self.incidents[self.incident_ids[key]]))
+    return results
+```
+
+Returns the most recent incidents (up to `limit`).
+
+#### `get_stats() → dict`
+
+```python
+@gl.public.view
+def get_stats(self) -> dict:
+    # Returns:
+    {
+        "total": 42,
+        "approved": 15,
+        "rejected": 10,
+        "escalated": 12,
+        "executed": 5
+    }
+```
+
+---
+
+## Incident Lifecycle State Machine
+
+```
+                    submit_incident()
+                          │
+                          ▼
+                  ┌───────────────┐
+                  │pending_consensus│
+                  └───────┬───────┘
+                          │ evaluate_incident()
+                          ▼
+              ┌───────────┴───────────┐
+              │                       │
+         consensus YES          consensus NO
+              │                       │
+              ▼                       ▼
+    ┌─────────────────┐     ┌─────────────────┐
+    │   confidence     │     │    rejected     │
+    │   check          │     │                 │
+    └────┬───────┬─────┘     └─────────────────┘
+         │       │
+    conf ≥ 70  conf < 70
+         │       │
+         ▼       ▼
+    ┌───────┐ ┌──────────┐
+    │approved│ │escalated │
+    └───┬───┘ └──────────┘
+        │ mark_executed()
+        ▼
+    ┌──────────┐
+    │ executed │
+    └──────────┘
+```
+
+---
+
+## Frontend Integration
+
+The TypeScript client (`frontend/src/lib/genlayerConsensus.ts`) provides a typed interface:
+
+```typescript
+export class IncidentConsensusGuardClient {
+  private client: GenLayerClient;
+
+  constructor(client: GenLayerClient) {
+    this.client = client;
+  }
+
+  async submitIncident(input: ConsensusIncidentInput) {
+    return this.client.writeContract({
+      address: this.requireAddress(),
+      functionName: 'submit_incident',
+      args: [input.incidentId, input.protocol, input.txHash,
+             input.threatType, input.proposedAction,
+             input.llmReasoning, input.confidence],
+    });
+  }
+
+  async evaluateIncident(incidentId: string) {
+    return this.client.writeContract({
+      address: this.requireAddress(),
+      functionName: 'evaluate_incident',
+      args: [incidentId],
+    });
+  }
+
+  async getIncident(incidentId: string) {
+    return this.client.readContract({
+      address: this.requireAddress(),
+      functionName: 'get_incident',
+      args: [incidentId],
+    });
+  }
+
+  async listIncidents() {
+    return this.client.readContract({
+      address: this.requireAddress(),
+      functionName: 'list_incidents',
+      args: [],
+    });
+  }
+}
+```
+
+### GenLayer Client Setup
+
+```typescript
+import { createClient } from 'genlayer-js';
+import { simulator } from 'genlayer-js/chains';
+
+const client = createClient({
+  chain: simulator,
+  endpoint: process.env.NEXT_PUBLIC_GENLAYER_STUDIO_URL,
+  // Account from localStorage or freshly generated
+  account: getStoredGenLayerAccount(),
+});
+
+const guard = new IncidentConsensusGuardClient(client);
+```
+
+---
+
+## Testing
+
+The consensus guard has an extensive test suite (`tests/direct/test_incident_consensus_guard.py`):
+
+| Test | Description |
+|---|---|
+| `test_submit_and_read_incident` | Submit incident, verify storage |
+| `test_rejects_non_allowlisted_action` | `transfer_funds` → revert |
+| `test_evaluate_approved_incident` | Consensus approves, status = `approved` |
+| `test_low_confidence_llm_escalates` | Confidence < 70 → `escalated` |
+| `test_llm_rejection_is_stored` | Consensus rejects, reason stored |
+| `test_mark_executed_requires_approval` | Cannot execute unapproved |
+| `test_mark_executed_after_approval` | Full lifecycle: submit → evaluate → execute |
+| `test_unknown_incident_reverts` | Missing incident → revert |
+
+Tests use GenLayer's `direct_vm` fixture for local simulation and `mock_llm` to inject controlled LLM responses:
+
+```python
+def test_evaluate_approved_incident(direct_vm, direct_deploy):
+    contract = deploy_guard(direct_deploy)
+    submit_sample(contract, "incident-approved", "pause_protocol", "0.88")
+
+    # Mock the LLM to return a specific verdict
+    direct_vm.mock_llm(
+        r".*decentralized incident-response validator.*",
+        mock_eval(True, "critical", "0.93", "pause_protocol")
+    )
+
+    contract.evaluate_incident("incident-approved")
+
+    incident = contract.get_incident("incident-approved")
+    assert incident["approved"] is True
+    assert incident["status"] == "approved"
+```
+
+---
+
+## Security Guarantees
+
+### Action Allowlisting
+
+The contract can never authorize actions outside `ALLOWED_ACTIONS`. Even if every validator agrees to `transfer_funds`, the contract rejects it at submission time:
+
+```python
+def _normalize_action(self, raw) -> str:
+    action = str(raw).strip().lower()
+    if action not in ALLOWED_ACTIONS:
+        return "reject"
+    return action
+```
+
+### Confidence Floor
+
+Incidents with primary LLM confidence below 70% are automatically escalated regardless of validator consensus:
+
+```python
+if confidence < 70:
+    approved = False
+    action = "multisig_proposal"
+```
+
+### Validator Disagreement
+
+If validators disagree on any consensus dimension, the incident is **rejected** (not approved). There is no "majority vote" — consensus requires unanimous agreement on key dimensions.
+
+### Execution Gating
+
+Only approved incidents can be marked as executed:
+
+```python
+if not bool(incident.get("approved", False)):
+    raise gl.vm.UserError("Cannot execute unapproved incident")
+```
+
+---
+
+## Next Steps
+
+- **[Detect Pipeline](/architecture/detect-pipeline)** — How incidents reach the consensus guard
+- **[Agent Response Modes](/agent/response-modes)** — Manual vs autonomous response configuration

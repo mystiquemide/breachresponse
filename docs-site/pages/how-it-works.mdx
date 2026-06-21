@@ -1,0 +1,406 @@
+---
+title: How It Works
+description: Complete walkthrough of the Monitor → Detect → Respond pipeline
+---
+
+# How It Works
+
+BreachResponse operates as a three-stage pipeline: **Monitor**, **Detect**, and **Respond**. Each stage builds on the previous, producing an end-to-end active-defense system that can identify exploits in real time and execute countermeasures under operator supervision.
+
+---
+
+## The Pipeline at a Glance
+
+```
+Mantle Block
+     │
+     ▼
+┌─────────────────────────────────────────────────────────────┐
+│                     STAGE 1: MONITOR                        │
+│                                                             │
+│  Python Agent polls RPC for new blocks                     │
+│  Filters transactions targeting registered contracts       │
+│  Groups event logs by tx hash (reentrancy detection)       │
+│  Extracts calldata, gas consumption, value transferred     │
+│  Publishes telemetry events to frontend SSE stream         │
+└─────────────────────────────────────────────────────────────┘
+     │ suspicious transactions
+     ▼
+┌─────────────────────────────────────────────────────────────┐
+│                     STAGE 2: DETECT                         │
+│                                                             │
+│  Heuristic scanner: opcode patterns, gas anomalies         │
+│  Dual AI classification: Groq + Hunyuan (parallel)         │
+│  Confidence scoring, severity labeling, action recommendation│
+│  GenLayer consensus guard: validator-level agreement       │
+│  Side-by-side model comparison for operator review         │
+└─────────────────────────────────────────────────────────────┘
+     │ classified incident
+     ▼
+┌─────────────────────────────────────────────────────────────┐
+│                     STAGE 3: RESPOND                        │
+│                                                             │
+│  Incident displayed in Command Center dashboard            │
+│  Operator reviews AI verdicts, evidence points             │
+│  Manual approval gate (default) or autonomous execution    │
+│  Signed pause transaction broadcast to Mantle              │
+│  On-chain confirmation and status update                   │
+└─────────────────────────────────────────────────────────────┘
+     │
+     ▼
+  Protocol Paused / Funds Protected
+```
+
+---
+
+## Stage 1: Monitor — Real-Time Block Scanning
+
+The Python Sentinel Agent (`agent/main.py`) is the system's eyes on the blockchain. It connects to Mantle Sepolia RPC and runs an infinite scanning loop.
+
+### Block Polling
+
+The agent tracks the last scanned block number. On each iteration (every ~3 seconds), it queries the current block height:
+
+```python
+current_block = w3.eth.block_number
+if current_block > last_scanned_block:
+    for block_num in range(last_scanned_block + 1, current_block + 1):
+        # scan block...
+```
+
+This catches up to any blocks produced since the last scan, ensuring no gap in coverage.
+
+### Event Log Filtering
+
+For each new block, the agent fetches **all event logs** emitted by registered protocol contracts:
+
+```python
+logs = w3.eth.get_logs({
+    'fromBlock': block_num,
+    'toBlock': block_num,
+    'address': checksum_addresses  # all registered sentinel addresses
+})
+```
+
+Multiple logs from the same transaction hitting monitored contracts is a **strong signal of reentrancy** — the attacker's fallback function triggers a second call that produces a second event before the first completes.
+
+```python
+# Group logs by transaction hash
+tx_to_logs = {}
+for log in logs:
+    tx_hash = w3.to_hex(log['transactionHash'])
+    tx_to_logs[tx_hash] = tx_to_logs.get(tx_hash, []) + [log]
+
+for tx_hash, logs_in_tx in tx_to_logs.items():
+    if len(logs_in_tx) > 1:
+        # REENTRANCY DETECTED — trigger AI analysis
+```
+
+### Direct Transaction Inspection
+
+Beyond event logs, the agent also inspects every transaction in the block for direct calls to monitored contracts:
+
+```python
+block = w3.eth.get_block(block_num, full_transactions=True)
+for tx in block.transactions:
+    to_addr = tx.get('to')
+    if to_addr and to_addr.lower() in monitored_addresses:
+        # Monitored direct interaction detected
+```
+
+### Telemetry Streaming
+
+The agent publishes events to the frontend via `POST /api/logs/ingest`:
+
+```python
+post_log_to_frontend(
+    tx_hash=tx_hash_hex,
+    protocol="TargetVault",
+    exploit_type="On-Chain Reentrancy Proposal",
+    gas_saved="pending operator approval",
+    status="PROPOSED"
+)
+```
+
+The frontend's ingest route emits these as SSE events through a Node.js `EventEmitter`:
+
+```typescript
+// frontend/src/app/api/logs/ingest/route.ts
+sseEmitter.emit('log', {
+  id: crypto.randomUUID(),
+  type: body.status === 'MITIGATED' ? 'ALERT' : 'LOG',
+  timestamp: new Date().toISOString(),
+  data: body,
+});
+```
+
+---
+
+## Stage 2: Detect — AI Classification and Consensus
+
+### Heuristic Pre-Filtering
+
+Before hitting AI models, transactions pass through a multi-factor heuristic scanner (`frontend/src/lib/threatScan.ts`):
+
+```typescript
+export function detectThreatHeuristic(tx: HeuristicTx) {
+  const value = tx.value ?? BigInt(0);
+  const gas = tx.gas ?? BigInt(0);
+  const input = tx.input ?? '0x';
+
+  const highValue = value > BigInt(0);
+  const highGas = gas > BigInt(200000);
+  const hasReentrancySig = input.includes('2e1a7d4d') || input.includes('8456cb59');
+  const hasDelegateCall = input.includes('4e487b71') || input.includes('f4');
+  const longCalldata = input.length > 200;
+
+  let score = 0;
+  if (hasReentrancySig) { score += 3; matchedType = 'Reentrancy'; }
+  if (hasDelegateCall || longCalldata) { score += 2; }
+  if (highValue) score += 1;
+  if (highGas) score += 1;
+
+  return { isThreat: score >= 3, threatType, score };
+}
+```
+
+Transactions scoring below the threshold are classified as `SAFE`. Those above are sent to AI classification.
+
+### AI Threat Classification
+
+The `POST /api/analyze` endpoint (`frontend/src/app/api/analyze/route.ts`) sends the transaction details to Groq's Llama 3.1-8B-Instant:
+
+```typescript
+const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    model: 'llama-3.1-8b-instant',
+    messages: [
+      { role: 'system', content: 'You are a smart contract security AI...' },
+      { role: 'user', content: `Analyze this smart contract security incident...` }
+    ],
+    temperature: 0.2,
+    max_tokens: 350,
+    response_format: { type: 'json_object' }
+  })
+});
+```
+
+The AI returns a structured JSON verdict:
+
+```json
+{
+  "confidence": 0.91,
+  "severity": "CRITICAL",
+  "evidencePoints": [
+    "Recursive external call detected",
+    "State mutation after external transfer",
+    "Gas pattern matches known reentrancy exploit"
+  ],
+  "recommendation": "Pause protocol",
+  "reasoning": "Transaction exhibits classic reentrancy pattern...",
+  "gasUsed": 187420,
+  "expectedGas": 45000,
+  "gasAnomalyFactor": 4.2
+}
+```
+
+### Dual-Model Comparison
+
+The `POST /api/compare` endpoint runs the same prompt against **both** Groq and Hunyuan in parallel:
+
+```typescript
+const [groq, hunyuan] = await Promise.all([
+  callGroq(prompt),
+  callHunyuan(prompt)
+]);
+
+const agreement = groq.severity === hunyuan.severity;
+const consensusConfidence = (groq.confidence + hunyuan.confidence) / 2;
+```
+
+Operators see both verdicts side by side with latency measurements, enabling informed decisions when models disagree.
+
+### Agent-Side AI Analysis
+
+The Python agent also runs its own AI analysis through `IncidentAnalyzer` (`agent/incident_analyzer.py`):
+
+```python
+response = self.client.chat.completions.create(
+    model=self.model,
+    messages=[
+        {"role": "system", "content": "You are a smart contract active-defense AI."},
+        {"role": "user", "content": prompt}
+    ],
+    response_format={"type": "json_object"},
+    temperature=0.0
+)
+```
+
+The agent uses this to determine whether a pause transaction should be proposed (manual mode) or broadcast immediately (autonomous mode).
+
+### GenLayer Consensus Guard
+
+For incidents requiring validator-level agreement, the `IncidentConsensusGuard` contract on GenLayer StudioNet provides decentralized evaluation:
+
+```python
+# contracts/genlayer/IncidentConsensusGuard.py
+result = gl.vm.run_nondet_unsafe(leader_fn, validator_fn)
+```
+
+The leader validator runs an LLM evaluation. The follower re-runs the same prompt. Their outputs must agree on:
+- `approved` boolean
+- `action` string
+- `severity` (within 1 level)
+- `confidence` (within 20 points)
+
+Only when consensus is reached does the incident move to `approved` status.
+
+---
+
+## Stage 3: Respond — Human-Gated Emergency Action
+
+### Manual Mode (Default)
+
+By default, the agent operates in **manual approval mode** (`SENTINEL_RESPONSE_MODE=manual`). When a threat is detected:
+
+1. The AI produces a confidence score and recommended mitigation
+2. The agent formulates a rescue transaction (target contract + pause calldata)
+3. The incident is posted to the frontend with status `PROPOSED`
+4. The operator reviews the proposal in the Command Center
+5. If approved, the operator initiates the transaction through the dashboard
+6. The agent broadcasts the signed pause transaction to Mantle
+
+```python
+if SENTINEL_RESPONSE_MODE != "autonomous":
+    print(f"[SENTINEL] Manual approval mode active. Proposed action: send {rescue_tx['data']} to {vault_addr}.")
+    post_log_to_frontend(
+        tx_hash=tx_hash,
+        protocol="TargetVault",
+        exploit_type="On-Chain Reentrancy Proposal",
+        gas_saved="pending operator approval",
+        status="PROPOSED"
+    )
+    continue  # Do not broadcast without approval
+```
+
+### Autonomous Mode
+
+When `SENTINEL_RESPONSE_MODE=autonomous` is set, the agent proceeds immediately:
+
+```python
+print(f"[SENTINEL] Autonomous mode enabled. Broadcasting emergency pause transaction...")
+pause_tx_hash = pause_target_vault(vault_addr, rescue_tx["data"])
+```
+
+The pause transaction is constructed with:
+```python
+tx_data = {
+    'chainId': 5003,           # Mantle Sepolia
+    'from': agent_address,
+    'gas': 120000,
+    'maxFeePerGas': w3.eth.gas_price,
+    'maxPriorityFeePerGas': w3.to_wei(1.5, 'gwei'),
+    'nonce': w3.eth.get_transaction_count(agent_address),
+    'to': Web3.to_checksum_address(vault_address),
+    'data': custom_calldata    # Usually 0x8456cb59 (pause() selector)
+}
+```
+
+> **Warning:** Autonomous mode bypasses the human approval gate. Only enable it for allowlisted contracts with value caps and when the agent wallet holds minimal funds. A compromised or overeager agent could pause legitimate protocols.
+
+### Transaction Execution Flow
+
+```
+pause_target_vault(vault_address, calldata)
+    │
+    ├─► eth_estimateGas() — estimate gas with 20% buffer
+    │
+    ├─► eth_account.sign_transaction() — sign with agent private key
+    │
+    ├─► eth_sendRawTransaction() — broadcast to Mantle Sepolia
+    │
+    ├─► eth_wait_for_transaction_receipt() — wait up to 30s
+    │
+    └─► Return tx_hash or None
+```
+
+On success, the `TargetVault.pause()` function sets `isPaused = true`, preventing further withdrawals:
+
+```solidity
+function pause() external onlySentinelOrOwner whenNotPaused {
+    isPaused = true;
+    emit Paused();
+}
+```
+
+The `onlySentinelOrOwner` modifier ensures only the registered sentinel agent or the vault owner can trigger the pause:
+
+```solidity
+modifier onlySentinelOrOwner() {
+    require(
+        msg.sender == owner || msg.sender == registry.sentinelAgent(),
+        "Not sentinel agent or owner"
+    );
+    _;
+}
+```
+
+---
+
+## Data Flow: Complete Trace
+
+Here is a complete trace of a reentrancy exploit detection and response:
+
+```
+1. Attacker deploys Attacker.sol contract
+2. Attacker calls attacker.attack(amount)
+3. TargetVault.withdraw() sends ETH to attacker (external call)
+4. Attacker.receive() calls TargetVault.withdraw() again (reentrancy)
+5. Block N contains 2 Withdrawn events from the same tx on TargetVault
+   │
+6. Python agent polls block N
+7. get_logs() returns 2 events on TargetVault -> tx_to_logs groups them
+8. len(logs_in_tx) > 1 → REENTRANCY DETECTED
+   │
+9. IncidentAnalyzer.analyze_exploit_payload() sends to LLM
+10. LLM returns confidence 0.98, exploit_type "Reentrancy"
+11. confidence > 0.9 → THREAT VERIFIED
+   │
+12. formulate_rescue_transaction() returns pause calldata 0x8456cb59
+13. Manual mode: status="PROPOSED", wait for operator
+14. POST /api/logs/ingest → SSE → Dashboard shows alert
+   │
+15. Operator reviews in Command Center
+16. Operator approves pause action
+17. pause_target_vault() signs and broadcasts tx
+18. Tx confirmed: TargetVault.isPaused = true
+19. Attacker's receive() loop hits whenNotPaused modifier → reverts
+   │
+20. post_log_to_frontend(status="MITIGATED")
+21. Dashboard updates: "1,420.5 mETH saved"
+```
+
+---
+
+## Key Design Decisions
+
+### Why Python for the Agent?
+
+Python's `web3.py` library provides the most mature and well-documented interface for Ethereum/EVM interaction. The agent needs synchronous, blocking RPC calls (it polls for new blocks and waits for receipts), which aligns with Python's straightforward concurrency model. The OpenAI Python SDK integration is also simple and battle-tested.
+
+### Why Dual LLM Comparison?
+
+A single LLM can hallucinate or misclassify. By running Groq and Hunyuan in parallel and showing both verdicts to the operator, we provide a confidence signal through model agreement. If both models independently classify a threat as `CRITICAL`, the operator can act with higher confidence. If they disagree, the operator knows to investigate further.
+
+### Why GenLayer for Consensus?
+
+On-chain consensus through a traditional EVM contract would be limited to deterministic logic. GenLayer's `gl.vm.run_nondet_unsafe` primitive allows validators to run nondeterministic LLM inference and reach agreement — enabling AI-powered consensus that's cryptographically verifiable.
+
+### Why PostgreSQL + Upstash?
+
+Neon PostgreSQL provides durable, serverless storage for sentinel state and telemetry history. Upstash Redis provides a global event bus for SSE streaming, allowing telemetry to be delivered to multiple dashboard clients simultaneously. The system gracefully degrades to in-memory storage when neither is configured.

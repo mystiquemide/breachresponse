@@ -1,0 +1,233 @@
+---
+title: Getting Started
+description: Deploy BreachResponse in 5 minutes
+---
+
+# Getting Started
+
+Set up a complete BreachResponse deployment — frontend dashboard, Python sentinel agent, and database — in under 5 minutes.
+
+---
+
+## Prerequisites
+
+| Requirement | Version | Purpose |
+|---|---|---|
+| **Node.js** | 20+ | Frontend build and development |
+| **Python** | 3.11+ | Sentinel agent runtime |
+| **PostgreSQL** | 14+ | Telemetry and sentinel state persistence (Neon recommended) |
+| **Mantle Sepolia RPC** | — | On-chain block scanning and contract interaction |
+| **Groq API Key** | — | AI threat classification (optional but recommended) |
+
+---
+
+## Step 1: Clone and Install
+
+```bash
+git clone https://github.com/mystiquemide/breachresponse.git
+cd breachresponse
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+```
+
+### Agent
+
+```bash
+cd agent
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+The agent dependencies are minimal:
+
+```
+# agent/requirements.txt
+web3
+requests
+python-dotenv
+openai
+```
+
+---
+
+## Step 2: Configure Environment Variables
+
+Create a `.env` file in the project root:
+
+```bash
+# Required
+MANTLE_RPC_URL=https://rpc.sepolia.mantle.xyz
+
+# Database (Neon PostgreSQL)
+DATABASE_URL=postgresql://user:password@ep-xxxx.us-east-2.aws.neon.tech/breachresponse?sslmode=require
+
+# AI Classification (at least one required for AI features)
+GROQ_API_KEY=gsk_your_groq_api_key
+HUNYUAN_API_KEY=your_hunyuan_api_key
+
+# Agent Wallet (required for on-chain response)
+PRIVATE_KEY=0x_your_agent_wallet_private_key
+
+# Optional — Agent-to-Frontend Security
+INGEST_TOKEN=your_shared_secret_token
+FRONTEND_API_BASE_URL=https://your-frontend.vercel.app/api
+
+# Optional — GenLayer Consensus
+NEXT_PUBLIC_GENLAYER_CONSENSUS_GUARD_ADDRESS=0x86369EC44fbB5EB682729368557176858aBe0c73
+NEXT_PUBLIC_GENLAYER_STUDIO_URL=https://studio.genlayer.com/api
+```
+
+> **Important:** The `PRIVATE_KEY` must be for a wallet funded with Mantle Sepolia testnet MNT. This wallet will be the **Sentinel Agent** that broadcasts emergency pause transactions.
+
+---
+
+## Step 3: Start the Frontend Dashboard
+
+```bash
+cd frontend
+npm run dev
+```
+
+The Command Center dashboard starts at `http://localhost:3000`. You'll see:
+
+- **Threat Scanner** — real-time block scanning results
+- **Sentinel Nodes** — registered monitoring contracts
+- **Threat History** — classified incident timeline
+- **Gas Estimator** — on-chain gas cost estimation
+- **Contract Auditor** — AI-powered bytecode analysis
+
+---
+
+## Step 4: Start the Sentinel Agent
+
+In a separate terminal:
+
+```bash
+cd agent
+source venv/bin/activate
+python main.py
+```
+
+You should see output similar to:
+
+```
+=== SENTINEL.AX ACTIVE-DEFENSE MONITORING SERVICE STARTED ===
+Connecting to Mantle Node: https://rpc.sepolia.mantle.xyz
+Sentinel Agent Wallet: 0x9f758be3ae3D985713964339E2f0bD783fC6015c
+[SENTINEL] Web3 connection established with RPC: https://rpc.sepolia.mantle.xyz
+[SENTINEL] Starting scan from block height: 12345678
+Listening to blocks and event logs...
+
+[SCAN] Scanning Mantle Sepolia Block #12345679...
+[SCAN] Mempool scan tx: 0x4bfa...827391 -> Targeting MantleSwap :: SAFE
+```
+
+The agent immediately begins:
+1. Sending heartbeat pings to the frontend
+2. Scanning new blocks for monitored contract interactions
+3. Publishing telemetry events to the SSE stream
+4. Running simulated safe transactions to populate the dashboard
+
+---
+
+## Step 5: Register a Sentinel (Protocol)
+
+You can register a protocol contract for monitoring through the dashboard UI or via the API:
+
+```bash
+curl -X POST http://localhost:3000/api/sentinels \
+  -H "Content-Type: application/json" \
+  -d '{
+    "address": "0x9d9b602CFe69cfF9706EAc399808E84682ce94FB",
+    "name": "TargetVault",
+    "owner": "your-wallet-address"
+  }'
+```
+
+Response:
+
+```json
+{
+  "id": "a1b2c3d4-...",
+  "name": "TargetVault",
+  "address": "0x9d9b602CFe69cfF9706EAc399808E84682ce94FB",
+  "owner": "your-wallet-address",
+  "status": "ACTIVE",
+  "latency": "6.4ms",
+  "events": 0,
+  "lastHeartbeat": "2026-06-21T00:00:00.000Z",
+  "registeredAt": "2026-06-21T00:00:00.000Z"
+}
+```
+
+Once registered, the sentinel agent will begin monitoring this contract for suspicious activity.
+
+---
+
+## Step 6: Verify the Deployment
+
+### Check Agent-Frontend Bridge
+
+The agent sends heartbeat pings every 3 seconds. In the dashboard, the Sentinel Nodes table should show your agent as `ACTIVE` with a recent heartbeat timestamp.
+
+### Run a Contract Audit
+
+Use the audit tool to verify the AI pipeline:
+
+```bash
+curl -X POST http://localhost:3000/api/audit \
+  -H "Content-Type: application/json" \
+  -d '{"address": "0x9d9b602CFe69cfF9706EAc399808E84682ce94FB"}'
+```
+
+### Test Gas Estimation
+
+```bash
+curl -X POST http://localhost:3000/api/gas-estimate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "address": "0x9d9b602CFe69cfF9706EAc399808E84682ce94FB",
+    "calldata": "0x8456cb59"
+  }'
+```
+
+---
+
+## Next Steps
+
+- **[How It Works](/how-it-works)** — Understand the Monitor → Detect → Respond pipeline
+- **[Agent Configuration](/agent/configuration)** — Full environment variable reference
+- **[Response Modes](/agent/response-modes)** — Manual vs autonomous mode setup
+- **[Deployment](/deployment/vercel)** — Production deployment guides
+
+---
+
+## Troubleshooting
+
+### Agent can't connect to RPC
+
+Verify `MANTLE_RPC_URL` is correct and accessible. Test connectivity:
+
+```bash
+curl -X POST https://rpc.sepolia.mantle.xyz \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}'
+```
+
+### No AI classification happening
+
+If no `GROQ_API_KEY` or `HUNYUAN_API_KEY` is set, the system uses deterministic fallback analysis. This produces realistic-looking results but without actual LLM inference. Set at least one API key for live AI classification.
+
+### Database connection refused
+
+If `DATABASE_URL` is not configured, the system falls back to in-memory storage. This works for development but data will be lost on restart. Set up a Neon PostgreSQL database (free tier available) for persistence.
+
+### Agent "Private key missing" warning
+
+Without `PRIVATE_KEY`, the agent cannot broadcast on-chain transactions. It will still monitor blocks and classify threats, but emergency pause actions will fail. Fund a wallet with Mantle Sepolia testnet MNT and set the private key.

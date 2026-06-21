@@ -1,0 +1,229 @@
+---
+title: Vercel Deployment
+description: Deploy the Next.js Command Center frontend to Vercel
+---
+
+# Vercel Deployment
+
+Deploy the BreachResponse Command Center frontend to Vercel for production hosting.
+
+---
+
+## Prerequisites
+
+- A [Vercel](https://vercel.com) account
+- Git repository with the BreachResponse codebase
+- Environment variables configured (see [Environment Variables](/deployment/environment-variables))
+
+---
+
+## Deployment Options
+
+### Option 1: Vercel Git Integration (Recommended)
+
+1. Push your BreachResponse repository to GitHub/GitLab/Bitbucket
+2. In the Vercel dashboard, click **Add New → Project**
+3. Import your repository
+4. Configure the project:
+
+| Setting | Value |
+|---|---|
+| **Framework** | Next.js |
+| **Root Directory** | `frontend` |
+| **Build Command** | `npm run build` |
+| **Output Directory** | `.next` |
+| **Install Command** | `npm install` |
+
+5. Add environment variables (see below)
+6. Click **Deploy**
+
+### Option 2: Vercel CLI
+
+```bash
+cd frontend
+npm install -g vercel
+vercel
+```
+
+Follow the interactive prompts:
+
+```
+? Set up and deploy? Y
+? Which scope? (your-account)
+? Link to existing project? N
+? What's your project's name? breachresponse
+? In which directory is your code? ./
+? Want to override settings? N
+```
+
+### Option 3: Static Export
+
+The `next.config.ts` is already configured for static export:
+
+```typescript
+const nextConfig: NextConfig = {
+  output: "export",
+  images: { unoptimized: true },
+};
+```
+
+This means the frontend can also be deployed to any static hosting (Cloudflare Pages, GitHub Pages, S3 + CloudFront).
+
+```bash
+cd frontend
+npm run build
+# Static files are in frontend/out/
+```
+
+---
+
+## Environment Variables
+
+Configure these in **Vercel Dashboard → Project → Settings → Environment Variables**:
+
+| Variable | Required | Description |
+|---|---|---|
+| `DATABASE_URL` | Production | Neon PostgreSQL connection string |
+| `GROQ_API_KEY` | For AI features | Groq API key |
+| `HUNYUAN_API_KEY` | For AI features | Tencent Hunyuan API key |
+| `INGEST_TOKEN` | Recommended | Bearer token for agent-to-frontend auth |
+| `MANTLE_RPC_URL` | No | Override default Mantle Sepolia RPC |
+| `NEXT_PUBLIC_REGISTRY_ADDRESS` | No | Override registry contract address |
+| `NEXT_PUBLIC_GENLAYER_CONSENSUS_GUARD_ADDRESS` | No | GenLayer consensus guard address |
+| `NEXT_PUBLIC_GENLAYER_STUDIO_URL` | No | GenLayer StudioNet endpoint |
+| `UPSTASH_REDIS_REST_URL` | Optional | Redis for cross-instance SSE |
+| `UPSTASH_REDIS_REST_TOKEN` | Optional | Redis auth token |
+
+For the full reference, see [Environment Variables](/deployment/environment-variables).
+
+---
+
+## Build Configuration
+
+The frontend's `package.json` scripts:
+
+```json
+{
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint"
+  }
+}
+```
+
+Vercel automatically detects Next.js and uses `next build`.
+
+---
+
+## Post-Deployment Verification
+
+### 1. Check the Dashboard
+
+Visit your deployment URL. You should see the Command Center with:
+- Threat Scanner (may show "Loading" until the agent is running)
+- Sentinel Nodes table (at least one seed node)
+- Navigation working
+
+### 2. Test an API Endpoint
+
+```bash
+curl https://your-project.vercel.app/api/sentinels
+```
+
+Should return the seed node:
+
+```json
+[{
+  "id": "sentinel-ax-node",
+  "name": "Sentinel.ax Node",
+  "address": "0x9f758be3ae3D985713964339E2f0bD783fC6015c",
+  "status": "ACTIVE",
+  ...
+}]
+```
+
+### 3. Test AI Endpoint (if keys configured)
+
+```bash
+curl -X POST https://your-project.vercel.app/api/analyze \
+  -H "Content-Type: application/json" \
+  -d '{"protocol": "TestProtocol", "threatType": "Reentrancy"}'
+```
+
+### 4. Verify Database Connectivity
+
+The dashboard should persist sentinel registrations between deployments. Register a test sentinel via the API and verify it appears in subsequent requests.
+
+---
+
+## Static Export Considerations
+
+Since `output: "export"` is configured, these API routes **will not work** in a purely static deployment:
+
+- `/api/audit`
+- `/api/analyze`
+- `/api/compare`
+- `/api/gas-estimate`
+- `/api/sentinels` (mutations)
+- `/api/nodes/heartbeat`
+- `/api/logs/ingest`
+- `/api/logs/stream`
+
+For static hosting, you have two options:
+
+### Option A: Hybrid (Recommended)
+
+Remove `output: "export"` from `next.config.ts` and deploy to Vercel with serverless functions. This gives you both the static dashboard and working API routes.
+
+### Option B: Separate Backend
+
+Keep static export for the dashboard and deploy the API routes separately (e.g., as a standalone Express server or to Railway alongside the agent).
+
+---
+
+## Custom Domain
+
+1. In Vercel Dashboard → Project → Settings → Domains
+2. Add your domain (e.g., `docs.breachresponse.io`)
+3. Configure DNS:
+   - **Apex domain:** Add an `A` record pointing to `76.76.21.21`
+   - **Subdomain:** Add a `CNAME` record pointing to `cname.vercel-dns.com`
+4. Vercel automatically provisions an SSL certificate
+
+---
+
+## Troubleshooting
+
+### Build Fails with "Module not found"
+
+Ensure `frontend` is set as the root directory in Vercel. If using a monorepo structure, you may need to configure the install command:
+
+```
+Install Command: cd frontend && npm install
+```
+
+### API Routes Return 404
+
+If using `output: "export"`, API routes are not included in the build. Remove `output: "export"` or switch to a serverless deployment.
+
+### Database Connection Refused
+
+Verify `DATABASE_URL` is correctly set in Vercel environment variables. Test connectivity:
+
+```bash
+psql "$DATABASE_URL" -c "SELECT 1"
+```
+
+### CORS Errors
+
+Vercel handles CORS automatically for same-origin requests. If accessing the API from a different domain, add CORS headers to the route handlers.
+
+---
+
+## Next Steps
+
+- **[Railway Agent Deployment](/deployment/railway-worker)** — Deploy the Python sentinel agent
+- **[Neon PostgreSQL](/deployment/neon-postgres)** — Set up the database
+- **[Environment Variables](/deployment/environment-variables)** — Complete variable reference
