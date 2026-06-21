@@ -4,17 +4,15 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useWriteContract, useWaitForTransactionReceipt, useAccount } from 'wagmi';
 import { getAddress } from 'viem';
-import { ShieldAlert, Radio, Activity, ShieldCheck, Cpu, HelpCircle } from 'lucide-react';
+import { Radio, Activity, HelpCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
-import Counter from './Counter';
 import Onboarding from './Onboarding';
 import AttackModal from './AttackModal';
 import { REGISTRY_ADDRESS, REGISTRY_ABI } from '../constants';
 import { DASHBOARD_PATH, HISTORY_PATH, LANDING_PATH, clearCommandCenterNavigationState, navigateToAppPath, replaceWithAppPath } from '../../lib/navigation';
 import AuditScanner from '../../components/AuditScanner';
 import GasEstimator from '../../components/GasEstimator';
-import { summarizeValueMetrics } from '../../lib/valueMonitored';
-import { WalletConnectControl, WalletStatusGate } from '../../components/WalletConnectControl';
+import { WalletConnectControl } from '../../components/WalletConnectControl';
 import {
   GENLAYER_CONSENSUS_GUARD_ADDRESS,
   type GenLayerAccount,
@@ -23,64 +21,13 @@ import {
   generateGenLayerAccount,
   getStoredGenLayerAccount,
 } from '../../lib/genlayerConsensus';
-
-interface Asset {
-  id: string;
-  name: string;
-  address: string;
-  status: 'ACTIVE' | 'PAUSED' | 'MITIGATING';
-  latency: string;
-  events: number;
-  lastHeartbeat?: string;
-}
-
-interface ValueMetrics {
-  network: string;
-  chainId: number;
-  source: string;
-  totalUsd: number;
-  native: {
-    symbol: string;
-    amount: string;
-    usd: number | null;
-  };
-  tokens: Array<{
-    symbol: string;
-    amount: string;
-    usd: number | null;
-  }>;
-  updatedAt?: string;
-}
-
-const capTerminal = (lines: string[]) => lines.slice(-120);
-
-const BootSequence = () => {
-  const lines = [
-    'MANTLE RPC LINKED',
-    'SENTINEL REGISTRY FOUND',
-    'EXTERNAL CONSENSUS GUARD READY',
-    'COMMAND CENTER ONLINE',
-  ];
-
-  return (
-    <div className="fixed inset-0 z-[120] bg-[#050507]/95 backdrop-blur-sm flex items-center justify-center p-6">
-      <div className="w-full max-w-md border border-[#10B981]/30 bg-black/70 rounded-2xl p-6 shadow-[0_0_60px_rgba(16,185,129,0.18)]">
-        <div className="flex items-center gap-3 mb-5">
-          <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-pulse" />
-          <span className="text-xs uppercase tracking-[0.35em] text-[#10B981]">Boot sequence</span>
-        </div>
-        <div className="space-y-3 font-mono text-xs text-gray-300">
-          {lines.map((line, index) => (
-            <div key={line} className="flex items-center justify-between border-b border-white/5 pb-2">
-              <span>{line}</span>
-              <span className="text-[#10B981]">{index === lines.length - 1 ? 'READY' : 'OK'}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
+import { type Asset, type ValueMetrics, capTerminal } from './types';
+import BootSequence from './components/BootSequence';
+import StatsStrip from './components/StatsStrip';
+import RegisterSentinelCard from './components/RegisterSentinelCard';
+import GenLayerGuardCard from './components/GenLayerGuardCard';
+import MonitoredNodes from './components/MonitoredNodes';
+import SentinelConsole from './components/SentinelConsole';
 
 export default function Dashboard() {
   const router = useRouter();
@@ -97,6 +44,15 @@ export default function Dashboard() {
   const [blocksScanned, setBlocksScanned] = useState(0);
   const [commandInput, setCommandInput] = useState('');
   const [waveform, setWaveform] = useState<number[]>([15, 30, 10, 45, 25, 60, 35, 20, 50, 40, 30, 20, 45, 65, 40, 25, 55, 30, 15, 40]);
+  const [demoMode, setDemoMode] = useState(false);
+  const [isSSEConnected, setIsSSEConnected] = useState(false);
+  const [isSimulating, setIsSimulating] = useState(false);
+  const sseActivityTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const simulatedStreamRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const heartbeatRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const [cumulativeGasSaved, setCumulativeGasSaved] = useState(0);
+  const [simThreatCount, setSimThreatCount] = useState(0);
+  const [simSafeCount, setSimSafeCount] = useState(0);
   
   const [terminalLines, setTerminalLines] = useState<string[]>([
     "[SYS] Establishing connection to Mantle Sepolia RPC",
@@ -226,9 +182,11 @@ export default function Dashboard() {
 
   useEffect(() => {
     // Keep wallet actions available by default. The tour is still available from Replay Setup Tour or /dashboard?tour=1.
+    // Auto-show onboarding for first-time visitors
     const shouldOpenTour = new URLSearchParams(window.location.search).get('tour') === '1';
-    if (shouldOpenTour) {
-      setTimeout(() => setShowOnboarding(true), 0);
+    const hasOnboarded = localStorage.getItem('breachresponse_onboarded');
+    if (shouldOpenTour || !hasOnboarded) {
+      setTimeout(() => setShowOnboarding(true), 1200);
     }
   }, []);
 
@@ -246,17 +204,118 @@ export default function Dashboard() {
     setShowOnboarding(false);
   };
 
-  // Live block scan & api logs via Server-Sent Events (SSE)
+  // Live block scan & api logs via Server-Sent Events (SSE) with simulation fallback
   useEffect(() => {
+    const simulatedProtocols = ['MantleSwap', 'LendX Protocol', 'YieldFlow', 'ApexVaults', 'LiquidMNT'];
+    const simulatedThreats = [
+      { name: 'Reentrancy signature 0x89A', severity: 'CRITICAL', gasSave: 12450 },
+      { name: 'Oracle price deviation 12%', severity: 'HIGH', gasSave: 8900 },
+      { name: 'Flash loan detected 500 MNT', severity: 'HIGH', gasSave: 15700 },
+      { name: 'Unusual gas pattern', severity: 'MEDIUM', gasSave: 3200 },
+      { name: 'Suspicious delegatecall', severity: 'CRITICAL', gasSave: 22300 },
+      { name: 'Unchecked external call', severity: 'HIGH', gasSave: 6800 },
+      { name: 'Timestamp manipulation', severity: 'MEDIUM', gasSave: 4100 },
+    ];
+    const simulatedSafe = [
+      'Normal ERC-20 transfer', 'Contract interaction (safe)', 'View-only call',
+      'Approved allowance update', 'Standard swap execution', 'Liquidity provision',
+      'Governance vote cast', 'Token mint (authorized)',
+    ];
+    let sseHadActivity = false;
+    let blockCounter = 14200000;
+
+    const stopHeartbeat = () => {
+      if (heartbeatRef.current) {
+        clearInterval(heartbeatRef.current);
+        heartbeatRef.current = null;
+      }
+    };
+
+    const startHeartbeat = () => {
+      stopHeartbeat();
+      heartbeatRef.current = setInterval(() => {
+        setTerminalLines(prev => capTerminal([...prev,
+          `[HEARTBEAT] Sentinel telemetry stream healthy — ${new Date().toISOString()}`,
+        ]));
+      }, 20000);
+    };
+
+    const startSimulatedStream = () => {
+      if (simulatedStreamRef.current) return;
+      setIsSimulating(true);
+      setTerminalLines(prev => capTerminal([...prev,
+        '[SYS] Demo mode active — simulated Mantle Sepolia agent stream',
+        '[SYS] Threat signatures loaded: Reentrancy, Oracle, FlashLoan, DelegateCall, GasAnomaly',
+        '[SYS] Response engine initialized — operator-gated by default',
+      ]));
+      startHeartbeat();
+      simulatedStreamRef.current = setInterval(() => {
+        const roll = Math.random();
+        const blockNum = blockCounter++;
+        const proto = simulatedProtocols[Math.floor(Math.random() * simulatedProtocols.length)];
+
+        if (roll < 0.30) {
+          // Threat detected
+          const threat = simulatedThreats[Math.floor(Math.random() * simulatedThreats.length)];
+          const confidence = (0.72 + Math.random() * 0.27);
+          setTerminalLines(prev => capTerminal([...prev,
+            `[LOG] [SCAN] Scanning Mantle Sepolia Block #${blockNum}`,
+            `[ALERT] [ANOMALY-ALERT] ${threat.name} detected on ${proto} [${threat.severity}]`,
+            `[SYS] [ANALYZER-LLM] Groq AI confidence: ${confidence.toFixed(2)} — ${threat.severity} threat classified`,
+            `[SYS] [SENTINEL] Response proposal queued for ${proto} — est. gas saved: ${threat.gasSave.toLocaleString()}`,
+            `[SYS] [CONSENSUS] Awaiting operator review — manual approval required`,
+          ]));
+          setBlocksScanned(prev => prev + 1);
+          setCumulativeGasSaved(prev => prev + threat.gasSave);
+          setSimThreatCount(prev => prev + 1);
+        } else if (roll < 0.55) {
+          // Safe transaction
+          const safe = simulatedSafe[Math.floor(Math.random() * simulatedSafe.length)];
+          setTerminalLines(prev => capTerminal([...prev,
+            `[LOG] [SCAN] Scanning Mantle Sepolia Block #${blockNum}`,
+            `[LOG] ${safe} on ${proto} — no threat signature matched`,
+          ]));
+          setBlocksScanned(prev => prev + 1);
+          setSimSafeCount(prev => prev + 1);
+        } else {
+          // System status / heartbeat
+          const msgs = [
+            `[SYS] Sentinel registry synced — ${customAssets.length + 3} guards active`,
+            `[SYS] Mantle Sepolia RPC latency: ${(2.1 + Math.random() * 5).toFixed(1)}ms`,
+            `[SYS] Mempool depth: ${Math.floor(40 + Math.random() * 200)} pending txns`,
+            `[SYS] Groq inference engine healthy — avg response: ${(180 + Math.random() * 400).toFixed(0)}ms`,
+            `[SYS] GenLayer consensus network: 5/5 validators online`,
+          ];
+          setTerminalLines(prev => capTerminal([...prev, msgs[Math.floor(Math.random() * msgs.length)]]));
+        }
+      }, 2800 + Math.random() * 2200);
+    };
+
+    const stopSimulatedStream = () => {
+      if (simulatedStreamRef.current) {
+        clearInterval(simulatedStreamRef.current);
+        simulatedStreamRef.current = null;
+      }
+      setIsSimulating(false);
+      stopHeartbeat();
+    };
+
     const sse = new EventSource('/api/logs/stream');
     
     sse.onmessage = (event) => {
       try {
         const payload = JSON.parse(event.data);
-        if (payload.type === 'CONNECTED') {
+
+        // Ignore heartbeats — they don't count as real activity
+        if (payload.type === 'heartbeat') return;
+
+        sseHadActivity = true;
+        stopSimulatedStream();
+        setIsSSEConnected(true);
+
+        if (payload.type === 'system') {
           setTerminalLines(prev => capTerminal([...prev, `[SYS] ${payload.message}`]));
         } else if (payload.type === 'LOG') {
-          // It's a raw python agent log
           let color = "[LOG]";
           if (payload.data.level === "WARN") color = "[ERR]";
           if (payload.data.text.includes("[SCAN]")) color = "[LOG]";
@@ -266,27 +325,86 @@ export default function Dashboard() {
           if (payload.data.text.includes("[SCAN] Scanning Mantle Sepolia Block #")) {
             setBlocksScanned((prev) => prev + 1);
           }
-          
           setTerminalLines(prev => capTerminal([...prev, `${color} ${payload.data.text}`]));
         } else if (payload.type === 'ALERT') {
-          // Executed response alert
           const log = payload.data;
           setTerminalLines(prev => capTerminal([...prev, `[ALERT] Response proposal recorded for ${log.protocol}. Type: ${log.type}. Metric: ${log.gasSaved}`]));
+        } else if (payload.type === 'CONNECTED') {
+          setTerminalLines(prev => capTerminal([...prev, `[SYS] ${payload.message}`]));
         }
       } catch (err) {
         console.warn("SSE Parse Error", err);
       }
     };
 
-    sse.onerror = (err) => {
-      console.warn("SSE Error:", err);
+    sse.onerror = () => {
+      console.warn("SSE Error — falling back to simulated stream");
       sse.close();
+      setIsSSEConnected(false);
+      if (!sseHadActivity) {
+        startSimulatedStream();
+      }
     };
+
+    sse.onopen = () => {
+      setIsSSEConnected(true);
+    };
+
+    // If no real events within 8 seconds, start simulation
+    sseActivityTimer.current = setTimeout(() => {
+      if (!sseHadActivity) {
+        startSimulatedStream();
+      }
+    }, 8000);
 
     return () => {
       sse.close();
+      stopSimulatedStream();
+      if (sseActivityTimer.current) {
+        clearTimeout(sseActivityTimer.current);
+        sseActivityTimer.current = null;
+      }
     };
   }, []);
+
+  // Demo mode toggle — pre-populates dashboard with realistic data
+  useEffect(() => {
+    if (!demoMode) return;
+    // Pre-populate with demo sentinels if none exist
+    if (customAssets.length === 0) {
+      const demoSentinels: Asset[] = [
+        { id: 'demo-1', name: 'MantleSwap Vault Guard', address: '0x5e8c1a2f3b4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f', status: 'ACTIVE', latency: '4.2ms', events: 1423, lastHeartbeat: new Date().toISOString() },
+        { id: 'demo-2', name: 'LendX Protocol Sentinel', address: '0x1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a', status: 'ACTIVE', latency: '7.1ms', events: 892, lastHeartbeat: new Date().toISOString() },
+        { id: 'demo-3', name: 'YieldFlow Oracle Guard', address: '0x9f8e7d6c5b4a3928170654fedcba9876543210', status: 'MITIGATING', latency: '12.4ms', events: 567, lastHeartbeat: new Date().toISOString() },
+      ];
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setCustomAssets(demoSentinels);
+      setBlocksScanned(prev => Math.max(prev, 2882));
+    }
+    if (consensusIncidents.length === 0) {
+      setConsensusIncidents([
+        { id: 'mantle-1719000000000', status: 'approved', timestamp: Date.now() - 3600000 },
+        { id: 'mantle-1719003600000', status: 'approved', timestamp: Date.now() - 1800000 },
+      ]);
+      setConsensusStatus('Consensus guard read complete — 2 incidents validated');
+    }
+    // Pre-populate demo value metrics if none loaded
+    if (!valueMetrics) {
+      setValueMetrics({
+        network: 'Mantle Sepolia',
+        chainId: 5003,
+        source: 'RPC (demo)',
+        totalUsd: 2847500,
+        native: { symbol: 'MNT', amount: '12500.45', usd: 12500.45 },
+        tokens: [
+          { symbol: 'USDC', amount: '500000', usd: 500000 },
+          { symbol: 'WETH', amount: '350.2', usd: 1225700 },
+          { symbol: 'USDT', amount: '750000', usd: 750000 },
+        ],
+        updatedAt: new Date().toISOString(),
+      });
+    }
+  }, [demoMode, customAssets.length, consensusIncidents.length, valueMetrics]);
 
   // Fetch initial registered sentinels from database
   useEffect(() => {
@@ -310,7 +428,7 @@ export default function Dashboard() {
     const interval = window.setInterval(() => {
       if (document.hidden) return;
       fetchSentinels();
-    }, 60000);
+    }, 120000); // Reduced from 60s to 120s for Vercel limits
     return () => window.clearInterval(interval);
   }, [walletAddress]);
 
@@ -334,7 +452,7 @@ export default function Dashboard() {
     const interval = window.setInterval(() => {
       if (document.hidden) return;
       fetchValueMetrics();
-    }, 120000);
+    }, 300000); // Reduced from 120s to 300s for Vercel limits
     return () => window.clearInterval(interval);
   }, [walletAddress]);
 
@@ -631,6 +749,19 @@ export default function Dashboard() {
         </div>
         
         <div className="flex items-center gap-4">
+          {/* Demo Mode Toggle */}
+          <button
+            type="button"
+            onClick={() => setDemoMode(!demoMode)}
+            className={`text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded border transition-all ${
+              demoMode
+                ? 'bg-yellow-500/10 border-yellow-500/40 text-yellow-400 shadow-[0_0_10px_rgba(250,204,21,0.3)]'
+                : 'bg-[#18181B]/50 border-gray-700 text-gray-500 hover:text-gray-300 hover:border-gray-600'
+            }`}
+            title="Toggle Demo Mode — pre-populates dashboard with realistic simulation data"
+          >
+            {demoMode ? '🧪 Demo On' : 'Demo Mode'}
+          </button>
           <button 
             onClick={() => setShowOnboarding(true)}
             className="text-gray-500 hover:text-white transition-colors p-2"
@@ -641,6 +772,28 @@ export default function Dashboard() {
           <WalletConnectControl />
         </div>
       </header>
+
+      {/* Demo Mode Banner */}
+      {demoMode && (
+        <div className="relative z-10 mb-6 px-4 py-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-lg">🧪</span>
+            <div>
+              <span className="text-yellow-400 font-bold text-xs uppercase tracking-widest">Demo Mode Active</span>
+              <p className="text-yellow-400/60 text-[10px] mt-0.5 font-sans">
+                Pre-populated with simulation data. All threat events, sentinels, and consensus records are synthetic.
+                Connect a Mantle wallet and register a contract to test real on-chain monitoring.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setDemoMode(false)}
+            className="text-yellow-400/70 hover:text-yellow-300 text-[10px] font-bold uppercase tracking-widest border border-yellow-500/30 rounded px-3 py-1.5 transition-colors shrink-0 ml-4"
+          >
+            Exit Demo
+          </button>
+        </div>
+      )}
 
       <nav className="relative z-10 grid grid-cols-2 gap-3 mb-6 md:hidden text-xs font-bold tracking-widest uppercase">
         <button type="button" onClick={handleOpenDashboard} className="rounded border border-[#10B981]/40 bg-[#10B981]/10 px-4 py-3 text-center text-[#10B981]">
@@ -654,67 +807,15 @@ export default function Dashboard() {
       <div className="fixed top-1/3 left-1/4 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#10B981]/5 rounded-full blur-[150px] pointer-events-none z-0" />
 
       {/* Stats Strip Bar */}
-      <motion.section 
-        initial={false}
-        animate={{ opacity: 1, y: 0 }}
-        className="relative grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8"
-      >
-        <div className="sci-fi-panel p-4 flex flex-col justify-between relative overflow-hidden">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-gray-400 text-xs font-bold tracking-widest">Blocks Scanned</h3>
-            <Activity className="w-4 h-4 text-[#10B981]" />
-          </div>
-          <div className="text-2xl md:text-3xl font-black text-white font-mono tracking-tighter">
-            <Counter value={blocksScanned} />
-          </div>
-        </div>
-
-        <div className="sci-fi-panel p-4 flex flex-col justify-between relative overflow-hidden">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-gray-400 text-xs font-bold tracking-widest">Active Sentinels</h3>
-            <ShieldCheck className="w-4 h-4 text-blue-400" />
-          </div>
-          <div className="text-2xl md:text-3xl font-black text-white font-mono tracking-tighter">
-            <Counter value={allAssets.length} />
-          </div>
-        </div>
-
-        <div className="sci-fi-panel p-4 flex flex-col justify-between relative overflow-hidden">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-gray-400 text-xs font-bold tracking-widest">Worker Checks</h3>
-            <span className="text-[#10B981] text-xs font-bold">LIVE</span>
-          </div>
-          <div className="text-2xl md:text-3xl font-black text-white font-mono tracking-tighter">
-            <Counter value={liveWorkerChecks || blocksScanned} suffix=" checks" />
-          </div>
-        </div>
-
-        <div className="sci-fi-panel p-4 flex flex-col justify-between relative overflow-hidden">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-gray-400 text-xs font-bold tracking-widest">Value Monitored</h3>
-            <span className="text-[#10B981] text-[10px] font-bold uppercase">RPC</span>
-          </div>
-          <div className="text-2xl md:text-3xl font-black text-white font-mono tracking-tighter">
-            {valueMetrics ? `$${valueMetrics.totalUsd.toLocaleString(undefined, { maximumFractionDigits: 2 })}` : valueMetricsError ? 'N/A' : '...' }
-          </div>
-          <p className="mt-2 text-[9px] leading-relaxed text-gray-500 font-sans">
-            {valueMetrics ? summarizeValueMetrics(valueMetrics) : 'Read-only balance aggregation. No signer, private key, or transaction.'}
-          </p>
-          <p className="mt-1 text-[8px] uppercase tracking-widest text-[#10B981]/80">
-            Read-only RPC. No signer, private key, or transaction.
-          </p>
-        </div>
-
-        <div className="sci-fi-panel p-4 flex flex-col justify-between relative overflow-hidden">
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="text-gray-400 text-xs font-bold tracking-widest">Response Proposals</h3>
-            <ShieldAlert className="w-4 h-4 text-red-500" />
-          </div>
-          <div className="text-2xl md:text-3xl font-black text-white font-mono tracking-tighter">
-            <Counter value={consensusIncidents.length} />
-          </div>
-        </div>
-      </motion.section>
+      <StatsStrip
+        blocksScanned={blocksScanned}
+        activeSentinels={allAssets.length}
+        liveWorkerChecks={liveWorkerChecks}
+        valueMetrics={valueMetrics}
+        valueMetricsError={valueMetricsError}
+        responseProposals={consensusIncidents.length}
+        cumulativeGasSaved={cumulativeGasSaved}
+      />
 
       {/* Workspace Grid */}
       <div className="relative grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -727,51 +828,18 @@ export default function Dashboard() {
         >
           
           {/* Register Sentinel Card */}
-          <div id="ob-sentinel" className="sci-fi-panel p-6 relative overflow-hidden transition-all duration-500">
-            <h2 className="text-base font-bold mb-4 flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-[#10B981]" />
-              Register Sentinel Guard
-            </h2>
-            <p className="text-gray-400 text-xs mb-4 leading-relaxed font-sans">
-              Register a Mantle Sepolia contract for sentinel monitoring and operator-reviewed response proposals.
-            </p>
-            <input
-              type="text"
-              value={sentinelName}
-              onChange={(e) => setSentinelName(e.target.value)}
-              placeholder="Sentinel name (e.g. MNT Vault Guard)"
-              className="w-full bg-[#09090B] border border-gray-700 rounded p-3 text-xs text-white outline-none focus:border-[#10B981] mb-3 transition-colors font-sans"
-            />
-            <input
-              type="text"
-              value={protocolAddress}
-              onChange={(e) => setProtocolAddress(e.target.value)}
-              placeholder="0x... (Contract Address)"
-              className="w-full bg-[#09090B] border border-gray-700 rounded p-3 text-xs text-white outline-none focus:border-[#10B981] mb-4 transition-colors font-mono"
-            />
-            <WalletStatusGate>
-              {({ ready, connected, wrongNetwork }) => {
-                const canRegister = ready && connected && !wrongNetwork && !isPending && !isConfirming;
-
-                return (
-                  <>
-                    <button
-                      onClick={handleRegister}
-                      disabled={!canRegister}
-                      className={`w-full bg-[#10B981] text-black font-bold py-3 rounded text-xs transition-all ${!canRegister ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-400 hover:shadow-[0_0_15px_rgba(16,185,129,0.3)]'}`}
-                    >
-                      {isPending ? 'Waiting for wallet...' : isConfirming ? 'Confirming on-chain...' : 'Register sentinel guard'}
-                    </button>
-                    {isConfirmed && receipt?.status === 'success' && !writeErrorMsg && <p className="text-[#10B981] mt-3 text-[10px] text-center">Sentinel confirmed and registered on Mantle Sepolia</p>}
-                    {writeErrorMsg && <p className="text-red-500 mt-3 text-[10px] text-center font-sans">{writeErrorMsg}</p>}
-                    {!ready && <p className="text-gray-500 mt-3 text-[10px] text-center font-sans">Restoring wallet session...</p>}
-                    {ready && !connected && <p className="text-red-500 mt-3 text-[10px] text-center font-sans">Connect a Mantle wallet to initialize guards</p>}
-                    {ready && connected && wrongNetwork && <p className="text-yellow-400 mt-3 text-[10px] text-center font-sans">Switch to Mantle Sepolia to initialize guards</p>}
-                  </>
-                );
-              }}
-            </WalletStatusGate>
-          </div>
+          <RegisterSentinelCard
+            sentinelName={sentinelName}
+            setSentinelName={setSentinelName}
+            protocolAddress={protocolAddress}
+            setProtocolAddress={setProtocolAddress}
+            handleRegister={handleRegister}
+            isPending={isPending}
+            isConfirming={isConfirming}
+            isConfirmed={isConfirmed}
+            receiptSuccess={receipt?.status === 'success'}
+            writeErrorMsg={writeErrorMsg}
+          />
 
           {/* Contract Audit Scanner */}
           <AuditScanner />
@@ -799,123 +867,18 @@ export default function Dashboard() {
           </div>
 
           {/* GenLayer Consensus Guard */}
-          <div id="ob-genlayer" className="sci-fi-panel p-6 relative overflow-hidden transition-all duration-500 border border-[#10B981]/20">
-            <div className="flex items-start justify-between gap-4 mb-4">
-              <div>
-                <h2 className="text-base font-bold mb-2 flex items-center gap-2">
-                  <ShieldAlert className="w-4 h-4 text-[#10B981]" />
-                  GenLayer Consensus Guard
-                </h2>
-                <p className="text-gray-400 text-xs leading-relaxed font-sans">
-                  Escalates low-confidence Mantle incidents to a GenLayer intelligent contract for validator consensus. Operators keep their wallet on Mantle.
-                </p>
-              </div>
-              <span className="text-[9px] uppercase tracking-widest text-[#10B981] bg-[#10B981]/10 border border-[#10B981]/20 rounded px-2 py-1">
-                {GENLAYER_CONSENSUS_GUARD_ADDRESS ? 'StudioNet linked' : 'Consensus ready'}
-              </span>
-            </div>
-
-            <div className="space-y-3 text-[10px] text-gray-400 mb-4">
-              <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] gap-3 border-b border-gray-800/60 pb-2">
-                <span>StudioNet Guard</span>
-                <span className="min-w-0 text-right text-gray-300 break-words">
-                  {GENLAYER_CONSENSUS_GUARD_ADDRESS || 'Env address required'}
-                </span>
-              </div>
-              <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] gap-3 border-b border-gray-800/60 pb-2">
-                <span>App-managed signer</span>
-                <span className="min-w-0 text-right text-gray-300">
-                  {genLayerAccount ? `${genLayerAccount.address.slice(0, 6)}...${genLayerAccount.address.slice(-4)}` : 'Not generated'}
-                </span>
-              </div>
-              <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)] gap-3">
-                <span>Consensus records</span>
-                <span className="min-w-0 text-right text-gray-300">{consensusIncidents.length}</span>
-              </div>
-            </div>
-
-            {/* Consensus Validators */}
-            <div className="mb-4 pt-3 border-t border-gray-800/60">
-              <h3 className="text-[9px] uppercase tracking-widest text-gray-500 mb-2">Consensus Validators</h3>
-              <div className="space-y-1.5">
-                {[
-                  { addr: '0x7f2a...3e1c', weight: '20%' },
-                  { addr: '0x4b8d...9f2a', weight: '20%' },
-                  { addr: '0x1e5c...7a4b', weight: '20%' },
-                  { addr: '0x9d3f...2c8e', weight: '20%' },
-                  { addr: '0x3a6e...5d1f', weight: '20%' },
-                ].map((v, i) => {
-                  const voted = !isConsensusBusy && consensusIncidents.length > 0;
-                  const validating = isConsensusBusy && i < 3;
-                  const dotColor = voted ? 'bg-[#10B981]' : validating ? 'bg-yellow-400 animate-pulse' : 'bg-gray-700';
-                  const label = voted ? 'Approved' : validating ? 'Validating...' : 'Idle';
-                  const labelColor = voted ? 'text-[#10B981]' : validating ? 'text-yellow-400' : 'text-gray-600';
-                  return (
-                    <div key={v.addr} className="flex items-center justify-between bg-black/30 border border-gray-800/50 rounded px-3 py-1.5">
-                      <div className="flex items-center gap-2">
-                        <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${dotColor}`} />
-                        <span className="text-[9px] font-mono text-gray-400">{v.addr}</span>
-                      </div>
-                      <div className="flex items-center gap-3 text-[9px]">
-                        <span className="text-gray-600">{v.weight}</span>
-                        <span className={`font-bold uppercase tracking-widest ${labelColor}`}>{label}</span>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-
-            {/* Allowlisted Response Actions */}
-            <div className="mb-4">
-              <h3 className="text-[9px] uppercase tracking-widest text-gray-500 mb-2">Allowlisted Response Actions</h3>
-              <div className="flex flex-wrap gap-1.5 mb-2">
-                {['Pause', 'Quarantine', 'Monitor', 'Alert', 'Multisig'].map((action) => {
-                  const active = selectedAction === action;
-                  return (
-                    <button
-                      key={action}
-                      type="button"
-                      onClick={() => {
-                        setSelectedAction(action);
-                        setActionQueued(false);
-                        setTimeout(() => setActionQueued(true), 600);
-                      }}
-                      className={`text-[9px] font-bold uppercase tracking-widest rounded px-2 py-1 border transition-all ${
-                        active
-                          ? 'bg-[#10B981] border-[#10B981] text-black shadow-[0_0_10px_rgba(16,185,129,0.4)]'
-                          : 'bg-[#10B981]/10 border-[#10B981]/20 text-[#10B981] hover:bg-[#10B981]/20 hover:border-[#10B981]/40'
-                      }`}
-                    >
-                      {action}
-                    </button>
-                  );
-                })}
-              </div>
-              {selectedAction && actionQueued && (
-                <p className="text-[9px] text-[#10B981] font-mono">
-                  Action queued: <span className="font-bold">{selectedAction}</span> — pending GenLayer consensus approval
-                </p>
-              )}
-            </div>
-
-            <p className="min-h-8 text-[10px] text-gray-500 font-sans mb-4">{consensusStatus}</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <button
-                onClick={connectGenLayerFallback}
-                className="bg-[#18181B] border border-gray-800 text-white font-bold py-3 rounded text-[10px] hover:border-[#10B981]/50 transition-colors uppercase tracking-widest"
-              >
-                Prepare guard signer
-              </button>
-              <button
-                onClick={escalateDemoIncident}
-                disabled={isConsensusBusy || !genLayerAccount}
-                className={`bg-[#10B981] text-black font-bold py-3 rounded text-[10px] transition-all uppercase tracking-widest ${isConsensusBusy || !genLayerAccount ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-400 hover:shadow-[0_0_15px_rgba(16,185,129,0.3)]'}`}
-              >
-                {isConsensusBusy ? 'Consensus running...' : 'Validate incident'}
-              </button>
-            </div>
-          </div>
+          <GenLayerGuardCard
+            genLayerAccount={genLayerAccount}
+            consensusIncidentCount={consensusIncidents.length}
+            isConsensusBusy={isConsensusBusy}
+            selectedAction={selectedAction}
+            setSelectedAction={setSelectedAction}
+            setActionQueued={setActionQueued}
+            actionQueued={actionQueued}
+            consensusStatus={consensusStatus}
+            connectGenLayerFallback={connectGenLayerFallback}
+            escalateDemoIncident={escalateDemoIncident}
+          />
 
           {/* System Telemetry Oscilloscope (Inspired by ui panel.png) */}
           <div id="ob-telemetry" className="sci-fi-panel p-6 relative overflow-hidden transition-all duration-500">
@@ -940,114 +903,25 @@ export default function Dashboard() {
           </div>
 
           {/* Monitored Assets List */}
-          <div className="sci-fi-panel p-6 relative overflow-hidden">
-            <h2 className="text-base font-bold mb-4 flex items-center gap-2 text-gray-300">
-              <Cpu className="w-4 h-4 text-[#10B981]" />
-              Monitored Sentinel Nodes
-            </h2>
-            <div className="space-y-4">
-              {allAssets.map((asset) => (
-                <div key={asset.id} className="border border-gray-800/50 bg-black/50 rounded-lg p-4 flex flex-col justify-between">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <h4 className="text-xs font-bold text-white">{asset.name}</h4>
-                      <span className="text-[10px] text-gray-500 font-mono">{asset.address}</span>
-                    </div>
-                    
-                    <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${asset.status === 'ACTIVE' ? 'bg-[#10B981]/10 text-[#10B981]' : 'bg-red-500/10 text-red-500'}`}>
-                      {asset.status}
-                    </span>
-                  </div>
-
-                  <div className="mt-4 pt-3 border-t border-gray-800/50 flex justify-between items-center text-[9px] text-gray-500">
-                    <div>
-                      <span>LATENCY: </span>
-                      <span className="text-white">{asset.latency}</span>
-                    </div>
-                    <div>
-                      <span>SCANS: </span>
-                      <span className="text-white">{asset.events}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => navigateToAppPath(window.location, `${HISTORY_PATH}?protocol=${encodeURIComponent(asset.address)}`)}
-                        className="text-[#10B981] hover:underline"
-                      >
-                        View Activity
-                      </button>
-                      {asset.id.startsWith('d') ? (
-                        <span className="text-[8px] text-gray-600 uppercase">System</span>
-                      ) : (
-                        <button 
-                          onClick={() => toggleAssetStatus(asset.id, asset.name)}
-                          className="text-[#10B981] hover:underline"
-                        >
-                          {asset.status === 'ACTIVE' ? 'Pause' : 'Activate'}
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <MonitoredNodes assets={allAssets} toggleAssetStatus={toggleAssetStatus} />
         </motion.div>
 
         {/* Right Layout (Command Console & Terminal) */}
-        <motion.div 
-          initial={false}
-          animate={{ opacity: 1, x: 0 }}
-          className="lg:col-span-2 space-y-8"
-        >
-          <div id="ob-terminal" className="sci-fi-panel flex flex-col relative overflow-hidden h-full min-h-[580px] transition-all duration-500">
-            {/* Terminal Top Bar */}
-            <div className="bg-[#141416]/80 backdrop-blur-sm border-b border-gray-800/60 px-4 py-3 flex justify-between items-center z-10">
-              <div className="flex items-center gap-2">
-                <div className="w-2.5 h-2.5 rounded-full bg-red-500/80" />
-                <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/80" />
-                <div className="w-2.5 h-2.5 rounded-full bg-[#10B981]/80" />
-              </div>
-              <span className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">sentinel-console-v1.2.0</span>
-            </div>
-
-            {/* Terminal Logs Display */}
-            <div 
-              ref={terminalContainerRef}
-              onScroll={handleTerminalScroll}
-              className="p-6 font-mono text-xs space-y-2.5 flex-1 overflow-y-auto h-[500px] z-10 relative"
-            >
-              {terminalLines.map((line, index) => {
-                let color = "text-gray-300";
-                if (line.startsWith("[SYS]")) color = "text-[#10B981]";
-                if (line.startsWith("[LOG]")) color = "text-gray-500";
-                if (line.startsWith("[ERR]")) color = "text-red-500";
-                if (line.startsWith(">")) color = "text-white font-bold";
-                
-                return (
-                  <div key={index} className={`${color} leading-relaxed break-all`}>
-                    {line}
-                  </div>
-                );
-              })}
-              <div ref={terminalEndRef} />
-            </div>
-
-            {/* CRT Phosphor Scanline Overlay (Inspired by node.gif / ui panel.png) */}
-            <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.15)_50%)] bg-[length:100%_4px] opacity-25 z-20" />
-
-            {/* Terminal Prompt Input Form */}
-            <form onSubmit={handleCommandSubmit} className="border-t border-gray-800 bg-[#09090B] px-4 py-3 flex items-center gap-2 z-10">
-              <span className="text-[#10B981] font-bold text-xs select-none">&gt;</span>
-              <input 
-                type="text" 
-                value={commandInput}
-                onChange={(e) => setCommandInput(e.target.value)}
-                placeholder="Type 'help' for sentinel commands..." 
-                className="w-full bg-transparent text-white text-xs border-none outline-none font-mono"
-              />
-            </form>
-          </div>
-        </motion.div>
+        <SentinelConsole
+          isSSEConnected={isSSEConnected}
+          simulatedActive={isSimulating}
+          cumulativeGasSaved={cumulativeGasSaved}
+          simThreatCount={simThreatCount}
+          simSafeCount={simSafeCount}
+          blocksScanned={blocksScanned}
+          terminalLines={terminalLines}
+          terminalContainerRef={terminalContainerRef}
+          terminalEndRef={terminalEndRef}
+          handleTerminalScroll={handleTerminalScroll}
+          commandInput={commandInput}
+          setCommandInput={setCommandInput}
+          handleCommandSubmit={handleCommandSubmit}
+        />
 
       </div>
 

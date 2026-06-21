@@ -2,13 +2,12 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { mantleSepoliaTestnet } from 'wagmi/chains';
-import { createPublicClient, http } from 'viem';
 import { useAccount } from 'wagmi';
 import { Shield, ArrowLeft, Activity, ShieldCheck, History, Search, Filter, Cpu } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { DASHBOARD_PATH, navigateToAppPath } from '../../lib/navigation';
 import { WalletConnectControl } from '../../components/WalletConnectControl';
+import { scanRecentThreats } from '../../lib/threatScan';
 
 interface RegisteredProtocol {
   id: string;
@@ -29,6 +28,9 @@ interface TransactionLog {
   gasSaved: string;
   status: 'SCANNING' | 'PROPOSED' | 'SAFE';
   timestamp: string;
+  aiAnalyzed?: boolean;
+  aiConfidence?: number;
+  aiReasoning?: string;
 }
 
 // No hardcoded demo logs — real data comes from the DB (/api/logs) and Mantle RPC
@@ -105,13 +107,6 @@ function ThreatHistory() {
   }, []);
 
   useEffect(() => {
-    const publicClient = createPublicClient({
-      chain: mantleSepoliaTestnet,
-      transport: http()
-    });
-
-    const protocols = ['MantleSwap', 'LendX Protocol', 'YieldFlow', 'ApexVaults', 'LiquidMNT', 'MantleBridge'];
-    const threatTypes = ['Reentrancy', 'Oracle Manipulation', 'Flash Loan Attack'];
     let cancelled = false;
 
     const runWhenIdle = (callback: () => void) => {
@@ -123,47 +118,25 @@ function ThreatHistory() {
       }
     };
 
+    // Live chain scan + Groq classification via the shared threatScan lib.
     const fetchLogs = async () => {
       try {
-        const latestBlock = await Promise.race([
-          publicClient.getBlockNumber(),
-          new Promise<null>((resolve) => setTimeout(() => resolve(null), 2200)),
-        ]);
-        if (cancelled || latestBlock === null || latestBlock === undefined) return;
-
-        // Fetch last 5 blocks for a richer feed
-        const blockNumbers = Array.from({ length: 5 }, (_, i) => latestBlock - BigInt(i));
-        const blocks = await Promise.all(
-          blockNumbers.map((num) =>
-            Promise.race([
-              publicClient.getBlock({ blockNumber: num, includeTransactions: true }),
-              new Promise<null>((resolve) => setTimeout(() => resolve(null), 1500)),
-            ])
-          )
-        );
-
-        const allTxs: TransactionLog[] = [];
-        for (const block of blocks) {
-          if (!block || !block.transactions) continue;
-          for (const tx of block.transactions.slice(0, 10)) {
-            const hashInt = parseInt(tx.hash.slice(2, 10), 16);
-            const isThreat = hashInt % 15 === 0;
-            allTxs.push({
-              id: tx.hash,
-              txHash: tx.hash,
-              protocol: protocols[hashInt % protocols.length],
-              type: isThreat ? threatTypes[hashInt % threatTypes.length] : 'Normal Transfer',
-              gasSaved: isThreat ? 'response proposal ready' : '-',
-              status: isThreat ? 'PROPOSED' : 'SAFE' as const,
-              timestamp: new Date(Number(block.timestamp) * 1000).toISOString(),
-            });
-          }
-        }
-
-        if (allTxs.length > 0) {
-          // Only use chain data if we have no real DB alerts yet
-          setLogs(prev => prev.length === 0 ? allTxs.slice(0, 25) : prev);
-        }
+        const scanned = await scanRecentThreats({ blockCount: 5, txPerBlock: 10, maxAiCalls: 5 });
+        if (cancelled || scanned.length === 0) return;
+        const mapped: TransactionLog[] = scanned.map((t) => ({
+          id: t.id,
+          txHash: t.txHash,
+          protocol: t.protocol,
+          type: t.type,
+          gasSaved: t.gasSaved,
+          status: t.status,
+          timestamp: t.timestamp,
+          aiAnalyzed: t.aiAnalyzed,
+          aiConfidence: t.aiConfidence,
+          aiReasoning: t.aiReasoning,
+        }));
+        // Only use chain data if we have no real DB alerts yet
+        setLogs(prev => prev.length === 0 ? mapped.slice(0, 25) : prev);
       } catch (err) {
         console.error("Failed to fetch chain logs", err);
       } finally {
@@ -379,6 +352,19 @@ function ThreatHistory() {
                     <div className="text-gray-300 font-bold">{log.status === 'PROPOSED' ? log.gasSaved : 'Allowed'}</div>
                   </div>
                 </div>
+                {log.aiAnalyzed && (
+                  <div className="mt-2 pt-2 border-t border-gray-800/60">
+                    <div className="flex items-center gap-2 text-[10px]">
+                      <span className={(log.aiConfidence ?? 0) > 0.85 ? 'text-[#10B981]' : 'text-yellow-400'}>
+                        {(log.aiConfidence ?? 0) > 0.85 ? '🤖 Groq AI Verified' : '⚠️ Groq AI Flagged'}
+                      </span>
+                      <span className="text-gray-500">{((log.aiConfidence ?? 0) * 100).toFixed(0)}% confidence</span>
+                    </div>
+                    {log.aiReasoning && (
+                      <p className="text-[9px] text-gray-600 mt-1 leading-tight">{log.aiReasoning}</p>
+                    )}
+                  </div>
+                )}
               </article>
             ))
           )}
@@ -394,14 +380,15 @@ function ThreatHistory() {
                   <th className="px-6 py-4">Transaction Hash</th>
                   <th className="px-6 py-4">Target Protocol</th>
                   <th className="px-6 py-4">Threat Signature</th>
+                  <th className="px-6 py-4">AI Analysis</th>
                   <th className="px-6 py-4">Action Taken</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-800/40">
                 {isLoading ? (
-                  <tr><td colSpan={5} className="px-6 py-12 text-center text-gray-500">Loading immutable ledger</td></tr>
+                  <tr><td colSpan={6} className="px-6 py-12 text-center text-gray-500">Loading immutable ledger</td></tr>
                 ) : filteredLogs.length === 0 ? (
-                  <tr><td colSpan={5} className="px-6 py-12 text-center text-gray-500">No records found</td></tr>
+                  <tr><td colSpan={6} className="px-6 py-12 text-center text-gray-500">No records found</td></tr>
                 ) : (
                   filteredLogs.map(log => (
                     <tr key={log.id} className="hover:bg-white/[0.02] transition-colors">
@@ -415,6 +402,27 @@ function ThreatHistory() {
                         <span className={`px-2.5 py-1 rounded font-medium ${log.type.includes('Reentrancy') || log.type.includes('Manipulation') ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-[#18181B] text-gray-300'}`}>
                           {log.type}
                         </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        {log.aiAnalyzed ? (
+                          <div className="flex flex-col gap-1">
+                            <span className={`text-[10px] font-bold ${(log.aiConfidence ?? 0) > 0.85 ? 'text-[#10B981]' : 'text-yellow-400'}`}>
+                              {(log.aiConfidence ?? 0) > 0.85 ? '🤖 Verified' : '⚠️ Flagged'}
+                            </span>
+                            <span className="text-[9px] text-gray-500">
+                              Groq: {((log.aiConfidence ?? 0) * 100).toFixed(0)}% confidence
+                            </span>
+                            {log.aiReasoning && (
+                              <span className="text-[8px] text-gray-600 leading-tight max-w-[200px]">
+                                {log.aiReasoning.length > 60 ? log.aiReasoning.slice(0, 60) + '...' : log.aiReasoning}
+                              </span>
+                            )}
+                          </div>
+                        ) : log.status === 'PROPOSED' ? (
+                          <span className="text-[9px] text-gray-500 italic">Awaiting AI verification</span>
+                        ) : (
+                          <span className="text-[9px] text-gray-600">—</span>
+                        )}
                       </td>
                       <td className="px-6 py-4">
                         {log.status === 'PROPOSED' ? (

@@ -60,9 +60,9 @@ export async function GET() {
           timestamp: new Date().toISOString(),
           message: 'Sentinel telemetry stream healthy',
         });
-      }, 15000);
+      }, 45000); // Reduced from 15s to 45s for Vercel limits
 
-      poller = setInterval(flushRecent, 3000);
+      poller = setInterval(flushRecent, 15000); // Reduced from 3s to 15s for Vercel limits
       onLog = (payload: unknown) => send(payload);
       sseEmitter.on('log', onLog);
 

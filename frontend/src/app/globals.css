@@ -132,6 +132,73 @@ body {
     inset 0 0 35px rgba(250, 204, 21, 0.18) !important;
 }
 
+/* Accessibility: Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Accessibility: Minimum font size and improved focus styles */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+:focus-visible {
+  outline: 2px solid #10B981;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Ensure keyboard navigation is visible */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible {
+  outline: 2px solid #10B981;
+  outline-offset: 2px;
+}
+
+/* Minimum font size enforcement for readability */
+.text-\[7px\],
+.text-\[8px\],
+.text-\[9px\],
+.text-\[10px\] {
+  font-size: max(11px, var(--tw-font-size, 11px)) !important;
+}
+
+/* Skip to main content link */
+.skip-to-main {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  z-index: 9999;
+  padding: 12px 24px;
+  background: #10B981;
+  color: black;
+  font-weight: bold;
+  font-size: 14px;
+  text-decoration: none;
+  border-radius: 0 0 4px 0;
+  transition: top 0.2s;
+}
+
+.skip-to-main:focus {
+  top: 0;
+}
+
 .border-glow {
   box-shadow: 0 0 15px rgba(16, 185, 129, 0.05);
 }
@@ -160,5 +227,10 @@ body {
 
 .terminal-container {
   animation: terminalGlow 4s ease-in-out infinite;
+}
+
+@keyframes preloaderFadeOut {
+  0%, 85% { opacity: 1; }
+  100% { opacity: 0; pointer-events: none; }
 }
 
