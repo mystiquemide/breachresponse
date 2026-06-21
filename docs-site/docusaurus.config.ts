@@ -3,7 +3,7 @@ import type { Config } from '@docusaurus/types';
 
 const config: Config = {
   title: 'BreachResponse Docs',
-  tagline: 'AI-powered active-defense security monitoring for Mantle',
+  tagline: '',
   favicon: 'img/favicon.png',
 
   url: 'https://breachresponse-docs.vercel.app',
@@ -25,6 +25,7 @@ const config: Config = {
         docs: {
           sidebarPath: './sidebars.ts',
           routeBasePath: '/',
+          showLastUpdateTime: true,
           editUrl: 'https://github.com/mystiquemide/breachresponse/tree/main/docs-site/',
         },
         blog: false,
@@ -42,15 +43,19 @@ const config: Config = {
       respectPrefersColorScheme: false,
     },
     navbar: {
-      title: '',
       style: 'dark',
       logo: {
         alt: 'BreachResponse',
         src: 'img/logo.png',
-        width: 32,
-        height: 32,
+        width: 28,
+        height: 28,
       },
       items: [
+        {
+          href: 'https://breachresponse.xyz',
+          label: 'App',
+          position: 'right',
+        },
         {
           href: 'https://github.com/mystiquemide/breachresponse',
           label: 'GitHub',
