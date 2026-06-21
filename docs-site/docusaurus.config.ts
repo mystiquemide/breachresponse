@@ -2,11 +2,11 @@ import { themes as prismThemes } from 'prism-react-renderer';
 import type { Config } from '@docusaurus/types';
 
 const config: Config = {
-  title: 'BreachResponse',
-  tagline: 'AI-powered active-defense security for Mantle Network',
-  favicon: 'img/favicon.ico',
+  title: 'BreachResponse Docs',
+  tagline: 'AI-powered active-defense security monitoring for Mantle',
+  favicon: 'img/favicon.png',
 
-  url: 'https://docs.breachresponse.xyz',
+  url: 'https://breachresponse-docs.vercel.app',
   baseUrl: '/',
   organizationName: 'mystiquemide',
   projectName: 'breachresponse',
@@ -42,11 +42,13 @@ const config: Config = {
       respectPrefersColorScheme: false,
     },
     navbar: {
-      title: 'BREACH RESPONSE',
+      title: '',
       style: 'dark',
       logo: {
         alt: 'BreachResponse',
-        src: 'img/logo.svg',
+        src: 'img/logo.png',
+        width: 32,
+        height: 32,
       },
       items: [
         {
@@ -59,7 +61,7 @@ const config: Config = {
     footer: {
       style: 'dark',
       links: [],
-      copyright: `BreachResponse — AI-powered contract security for Mantle Network`,
+      copyright: 'BreachResponse',
     },
     prism: {
       theme: prismThemes.dracula,

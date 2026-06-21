@@ -1,65 +1,185 @@
 :root {
   --ifm-color-primary: #10B981;
-  --ifm-color-primary-dark: #0ea574;
-  --ifm-color-primary-darker: #0d9c6e;
-  --ifm-color-primary-darkest: #0b805a;
-  --ifm-color-primary-light: #12cd8e;
-  --ifm-color-primary-lighter: #13d694;
-  --ifm-color-primary-lightest: #1be3a0;
-  --ifm-background-color: #050507;
-  --ifm-background-surface-color: #0a0a0c;
-  --ifm-navbar-background-color: rgba(5, 5, 7, 0.95);
-  --ifm-navbar-link-color: #e5e7eb;
-  --ifm-footer-background-color: #050507;
-  --ifm-code-background: rgba(16, 185, 129, 0.08);
-  --ifm-font-family-base: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --ifm-heading-color: #ffffff;
-  --ifm-font-color-base: #d1d5db;
+  --ifm-color-primary-dark: #059669;
+  --ifm-color-primary-darker: #047857;
+  --ifm-color-primary-darkest: #065f46;
+  --ifm-color-primary-light: #34d399;
+  --ifm-color-primary-lighter: #6ee7b7;
+  --ifm-color-primary-lightest: #a7f3d0;
+  --ifm-background-color: #09090b;
+  --ifm-background-surface-color: #0f0f12;
+  --ifm-navbar-background-color: rgba(9, 9, 11, 0.95);
+  --ifm-navbar-link-color: #a1a1aa;
+  --ifm-footer-background-color: #09090b;
+  --ifm-code-background: rgba(16, 185, 129, 0.06);
+  --ifm-font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --ifm-font-family-monospace: 'JetBrains Mono', 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+  --ifm-heading-color: #fafafa;
+  --ifm-font-color-base: #d4d4d8;
+  --ifm-font-color-secondary: #a1a1aa;
   --ifm-link-color: #10B981;
-  --ifm-link-hover-color: #34D399;
-  --ifm-table-border-color: rgba(16, 185, 129, 0.1);
+  --ifm-link-hover-color: #34d399;
+  --ifm-table-border-color: rgba(255,255,255,0.06);
   --ifm-table-head-background: rgba(16, 185, 129, 0.05);
-  --ifm-table-head-color: #10B981;
+  --ifm-table-head-color: #a1a1aa;
+  --ifm-menu-color: #a1a1aa;
+  --ifm-menu-color-active: #fafafa;
+  --ifm-menu-color-background-active: rgba(16, 185, 129, 0.08);
+  --ifm-h1-font-size: 2rem;
+  --ifm-h2-font-size: 1.5rem;
+  --ifm-h3-font-size: 1.25rem;
+  --ifm-font-size-base: 94%;
+  --ifm-line-height-base: 1.7;
+  --ifm-spacing-horizontal: 1.5rem;
 }
 
 html[data-theme='dark'] {
-  --ifm-background-color: #050507;
-  --ifm-background-surface-color: #0a0a0c;
+  --ifm-background-color: #09090b;
+  --ifm-background-surface-color: #0f0f12;
 }
 
+/* Clean navbar */
 .navbar {
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  box-shadow: none;
 }
 
 .navbar__title {
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: #10B981;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
+  color: #fafafa;
 }
 
+.navbar__logo {
+  margin-right: 0.25rem;
+}
+
+/* Clean sidebar */
+.menu {
+  padding: 0.75rem !important;
+}
+
+.menu__link {
+  font-size: 0.875rem;
+  border-radius: 6px;
+  padding: 0.35rem 0.75rem;
+  transition: all 0.15s;
+}
+
+.menu__link:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+.menu__link--active {
+  font-weight: 500;
+}
+
+.menu__caret:before {
+  background: var(--ifm-menu-link-sublist-icon) 50% / 1.25rem 1.25rem;
+}
+
+/* Clean content */
+article {
+  max-width: 720px;
+}
+
+article h1 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+article h2 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-top: 2.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+
+article h3 {
+  font-weight: 600;
+  margin-top: 2rem;
+}
+
+article p, article li {
+  color: #a1a1aa;
+}
+
+article strong {
+  color: #d4d4d8;
+}
+
+/* Code blocks */
 pre {
-  background: #0a0a0c !important;
-  border: 1px solid rgba(16, 185, 129, 0.12);
+  background: #0c0c0e !important;
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+  font-size: 0.85rem;
 }
 
 code {
   color: #10B981;
-  border: 1px solid rgba(16, 185, 129, 0.15);
+  background: rgba(16, 185, 129, 0.06);
+  border: 1px solid rgba(16, 185, 129, 0.1);
+  border-radius: 4px;
+  padding: 0.1rem 0.3rem;
+  font-size: 0.875em;
 }
 
-.menu__link {
-  color: #9ca3af;
+/* Tables */
+table {
+  font-size: 0.875rem;
 }
 
-.menu__link:hover {
-  color: #10B981;
+th {
+  font-weight: 500;
+  text-transform: none;
+  font-size: 0.8rem;
 }
 
-.menu__link--active {
-  color: #10B981;
-}
-
+/* Footer */
 .footer {
-  border-top: 1px solid rgba(16, 185, 129, 0.1);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.8rem;
+  color: #71717a;
+}
+
+/* Remove default decorations */
+.menu__link:after {
+  display: none;
+}
+
+.pagination-nav {
+  display: none;
+}
+
+/* Table of contents */
+.table-of-contents {
+  font-size: 0.8rem;
+}
+
+.table-of-contents__link {
+  color: #71717a;
+}
+
+.table-of-contents__link--active {
+  color: #fafafa;
+}
+
+/* Sidebar category */
+.menu__list-item-collapsible {
+  border-radius: 6px;
+}
+
+.menu__list-item-collapsible:hover {
+  background: rgba(255,255,255,0.03);
+}
+
+/* Wide sidebar */
+@media (min-width: 997px) {
+  .docSidebarContainer_node_modules-\@docusaurus-theme-classic-lib-theme-DocRoot-Layout-Sidebar-styles-module {
+    width: 240px !important;
+  }
 }
