@@ -1,0 +1,433 @@
+---
+title: Respond Pipeline
+description: Human approval gate, multisig escalation, and on-chain emergency pause execution
+---
+
+# Respond Pipeline
+
+The Respond Pipeline is the action layer of BreachResponse. Once a threat has been detected and classified, this pipeline gates the response behind operator approval, executes emergency on-chain transactions, and verifies successful mitigation.
+
+---
+
+## Response Flow
+
+```
+Classified Incident
+        │
+        ▼
+┌─────────────────────────────────────────┐
+│         1. Response Mode Check          │
+│                                         │
+│  SENTINEL_RESPONSE_MODE env var         │
+│  ├─ "manual" (default) → Stage 2       │
+│  └─ "autonomous"      → Stage 3        │
+└─────────────────┬───────────────────────┘
+                  │
+      ┌───────────┴───────────┐
+      ▼                       ▼
+┌──────────────┐      ┌──────────────┐
+│ 2. Manual    │      │ 3. Autonomous│
+│    Approval  │      │    Execution │
+│              │      │              │
+│ Status:      │      │ Pause tx     │
+│ PROPOSED     │      │ signed &     │
+│              │      │ broadcast    │
+│ Dashboard    │      │              │
+│ notification │      │ Status:      │
+│              │      │ MITIGATED    │
+│ Operator     │      │              │
+│ reviews &    │      │              │
+│ approves     │      │              │
+└──────┬───────┘      └──────┬───────┘
+       │                     │
+       ▼                     │
+┌──────────────┐             │
+│ Operator     │             │
+│ approves     │             │
+│ action       │             │
+└──────┬───────┘             │
+       │                     │
+       └─────────┬───────────┘
+                 ▼
+┌─────────────────────────────────────────┐
+│      4. On-Chain Transaction            │
+│                                         │
+│  pause_target_vault(address, calldata)  │
+│  ├─ eth_estimateGas()                  │
+│  ├─ eth_account.sign_transaction()     │
+│  ├─ eth_sendRawTransaction()           │
+│  └─ eth_wait_for_transaction_receipt() │
+└─────────────────┬───────────────────────┘
+                  │
+                  ▼
+┌─────────────────────────────────────────┐
+│       5. Verification & Logging         │
+│                                         │
+│  Verify receipt.status == 1            │
+│  POST /api/logs/ingest (MITIGATED)     │
+│  Dashboard SSE event                   │
+│  GenLayer mark_executed()              │
+└─────────────────────────────────────────┘
+```
+
+---
+
+## 1. Response Mode Selection
+
+The agent's behavior is governed by a single environment variable:
+
+```python
+SENTINEL_RESPONSE_MODE = os.getenv("SENTINEL_RESPONSE_MODE", "manual").lower()
+```
+
+| Mode | Behavior | Risk Level | Use Case |
+|---|---|---|---|
+| `manual` | Proposes action, waits for operator approval | Low | Production, high-value protocols |
+| `autonomous` | Broadcasts pause tx immediately on high-confidence detection | High | Testnet, isolated vaults, allowlisted contracts |
+
+> **Critical:** Autonomous mode bypasses human review. Only enable it when the agent wallet holds minimal funds, the target contracts are value-capped, and you have a separate emergency unpause mechanism.
+
+---
+
+## 2. Manual Approval Mode (Default)
+
+When a threat is detected with confidence > 0.9 and the mode is `manual`, the agent:
+
+### Formulates the Proposal
+
+```python
+rescue_tx = incident_analyzer.formulate_rescue_transaction(
+    vault_addr,
+    incident_analyzer.last_analysis.get("exploit_type", "Reentrancy")
+)
+```
+
+This returns a dictionary with the proposed transaction parameters:
+
+```python
+{
+    "to": "0x9d9b602CFe69cfF9706EAc399808E84682ce94FB",
+    "data": "0x8456cb59",
+    "gas_limit": 120000,
+    "description": "Emergency mitigation for Reentrancy"
+}
+```
+
+### Posts the Proposal to the Dashboard
+
+```python
+if SENTINEL_RESPONSE_MODE != "autonomous":
+    print(f"[SENTINEL] Manual approval mode active. "
+          f"Proposed action: send {rescue_tx['data']} to {vault_addr}.")
+
+    post_log_to_frontend(
+        tx_hash=tx_hash,
+        protocol="TargetVault",
+        exploit_type="On-Chain Reentrancy Proposal",
+        gas_saved="pending operator approval",
+        status="PROPOSED"
+    )
+    continue  # DO NOT broadcast — wait for operator
+```
+
+### Dashboard Display
+
+The Command Center shows the proposal with:
+- Transaction hash of the suspicious activity
+- AI confidence score and evidence points
+- Proposed pause calldata (`0x8456cb59`)
+- The target contract address
+- A "waiting for operator" indicator
+
+### Operator Action
+
+The operator reviews the proposal and can:
+1. **Approve** — triggers the pause transaction
+2. **Reject** — marks the incident as a false positive
+3. **Escalate** — submits to multisig for broader review
+
+---
+
+## 3. Autonomous Mode
+
+When `SENTINEL_RESPONSE_MODE=autonomous`, the agent proceeds immediately:
+
+```python
+print(f"[SENTINEL] Autonomous mode enabled. "
+      f"Broadcasting emergency pause transaction...")
+
+pause_tx_hash = pause_target_vault(vault_addr, rescue_tx["data"])
+
+if pause_tx_hash:
+    post_log_to_frontend(
+        tx_hash=pause_tx_hash,
+        protocol="TargetVault",
+        exploit_type="On-Chain Reentrancy Mitigated",
+        gas_saved="1,420.5 mETH",
+        status="MITIGATED"
+    )
+```
+
+The transaction is constructed and broadcast in a single function call.
+
+---
+
+## 4. On-Chain Transaction Execution
+
+The `pause_target_vault()` function (`agent/main.py`) handles the complete lifecycle of an emergency pause:
+
+```python
+def pause_target_vault(vault_address: str, custom_calldata: str = '0x8456cb59'):
+    if not w3 or not agent_address or not PRIVATE_KEY:
+        print("[SENTINEL] Error: On-chain client not configured.")
+        return None
+
+    try:
+        # 1. Build transaction
+        tx_data = {
+            'chainId': 5003,  # Mantle Sepolia
+            'from': agent_address,
+            'gas': 120000,
+            'maxFeePerGas': w3.eth.gas_price,
+            'maxPriorityFeePerGas': w3.to_wei(1.5, 'gwei'),
+            'nonce': w3.eth.get_transaction_count(agent_address),
+            'to': Web3.to_checksum_address(vault_address),
+            'data': custom_calldata
+        }
+
+        # 2. Estimate gas (with 20% buffer)
+        try:
+            estimated_gas = w3.eth.estimate_gas(tx_data)
+            tx_data['gas'] = int(estimated_gas * 1.2)
+        except Exception as e:
+            print(f"[SENTINEL] Warning: Gas estimation failed: {e}")
+
+        # 3. Sign transaction
+        signed_tx = w3.eth.account.sign_transaction(
+            tx_data, private_key=PRIVATE_KEY
+        )
+
+        # 4. Broadcast
+        tx_hash = w3.eth.send_raw_transaction(signed_tx.raw_transaction)
+        tx_hash_hex = w3.to_hex(tx_hash)
+        print(f"[SENTINEL] Sent pause tx. Hash: {tx_hash_hex}")
+
+        # 5. Wait for confirmation
+        receipt = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=30)
+        print(f"[SENTINEL] Tx mined in block {receipt['blockNumber']}. "
+              f"Status: {receipt['status']}")
+
+        if receipt['status'] == 1:
+            print(f"[SENTINEL] Vault {vault_address} successfully PAUSED!")
+            return tx_hash_hex
+        else:
+            print(f"[SENTINEL] Error: Pause transaction reverted.")
+            return None
+
+    except Exception as e:
+        print(f"[SENTINEL] Exception during on-chain pause: {e}")
+        return None
+```
+
+### Transaction Parameters
+
+| Parameter | Value | Notes |
+|---|---|---|
+| `chainId` | `5003` | Mantle Sepolia testnet |
+| `gas` | `120000` (default) or `estimated × 1.2` | 20% buffer on estimate |
+| `maxFeePerGas` | `eth_gasPrice` | Current network gas price |
+| `maxPriorityFeePerGas` | `1.5 gwei` | Priority fee for inclusion |
+| `nonce` | `eth_getTransactionCount` | Current agent nonce |
+| `to` | Target vault address | Checksummed |
+| `data` | `0x8456cb59` | `pause()` function selector |
+
+### Gas Estimation
+
+The agent attempts `eth_estimateGas` first. If it reverts (e.g., the contract is already paused, or the agent lacks permission), it falls back to the default 120,000 gas limit.
+
+---
+
+## 5. The Pause Mechanism
+
+The `TargetVault` contract implements a `pause()` function guarded by the `onlySentinelOrOwner` modifier:
+
+```solidity
+modifier onlySentinelOrOwner() {
+    require(
+        msg.sender == owner || msg.sender == registry.sentinelAgent(),
+        "Not sentinel agent or owner"
+    );
+    _;
+}
+
+function pause() external onlySentinelOrOwner whenNotPaused {
+    isPaused = true;
+    emit Paused();
+}
+```
+
+The `whenNotPaused` modifier on `withdraw()` prevents further withdrawals:
+
+```solidity
+modifier whenNotPaused() {
+    require(!isPaused, "Contract is paused");
+    _;
+}
+
+function withdraw(uint256 amount) external whenNotPaused {
+    // ... reentrancy-vulnerable logic
+}
+```
+
+When the sentinel agent broadcasts a `pause()` transaction:
+1. `onlySentinelOrOwner` checks that `msg.sender` is either the owner or `registry.sentinelAgent()`
+2. `whenNotPaused` checks the contract isn't already paused
+3. `isPaused = true` is set
+4. All subsequent `withdraw()` calls revert with `"Contract is paused"`
+5. The attacker's reentrancy loop is broken
+
+### Registry Integration
+
+The `TargetVault` holds a reference to the `SentinelRegistry`:
+
+```solidity
+constructor(address _registryAddress) {
+    owner = msg.sender;
+    registry = ISentinelRegistry(_registryAddress);
+}
+```
+
+The registry's `sentinelAgent` address is read at call time:
+
+```solidity
+interface ISentinelRegistry {
+    function sentinelAgent() external view returns (address);
+}
+```
+
+This means the protocol admin can update the sentinel agent address on the registry without modifying the vault contract.
+
+---
+
+## 6. Verification and Logging
+
+### Transaction Receipt Verification
+
+After broadcast, the agent waits for confirmation and checks the receipt:
+
+```python
+receipt = w3.eth.wait_for_transaction_receipt(tx_hash, timeout=30)
+
+if receipt['status'] == 1:
+    # Success
+    post_log_to_frontend(
+        tx_hash=pause_tx_hash,
+        protocol="TargetVault",
+        exploit_type="On-Chain Reentrancy Mitigated",
+        gas_saved="1,420.5 mETH",
+        status="MITIGATED"
+    )
+else:
+    # Reverted — log failure for operator review
+    print(f"[SENTINEL] Error: Pause transaction reverted on-chain.")
+```
+
+### Dashboard Verification
+
+The frontend provides a vault status endpoint that operators can use to verify the pause:
+
+```typescript
+// GET /api/vault/status
+const targetVault = new ethers.Contract(targetVaultAddress, vaultAbi, provider);
+const isPaused = await targetVault.isPaused();
+return NextResponse.json({ success: true, isPaused });
+```
+
+### GenLayer Execution Marking
+
+For incidents tracked in the GenLayer consensus guard, execution is recorded:
+
+```python
+# contracts/genlayer/IncidentConsensusGuard.py
+@gl.public.write
+def mark_executed(self, incident_id: str) -> bool:
+    incident = self._require_incident(incident_id)
+    if not bool(incident.get("approved", False)):
+        raise gl.vm.UserError("Cannot execute unapproved incident")
+    incident["executed"] = True
+    incident["status"] = "executed"
+    incident["executed_at"] = gl.message_raw["datetime"]
+    return True
+```
+
+---
+
+## 7. Unpausing and Recovery
+
+After the threat is resolved, the protocol owner can unpause:
+
+```solidity
+function unpause() external onlyOwner {
+    isPaused = false;
+    emit Unpaused();
+}
+```
+
+Note that `unpause()` is restricted to the owner only — not the sentinel agent. This prevents an attacker who compromises the agent from unpausing a protocol that was legitimately paused.
+
+---
+
+## 8. Emergency Scenarios
+
+### Gas Spike During Attack
+
+If network gas prices spike during an attack, the agent's transaction may be underpriced. Mitigations:
+- The agent uses `maxFeePerGas = eth_gasPrice` (current market rate)
+- Priority fee of 1.5 gwei for inclusion
+- The `gas` parameter has a 20% buffer on estimates
+
+### Nonce Conflicts
+
+If the agent's wallet is used for other transactions, nonce conflicts could delay the pause. Consider:
+- Using a dedicated agent wallet with no other activity
+- Pre-funding the wallet with sufficient MNT for multiple transactions
+
+### Contract Already Paused
+
+If the vault is already paused when the agent tries to pause it:
+- `eth_estimateGas` will revert
+- The agent falls back to the default gas limit
+- The actual transaction will revert with `"Contract is paused"` from the `whenNotPaused` modifier
+- This is a harmless no-op — the vault was already protected
+
+### Agent Key Compromise
+
+If the agent's private key is compromised:
+- In `manual` mode, the attacker can only **propose** actions, not execute them
+- In `autonomous` mode, the attacker can pause protocols — but cannot unpause (owner-only)
+- The registry owner can update `sentinelAgent` to a new address
+- Protocol owners can independently remove the `PAUSER_ROLE` from the old agent
+
+---
+
+## 9. Response Latency Budget
+
+| Step | Typical Latency | Worst Case |
+|---|---|---|
+| Block detection (agent finds tx) | 3 seconds | 6 seconds (scan interval) |
+| AI classification | 200-800ms | 2 seconds (fallback) |
+| Operator review (manual mode) | 10-60 seconds | Minutes (operator unavailable) |
+| Transaction signing + broadcast | &lt;100ms | &lt;500ms |
+| Transaction confirmation | 2-5 seconds | 30 seconds (timeout) |
+| **Total (autonomous)** | **~5-9 seconds** | **~38 seconds** |
+| **Total (manual)** | **~15-70 seconds** | **Minutes** |
+
+> **Note:** On Mantle Sepolia (testnet), block times are ~2 seconds. On Mantle mainnet, block times are ~2 seconds as well. The latency budget is dominated by operator review time in manual mode.
+
+---
+
+## Next Steps
+
+- **[Agent Response Modes](/agent/response-modes)** — Detailed configuration of manual vs autonomous modes
+- **[Sentinel Registry](/smart-contracts/sentinel-registry)** — The on-chain contract infrastructure
+- **[Deployment](/deployment/vercel)** — Production deployment guides

@@ -1,6 +1,0 @@
-{
-  "vercel": "Vercel (Frontend)",
-  "railway-worker": "Railway (Agent)",
-  "neon-postgres": "Neon PostgreSQL",
-  "environment-variables": "Environment Variables"
-}

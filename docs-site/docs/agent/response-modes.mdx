@@ -1,0 +1,268 @@
+---
+title: Response Modes
+description: Manual approval vs autonomous execution — configuring BreachResponse incident response behavior
+---
+
+# Response Modes
+
+BreachResponse supports two response modes that control how the sentinel agent acts when a threat is detected. The mode is set via a single environment variable and fundamentally changes the system's risk profile.
+
+---
+
+## Mode Overview
+
+| Property | Manual (Default) | Autonomous |
+|---|---|---|
+| **Env variable** | `SENTINEL_RESPONSE_MODE=manual` | `SENTINEL_RESPONSE_MODE=autonomous` |
+| **Threat response** | Proposes action, waits for operator | Broadcasts pause tx immediately |
+| **Human in loop** | Yes — operator must approve | No — agent acts on AI verdict |
+| **Latency** | 15-70 seconds (operator dependent) | 5-9 seconds |
+| **Risk of false positive** | Low — operator can reject | Higher — agent may pause unnecessarily |
+| **Risk of missed attack** | Higher — operator may be unavailable | Low — agent acts autonomously |
+| **Use case** | Production, high-value protocols | Testnet, isolated vaults, allowlisted targets |
+
+---
+
+## Manual Mode (Default)
+
+### Configuration
+
+```bash
+# .env (or environment)
+SENTINEL_RESPONSE_MODE=manual
+```
+
+This is the default if `SENTINEL_RESPONSE_MODE` is not set or set to anything other than `autonomous`.
+
+### Behavior
+
+When the agent detects a threat with high confidence (>0.9), it:
+
+1. **Analyzes** the exploit with the LLM
+2. **Formulates** a rescue transaction (target contract + pause calldata)
+3. **Posts** a proposal to the dashboard with status `PROPOSED`
+4. **Waits** for the operator to approve
+5. Does **NOT** broadcast any on-chain transaction
+
+```python
+if SENTINEL_RESPONSE_MODE != "autonomous":
+    print(f"[SENTINEL] Manual approval mode active. "
+          f"Proposed action: send {rescue_tx['data']} to {vault_addr}.")
+
+    post_log_to_frontend(
+        tx_hash=tx_hash,
+        protocol="TargetVault",
+        exploit_type="On-Chain Reentrancy Proposal",
+        gas_saved="pending operator approval",
+        status="PROPOSED"
+    )
+    continue  # DO NOT broadcast
+```
+
+### Operator Workflow
+
+The operator reviews the proposal in the Command Center:
+
+1. **Check AI verdicts** — Both Groq and Hunyuan classifications, side by side
+2. **Review evidence** — Event log data, gas anomalies, reentrancy indicators
+3. **Assess risk** — Is this a real exploit or a false positive?
+4. **Decide:**
+   - **Approve** → Agent broadcasts pause transaction
+   - **Reject** → Incident marked as false positive
+   - **Escalate** → Send to multisig for broader review
+
+### Advantages
+
+- **Safety first** — No autonomous on-chain actions
+- **Human judgment** — Operator can spot AI hallucinations or false positives
+- **Compliance** — Satisfies regulatory requirements for human oversight
+- **Reversible** — Operator can reject an incorrect proposal before any on-chain action
+
+### Disadvantages
+
+- **Latency** — Operator may be unavailable, asleep, or slow to react
+- **Attention dependency** — Requires 24/7 monitoring coverage
+- **Manual errors** — Operator may misread the dashboard
+
+---
+
+## Autonomous Mode
+
+### Configuration
+
+```bash
+# .env (or environment)
+SENTINEL_RESPONSE_MODE=autonomous
+```
+
+### Behavior
+
+When the agent detects a threat with high confidence (>0.9), it:
+
+1. **Analyzes** the exploit with the LLM
+2. **Formulates** a rescue transaction
+3. **Broadcasts** the pause transaction immediately
+4. **Posts** the result with status `MITIGATED`
+
+```python
+# Autonomous path — no operator approval
+print(f"[SENTINEL] Autonomous mode enabled. "
+      f"Broadcasting emergency pause transaction...")
+
+pause_tx_hash = pause_target_vault(vault_addr, rescue_tx["data"])
+
+if pause_tx_hash:
+    post_log_to_frontend(
+        tx_hash=pause_tx_hash,
+        protocol="TargetVault",
+        exploit_type="On-Chain Reentrancy Mitigated",
+        gas_saved="1,420.5 mETH",
+        status="MITIGATED"
+    )
+```
+
+### Safety Constraints (Built-in)
+
+Even in autonomous mode, the system has hard constraints:
+
+| Constraint | Protection |
+|---|---|
+| **Confidence threshold** | Only acts on confidence > 0.9 (90%) |
+| **Allowlisted actions** | Only `pause()` — never transfers, withdrawals, or ownership changes |
+| **Gas limit cap** | Max 120,000 gas (plus 20% buffer) — prevents infinite loops |
+| **Agent wallet balance** | Agent only holds gas funds, not protocol value |
+| **Unpause restriction** | Only the protocol owner can unpause — not the agent |
+
+### Advantages
+
+- **Speed** — Response in 5-9 seconds instead of minutes
+- **24/7 coverage** — No operator availability dependency
+- **Consistent** — No operator fatigue or inconsistency
+- **Ideal for testnet** — Low stakes, high value for demonstrating the system
+
+### Disadvantages
+
+- **False positives** — Agent could pause a legitimate protocol unnecessarily
+- **AI hallucination risk** — LLM may misclassify benign activity
+- **No human override** — Once broadcast, the pause is on-chain and irreversible by the agent
+
+> **Warning:** Autonomous mode carries real risk. An overeager or hallucinating AI could pause a protocol at a critical moment (e.g., during a legitimate high-value withdrawal). Always pair autonomous mode with allowlisted contracts and value caps.
+
+---
+
+## Mode Selection Guide
+
+### Use Manual Mode When:
+
+- The protocol holds significant value (>$100K)
+- You have 24/7 operations coverage
+- Regulatory compliance requires human approval
+- You're running in production for the first time
+- The protocol is complex with ambiguous threat signals
+
+### Use Autonomous Mode When:
+
+- Running on testnet (Mantle Sepolia)
+- The protocol is value-capped (&lt;$10K)
+- The agent wallet holds minimal funds
+- You want maximum threat response speed
+- You're demonstrating the system's full capabilities
+
+---
+
+## Simulated Safety Guarantees
+
+The agent's simulation mode (controlled anomaly scenarios every 12 iterations) is designed to never trigger real on-chain actions, even in autonomous mode. Validation tests enforce this:
+
+```python
+# agent/test_simulation_wording.py
+def test_controlled_scenario_does_not_claim_real_broadcast_or_registry_mutation():
+    simulation_block = source[simulation_start:simulation_end]
+
+    forbidden_phrases = [
+        "Executing defensive payload action",
+        "Transaction broadcasted",
+        "Registry state updated",
+        "MITIGATED",
+    ]
+
+    for phrase in forbidden_phrases:
+        assert phrase not in simulation_block
+
+    assert "CONTROLLED SCENARIO" in simulation_block
+    assert "PROPOSED" in simulation_block
+    assert "operator approval" in simulation_block.lower()
+```
+
+Simulated scenarios are always:
+- Marked as `CONTROLLED SCENARIO`
+- Given status `PROPOSED` (not `MITIGATED`)
+- Never claim real broadcast or registry mutation
+- Always reference operator approval
+
+---
+
+## Confidence Thresholds
+
+The AI confidence score determines the agent's behavior at multiple levels:
+
+| Confidence | Manual Mode | Autonomous Mode |
+|---|---|---|
+| **< 0.5** | Logged only — no proposal | Logged only — no action |
+| **0.5 – 0.9** | Proposal with "review needed" flag | Logged only — no action |
+| **> 0.9** | Proposal with "high confidence" flag | **Broadcast pause transaction** |
+
+The 0.9 threshold for autonomous action means the LLM must be at least 90% confident. In practice, the Groq Llama 3.1 model tends to produce bimodal confidence scores (either ~0.3 or ~0.95), providing a clear separation between suspicious and benign activity.
+
+---
+
+## GenLayer Consensus Interaction
+
+The GenLayer consensus guard adds an additional layer of validation independent of the response mode:
+
+1. **Submit** — Incident sent to GenLayer validators for consensus
+2. **Evaluate** — Validators independently assess with LLM
+3. **Consensus** — Incident approved only if validators agree
+4. **Execute** — Approved incidents can be marked as executed
+
+The GenLayer consensus operates independently of the agent's response mode. Even in autonomous mode, the consensus guard provides a separate validation check that can reject incidents where validators disagree with the primary AI analysis.
+
+---
+
+## Transaction Parameters (Both Modes)
+
+Regardless of mode, all emergency responses use the same on-chain parameters:
+
+```python
+tx_data = {
+    'chainId': 5003,                      # Mantle Sepolia
+    'from': agent_address,
+    'gas': 120000,                        # Conservative gas limit
+    'maxFeePerGas': w3.eth.gas_price,     # Current network rate
+    'maxPriorityFeePerGas': w3.to_wei(1.5, 'gwei'),
+    'nonce': w3.eth.get_transaction_count(agent_address),
+    'to': Web3.to_checksum_address(vault_address),
+    'data': custom_calldata               # Usually 0x8456cb59 (pause())
+}
+```
+
+The only difference between modes is **when** the transaction is broadcast — immediately (autonomous) or after approval (manual).
+
+---
+
+## Monitoring Autonomous Mode
+
+When running in autonomous mode, monitor these signals:
+
+1. **Pause frequency** — If the agent pauses protocols more than once per hour without real attacks, the AI may be over-sensitive. Adjust the confidence threshold or switch to manual mode.
+2. **Gas costs** — Each autonomous pause costs gas. If false positives are frequent, gas costs add up.
+3. **Dashboard alerts** — The dashboard shows all autonomous actions with the agent's reasoning. Review them regularly.
+4. **GenLayer consensus stats** — If validators frequently disagree with the agent, the primary AI may need recalibration.
+
+---
+
+## Next Steps
+
+- **[Agent Configuration](/agent/configuration)** — Full environment variable reference
+- **[Respond Pipeline](/architecture/respond-pipeline)** — Detailed response execution flow
+- **[Deployment](/deployment/vercel)** — Production deployment with safe defaults
