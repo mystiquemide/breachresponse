@@ -365,9 +365,7 @@ export default function Dashboard() {
         sseActivityTimer.current = null;
       }
     };
-  }, []);
-
-  // Demo mode toggle — pre-populates dashboard with realistic data
+  }, [customAssets.length]);
   useEffect(() => {
     if (!demoMode) return;
     // Pre-populate with demo sentinels if none exist
