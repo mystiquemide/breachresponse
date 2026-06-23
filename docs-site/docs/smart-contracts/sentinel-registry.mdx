@@ -1,0 +1,381 @@
+---
+title: Sentinel Registry
+description: On-chain protocol registration and sentinel agent governance on Mantle Sepolia
+---
+
+# Sentinel Registry
+
+The `SentinelRegistry` contract is the on-chain governance hub for BreachResponse. It maintains a registry of monitored protocol contracts and controls which address is authorized to act as the Sentinel Agent.
+
+---
+
+## Contract Details
+
+| Property | Value |
+|---|---|
+| **Contract Name** | `SentinelRegistry` |
+| **Network** | Mantle Sepolia Testnet |
+| **Chain ID** | 5003 |
+| **Address** | `0xea3C039795B5b04105B795c8B0cB85e0a42Cc85C` |
+| **Solidity Version** | `^0.8.24` |
+| **License** | MIT |
+| **Compiler EVM Version** | `paris` |
+
+---
+
+## Data Model
+
+```solidity
+struct Protocol {
+    address admin;        // Address authorized to manage this protocol's registration
+    bool isActive;        // Whether the protocol is currently being monitored
+    uint256 registeredAt; // Block timestamp of registration
+}
+
+mapping(address => Protocol) public registeredProtocols;
+address public sentinelAgent;  // Address authorized to pause registered protocols
+address public owner;          // Registry administrator
+```
+
+### Storage Layout
+
+```
+registeredProtocols: mapping(address -> Protocol)
+  0x596F... -> { admin: 0xABC..., isActive: true, registeredAt: 1719000000 }
+  0x9d9b... -> { admin: 0xDEF..., isActive: true, registeredAt: 1719000100 }
+
+sentinelAgent: 0x9f758be3ae3D985713964339E2f0bD783fC6015c
+owner:          0x... (deployer address)
+```
+
+---
+
+## Events
+
+```solidity
+event ProtocolRegistered(address indexed protocolAddress, address indexed admin);
+event ProtocolDeregistered(address indexed protocolAddress);
+event ProtocolAdminTransferred(address indexed protocolAddress, address indexed newAdmin);
+event SentinelAgentUpdated(address indexed newAgent);
+```
+
+All events are indexed on key addresses, enabling efficient off-chain monitoring via `eth_getLogs` with address filters.
+
+---
+
+## Functions
+
+### Constructor
+
+```solidity
+constructor(address _sentinelAgent) {
+    owner = msg.sender;
+    sentinelAgent = _sentinelAgent;
+}
+```
+
+The deployer becomes the registry `owner`. The initial sentinel agent address is set by the deployer -- typically this is the agent's funded wallet.
+
+---
+
+### `registerProtocol(address protocolAddress)`
+
+```solidity
+function registerProtocol(address protocolAddress) external {
+    require(protocolAddress != address(0), "Invalid address");
+    require(!registeredProtocols[protocolAddress].isActive, "Already registered");
+
+    registeredProtocols[protocolAddress] = Protocol({
+        admin: msg.sender,
+        isActive: true,
+        registeredAt: block.timestamp
+    });
+
+    emit ProtocolRegistered(protocolAddress, msg.sender);
+}
+```
+
+**Anyone** can call `registerProtocol()` to register a contract for monitoring. The caller becomes the protocol's `admin`. This open registration model is intentional -- it allows any protocol team to onboard without registry owner approval.
+
+> **Important:** Registration alone does NOT grant the sentinel agent pause authority. The protocol contract must independently grant `PAUSER_ROLE` (or equivalent) to the `sentinelAgent` address. Registration is a **declaration of intent** to be monitored; the actual permission model lives in each protocol's own contract.
+
+#### Usage Example
+
+```typescript
+// frontend/src/app/constants.ts
+const registry = new ethers.Contract(
+  REGISTRY_ADDRESS,
+  REGISTRY_ABI,
+  signer
+);
+
+await registry.registerProtocol("0x9d9b602CFe69cfF9706EAc399808E84682ce94FB");
+```
+
+---
+
+### `deregisterProtocol(address protocolAddress)`
+
+```solidity
+function deregisterProtocol(address protocolAddress)
+    external
+    onlyProtocolAdmin(protocolAddress)
+{
+    require(registeredProtocols[protocolAddress].isActive, "Not registered");
+    registeredProtocols[protocolAddress].isActive = false;
+    emit ProtocolDeregistered(protocolAddress);
+}
+```
+
+Only the protocol's admin can deregister. The `isActive` flag is set to `false` rather than deleting the struct entry, preserving the registration history.
+
+---
+
+### `transferProtocolAdmin(address protocolAddress, address newAdmin)`
+
+```solidity
+function transferProtocolAdmin(address protocolAddress, address newAdmin)
+    external
+    onlyProtocolAdmin(protocolAddress)
+{
+    require(newAdmin != address(0), "Invalid admin");
+    registeredProtocols[protocolAddress].admin = newAdmin;
+    emit ProtocolAdminTransferred(protocolAddress, newAdmin);
+}
+```
+
+Enables the current admin to hand off registration management to a new address (e.g., a multisig wallet).
+
+---
+
+### `reassignProtocolAdmin(address protocolAddress, address newAdmin)`
+
+```solidity
+function reassignProtocolAdmin(address protocolAddress, address newAdmin)
+    external
+    onlyOwner
+{
+    require(registeredProtocols[protocolAddress].isActive, "Not registered");
+    require(newAdmin != address(0), "Invalid admin");
+    registeredProtocols[protocolAddress].admin = newAdmin;
+    emit ProtocolAdminTransferred(protocolAddress, newAdmin);
+}
+```
+
+**Registry owner only.** This is the remediation path for address squatting -- because `registerProtocol()` is open to anyone, a griefer could register a contract they don't control and lock the real admin out. The owner can reassign the slot to the rightful admin.
+
+---
+
+### `forceDeregisterProtocol(address protocolAddress)`
+
+```solidity
+function forceDeregisterProtocol(address protocolAddress)
+    external
+    onlyOwner
+{
+    require(registeredProtocols[protocolAddress].isActive, "Not registered");
+    registeredProtocols[protocolAddress].isActive = false;
+    emit ProtocolDeregistered(protocolAddress);
+}
+```
+
+**Registry owner only.** Clears a squatted or abandoned registration slot so the rightful owner can re-register.
+
+---
+
+### `setSentinelAgent(address _newAgent)`
+
+```solidity
+function setSentinelAgent(address _newAgent) external onlyOwner {
+    require(_newAgent != address(0), "Invalid address");
+    sentinelAgent = _newAgent;
+    emit SentinelAgentUpdated(_newAgent);
+}
+```
+
+**Registry owner only.** Updates the sentinel agent address. This is the mechanism for rotating agent keys or upgrading the agent wallet.
+
+---
+
+## Modifiers
+
+```solidity
+modifier onlyOwner() {
+    require(msg.sender == owner, "Not registry owner");
+    _;
+}
+
+modifier onlyProtocolAdmin(address protocolAddress) {
+    require(
+        registeredProtocols[protocolAddress].admin == msg.sender,
+        "Not protocol admin"
+    );
+    _;
+}
+```
+
+---
+
+## Integration with TargetVault
+
+The `TargetVault` contract integrates with the registry through a simple interface:
+
+```solidity
+interface ISentinelRegistry {
+    function sentinelAgent() external view returns (address);
+}
+
+contract TargetVault {
+    ISentinelRegistry public registry;
+
+    constructor(address _registryAddress) {
+        owner = msg.sender;
+        registry = ISentinelRegistry(_registryAddress);
+    }
+
+    modifier onlySentinelOrOwner() {
+        require(
+            msg.sender == owner || msg.sender == registry.sentinelAgent(),
+            "Not sentinel agent or owner"
+        );
+        _;
+    }
+
+    function pause() external onlySentinelOrOwner whenNotPaused {
+        isPaused = true;
+        emit Paused();
+    }
+}
+```
+
+The vault calls `registry.sentinelAgent()` at transaction time -- so if the registry owner updates the agent address, the vault automatically uses the new address without needing its own upgrade.
+
+---
+
+## Registration Flow (End-to-End)
+
+```
+1. Protocol team deploys their contract on Mantle Sepolia
+2. Protocol contract grants PAUSER_ROLE to sentinelAgent address
+3. Protocol team calls registerProtocol(theirAddress) on SentinelRegistry
+4. Python agent fetches registered addresses from GET /api/sentinels
+5. Agent begins monitoring registered contracts in new blocks
+6. On threat detection, agent proposes/calls pause() on the protocol
+7. Protocol contract checks registry.sentinelAgent() == msg.sender
+8. Pause executes, funds are protected
+```
+
+---
+
+## ABI Reference
+
+The frontend uses a minimal ABI for registry interaction:
+
+```typescript
+// frontend/src/app/constants.ts
+export const REGISTRY_ADDRESS =
+  "0xea3C039795B5b04105B795c8B0cB85e0a42Cc85C" as `0x${string}`;
+
+export const REGISTRY_ABI = [
+  {
+    inputs: [{ internalType: "address", name: "protocolAddress", type: "address" }],
+    name: "registerProtocol",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function"
+  },
+  {
+    inputs: [{ internalType: "address", name: "", type: "address" }],
+    name: "registeredProtocols",
+    outputs: [
+      { internalType: "address", name: "admin", type: "address" },
+      { internalType: "bool", name: "isActive", type: "bool" },
+      { internalType: "uint256", name: "registeredAt", type: "uint256" }
+    ],
+    stateMutability: "view",
+    type: "function"
+  }
+] as const;
+```
+
+The full ABI includes all functions listed above. The frontend's minimal ABI covers the most commonly used operations.
+
+---
+
+## Deployment
+
+The registry is deployed via Hardhat:
+
+```typescript
+// contracts/scripts/deploy.ts
+const SentinelRegistry = await ethers.getContractFactory("SentinelRegistry");
+const registry = await SentinelRegistry.deploy(deployer.address);
+await registry.waitForDeployment();
+const registryAddress = await registry.getAddress();
+```
+
+Network configuration:
+
+```typescript
+// contracts/hardhat.config.ts
+mantle_sepolia: {
+  type: "http",
+  chainType: "op",
+  url: "https://mantle-sepolia.drpc.org",
+  accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+  timeout: 1000000,
+}
+```
+
+---
+
+## Security Considerations
+
+### Address Squatting
+
+Since `registerProtocol()` is permissionless, a malicious actor could register a popular protocol's address before the real admin does. Mitigations:
+
+1. The registry owner can call `reassignProtocolAdmin()` to transfer the slot to the rightful admin
+2. The registry owner can call `forceDeregisterProtocol()` to clear the slot
+3. Registration alone does not grant the sentinel agent any authority -- the protocol contract must independently grant permissions
+
+### Agent Address Rotation
+
+If the agent's private key is compromised:
+1. Registry owner calls `setSentinelAgent(newAddress)`
+2. All protocol contracts that reference `registry.sentinelAgent()` automatically use the new address
+3. The old agent can no longer call `pause()` on any registered protocol
+
+### Registry Owner
+
+The registry owner holds significant power:
+- Can reassign protocol admins
+- Can forcefully deregister protocols
+- Can change the sentinel agent address
+
+In a production deployment, the registry owner should be a **multisig wallet** or **DAO governance contract**.
+
+---
+
+## Testing
+
+The registry has a comprehensive test suite:
+
+```typescript
+// contracts/test/SentinelRegistry.test.ts
+// Tests cover:
+// - Registration and deregistration
+// - Admin transfer
+// - Owner reassignment (anti-squatting)
+// - Agent address updates
+// - Permission checks
+// - Event emission
+// - Edge cases (zero address, double registration)
+```
+
+---
+
+## Next Steps
+
+- **[GenLayer Consensus Guard](/smart-contracts/genlayer-consensus)** -- Decentralized incident validation
+- **[Agent Configuration](/agent/configuration)** -- Setting up the sentinel agent

@@ -1,0 +1,188 @@
+---
+title: Railway Agent Deployment
+description: Deploy the Python Sentinel Agent to Railway for always-on monitoring
+---
+
+# Railway Agent Deployment
+
+Deploy the Python Sentinel Agent to [Railway](https://railway.com) for a persistent, always-on monitoring worker.
+
+---
+
+## Why Railway?
+
+Railway is ideal for the sentinel agent because:
+
+- **Always-on** -- The agent needs to run 24/7 scanning blocks
+- **Simple Python support** -- Nixpacks builder auto-detects Python
+- **Environment variables** -- Easy secret management
+- **Restart policies** -- Auto-restart on failure
+- **Log streaming** -- Real-time agent output in Railway dashboard
+
+---
+
+## Prerequisites
+
+- A [Railway](https://railway.com) account
+- Git repository with the BreachResponse codebase
+- Agent environment variables (see [Environment Variables](/deployment/environment-variables))
+
+---
+
+## Deployment Steps
+
+### Step 1: Create a New Service
+
+1. In Railway Dashboard, click **New -> Service**
+2. Select **Deploy from GitHub repo**
+3. Choose your BreachResponse repository
+
+### Step 2: Configure the Service
+
+Railway auto-detects the project using `railway.json` at the repo root:
+
+```json
+{
+  "build": {
+    "builder": "NIXPACKS",
+    "buildCommand": "pip install -r requirements.txt"
+  },
+  "deploy": {
+    "startCommand": "python main.py",
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 10
+  }
+}
+```
+
+Alternatively, if you want Railway to run from the `agent/` directory:
+
+1. Set **Root Directory** to `agent/`
+2. Railway will use `agent/main.py` directly (the `railway.json` root shim is not needed)
+
+### Step 3: Add Environment Variables
+
+In **Service -> Variables**, add:
+
+| Variable | Required | Value |
+|---|---|---|
+| `MANTLE_RPC_URL` | Yes | `https://rpc.sepolia.mantle.xyz` |
+| `PRIVATE_KEY` | For on-chain response | Agent wallet private key |
+| `OPENAI_API_KEY` | For AI analysis | Groq API key |
+| `OPENAI_BASE_URL` | With Groq | `https://api.groq.com/openai/v1` |
+| `LLM_MODEL` | No | `llama-3.1-8b-instant` (for Groq) |
+| `FRONTEND_API_BASE_URL` | Yes | Your Vercel deployment URL |
+| `INGEST_TOKEN` | Recommended | Same token as frontend |
+| `SENTINEL_RESPONSE_MODE` | No | `manual` (default) or `autonomous` |
+
+### Step 4: Deploy
+
+Railway automatically builds and deploys on push to the configured branch. You can also trigger a manual redeploy from the dashboard.
+
+---
+
+## Root Shim vs Direct
+
+The repository includes a root-level `main.py` shim for Railway:
+
+```python
+# /main.py (repo root) -- Railway entrypoint shim
+from pathlib import Path
+import runpy
+import sys
+
+AGENT_DIR = Path(__file__).resolve().parent / "agent"
+sys.path.insert(0, str(AGENT_DIR))
+runpy.run_path(str(AGENT_DIR / "main.py"), run_name="__main__")
+```
+
+This allows Railway to run `python main.py` from the repo root while the actual agent code lives in `agent/`.
+
+If you set Railway's root directory to `agent/`, this shim is not needed -- Railway runs `agent/main.py` directly.
+
+---
+
+## Monitoring the Agent
+
+### Railway Logs
+
+The agent's output is streamed in the Railway dashboard under **Deployments -> View Logs**:
+
+```
+=== SENTINEL.AX ACTIVE-DEFENSE MONITORING SERVICE STARTED ===
+Connecting to Mantle Node: https://rpc.sepolia.mantle.xyz
+Sentinel Agent Wallet: 0x9f758be3ae3D985713964339E2f0bD783fC6015c
+[SENTINEL] Web3 connection established
+[SENTINEL] Starting scan from block height: 12345678
+
+[SCAN] Scanning Mantle Sepolia Block #12345679...
+[SCAN] Mempool scan tx: 0x4bfa...827391 -> Targeting MantleSwap :: SAFE
+```
+
+### Health Check
+
+The agent doesn't have a built-in HTTP health endpoint, but you can monitor it through the dashboard's sentinel status. If the agent's heartbeat stops appearing, the sentinel will show `OFFLINE`.
+
+---
+
+## Restart Policy
+
+The `restartPolicyType: ON_FAILURE` ensures the agent restarts if it crashes. `restartPolicyMaxRetries: 10` prevents infinite restart loops.
+
+Common failure modes:
+- RPC endpoint temporarily unavailable -> agent catches the error, loop continues
+- Network blip during API call -> `urllib.request` timeout (3 seconds), loop continues
+- Unhandled exception -> `except Exception` in main loop catches it, 5-second backoff
+
+---
+
+## Scaling
+
+The sentinel agent is a single-process worker by design. For high-availability:
+
+1. Run a second agent instance in a different Railway project or region
+2. Use different `PRIVATE_KEY` values for each agent (or share one wallet carefully)
+3. The heartbeat system handles multiple agents -- each sends independent heartbeats
+4. If both agents detect the same threat and both are in autonomous mode, only the first transaction will succeed (the second will revert because the contract is already paused)
+
+> **Warning:** Running two agents with the same `PRIVATE_KEY` can cause nonce conflicts. Use separate wallets or coordinate nonce management.
+
+---
+
+## Cost
+
+Railway's pricing (as of 2026):
+- **Hobby plan:** $5/month (includes 500 hours of runtime)
+- **Pro plan:** $20/month (unlimited runtime)
+- The agent uses minimal resources (~256 MB RAM, &lt;0.1 vCPU)
+
+At $5/month, the agent costs approximately $0.17/day to run continuously.
+
+---
+
+## Troubleshooting
+
+### Agent Immediately Crashes
+
+Check Railway logs for the error. Common causes:
+- Missing `MANTLE_RPC_URL` -> "Web3 connection could not be established"
+- Missing `PRIVATE_KEY` -> "On-chain client not configured" (agent still runs but can't broadcast)
+- Missing `FRONTEND_API_BASE_URL` -> "Failed to sync log to Next.js dashboard" (agent still runs)
+
+### Agent Runs but Shows OFFLINE in Dashboard
+
+The agent's heartbeat is not reaching the frontend. Verify:
+1. `FRONTEND_API_BASE_URL` points to the correct Vercel deployment
+2. `INGEST_TOKEN` matches on both agent and frontend
+3. The frontend's ingest route is reachable from Railway
+
+### "ModuleNotFoundError: No module named 'incident_analyzer'"
+
+Railway is running from the wrong directory. Set **Root Directory** to `agent/` or ensure the root `main.py` shim is present.
+
+---
+
+## Next Steps
+
+- **[Neon PostgreSQL](/deployment/neon-postgres)** -- Set up the database that ties frontend and agent together
+- **[Environment Variables](/deployment/environment-variables)** -- Complete variable reference

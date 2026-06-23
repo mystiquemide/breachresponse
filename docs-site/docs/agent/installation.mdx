@@ -1,0 +1,309 @@
+---
+title: Agent Installation
+description: Setting up the Python sentinel agent for BreachResponse
+---
+
+# Agent Installation
+
+The Python Sentinel Agent is the active-defense monitor that scans Mantle Sepolia blocks, classifies threats, and executes emergency responses. This guide covers installation, dependencies, and runtime setup.
+
+---
+
+## Requirements
+
+| Requirement | Minimum | Recommended |
+|---|---|---|
+| **Python** | 3.11 | 3.12+ |
+| **pip** | 23+ | Latest |
+| **OS** | Linux, macOS | Linux (for production) |
+| **Memory** | 256 MB | 512 MB |
+| **Disk** | 100 MB | 200 MB |
+| **Network** | Outbound HTTPS | -- |
+
+---
+
+## Installation
+
+### Option 1: Virtual Environment (Recommended)
+
+```bash
+cd breachresponse/agent
+python3 -m venv venv
+source venv/bin/activate      # Linux/macOS
+# venv\Scripts\activate       # Windows
+pip install -r requirements.txt
+```
+
+### Option 2: System Python
+
+```bash
+cd breachresponse/agent
+pip install -r requirements.txt
+```
+
+> **Warning:** Installing globally can cause dependency conflicts with other Python projects. Use a virtual environment for development and production.
+
+---
+
+## Dependencies
+
+The agent has a minimal dependency footprint (`agent/requirements.txt`):
+
+```
+web3
+requests
+python-dotenv
+openai
+```
+
+### Dependency Details
+
+| Package | Version Constraint | Purpose |
+|---|---|---|
+| **web3** | latest (no pin) | Ethereum/Mantle RPC interaction, transaction signing, event log parsing |
+| **requests** | transitive (via web3) | HTTP library used by web3.py internally |
+| **python-dotenv** | latest | Loading `.env` file for environment variable configuration |
+| **openai** | latest | OpenAI-compatible API client for Groq, Hunyuan, or other LLM providers |
+
+### Install with Version Pins (Production)
+
+For production deployments, pin exact versions:
+
+```txt
+web3==7.8.0
+python-dotenv==1.0.1
+openai==1.68.0
+```
+
+Generate a lockfile:
+
+```bash
+pip freeze > requirements.lock
+```
+
+---
+
+## Verify Installation
+
+```bash
+python -c "
+import web3
+import dotenv
+import openai
+from incident_analyzer import IncidentAnalyzer
+from reporter import Reporter
+print('All imports successful')
+"
+```
+
+Expected output:
+
+```
+All imports successful
+```
+
+### Check Web3 Connectivity
+
+```bash
+python -c "
+from web3 import Web3
+w3 = Web3(Web3.HTTPProvider('https://rpc.sepolia.mantle.xyz'))
+print('Connected:', w3.is_connected())
+print('Block:', w3.eth.block_number)
+"
+```
+
+Expected output:
+
+```
+Connected: True
+Block: 12345678
+```
+
+---
+
+## Project Structure
+
+```
+agent/
+├── main.py                    # Entry point -- sentinel monitoring loop
+├── incident_analyzer.py       # LLM-based exploit analysis
+├── reporter.py                # Frontend API bridge (telemetry + heartbeat)
+├── requirements.txt           # Python dependencies
+├── test_frontend_api_config.py      # Config validation tests
+├── test_simulation_wording.py       # Simulation safety tests
+└── venv/                      # Virtual environment (gitignored)
+```
+
+### Root Shim (`main.py` at repo root)
+
+For Railway deployments that run from the repository root:
+
+```python
+# main.py (repo root)
+from pathlib import Path
+import runpy
+import sys
+
+AGENT_DIR = Path(__file__).resolve().parent / "agent"
+sys.path.insert(0, str(AGENT_DIR))
+runpy.run_path(str(AGENT_DIR / "main.py"), run_name="__main__")
+```
+
+This allows the agent to run with either:
+- `python main.py` from repo root (Railway)
+- `python main.py` from `agent/` directory (direct)
+
+---
+
+## Running the Agent
+
+### Development
+
+```bash
+cd agent
+source venv/bin/activate
+python main.py
+```
+
+### Background Process
+
+```bash
+cd agent
+source venv/bin/activate
+nohup python main.py > sentinel.log 2>&1 &
+echo $! > sentinel.pid
+```
+
+### Process Management (systemd)
+
+Create `/etc/systemd/system/breachresponse-agent.service`:
+
+```ini
+[Unit]
+Description=BreachResponse Sentinel Agent
+After=network.target
+
+[Service]
+Type=simple
+User=breachresponse
+WorkingDirectory=/opt/breachresponse/agent
+EnvironmentFile=/opt/breachresponse/.env
+ExecStart=/opt/breachresponse/agent/venv/bin/python main.py
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Enable and start:
+
+```bash
+sudo systemctl enable breachresponse-agent
+sudo systemctl start breachresponse-agent
+sudo systemctl status breachresponse-agent
+```
+
+---
+
+## Agent Startup Output
+
+A healthy agent startup looks like:
+
+```
+=== SENTINEL.AX ACTIVE-DEFENSE MONITORING SERVICE STARTED ===
+Connecting to Mantle Node: https://rpc.sepolia.mantle.xyz
+Sentinel Agent Wallet: 0x9f758be3ae3D985713964339E2f0bD783fC6015c
+[ANALYZER] Initialized OpenAI-compatible analysis client with model: gpt-4o-mini
+[SENTINEL] Web3 connection established with RPC: https://rpc.sepolia.mantle.xyz
+[SENTINEL] Loaded agent address: 0x9f758be3ae3D985713964339E2f0bD783fC6015c
+[SENTINEL] Starting scan from block height: 12345678
+Listening to blocks and event logs...
+
+[SCAN] Scanning Mantle Sepolia Block #12345679...
+[SCAN] Mempool scan tx: 0x4bfa...827391 -> Targeting MantleSwap :: SAFE
+```
+
+### Startup Warnings
+
+If you see these warnings, see the troubleshooting section:
+
+```
+[ANALYZER] Warning: OPENAI_API_KEY not found in environment. Using fallback mock mode.
+[SENTINEL] Warning: Could not connect to Web3 provider
+[SENTINEL] Error: On-chain client not configured or private key missing.
+```
+
+---
+
+## Testing
+
+The agent includes configuration validation tests:
+
+```bash
+cd agent
+python -m pytest test_frontend_api_config.py test_simulation_wording.py -v
+```
+
+### Test Coverage
+
+| Test | What It Validates |
+|---|---|
+| `test_agent_api_base_url_is_configurable` | `FRONTEND_API_BASE_URL` is read from env, not hardcoded |
+| `test_frontend_has_agent_log_ingest_route` | SSE bridge endpoint exists and emits events |
+| `test_controlled_scenario_does_not_claim_real_broadcast` | Simulations are clearly marked, never claim MITIGATED |
+
+---
+
+## Troubleshooting
+
+### "Web3 connection could not be established"
+
+**Cause:** `MANTLE_RPC_URL` is unreachable or incorrect.
+
+**Fix:**
+```bash
+# Test connectivity
+curl -X POST https://rpc.sepolia.mantle.xyz \
+  -H "Content-Type: application/json" \
+  -d '{"jsonrpc":"2.0","method":"eth_blockNumber","params":[],"id":1}'
+
+# Try alternative RPC
+export MANTLE_RPC_URL=https://mantle-sepolia.drpc.org
+```
+
+### "OPENAI_API_KEY not found"
+
+**Cause:** No LLM API key configured.
+
+**Fix:** The agent falls back to keyword-based detection, which works for basic scenarios. Set `OPENAI_API_KEY` for real AI analysis. The key works with Groq (set `OPENAI_BASE_URL=https://api.groq.com/openai/v1`).
+
+### "Private key missing"
+
+**Cause:** `PRIVATE_KEY` not set in `.env`.
+
+**Fix:** The agent will monitor blocks and classify threats but cannot broadcast on-chain transactions. Set a funded Mantle Sepolia wallet's private key.
+
+### "ModuleNotFoundError: No module named 'incident_analyzer'"
+
+**Cause:** Running from the wrong directory.
+
+**Fix:** The agent must be run from the `agent/` directory or through the root `main.py` shim:
+
+```bash
+# Correct
+cd agent && python main.py
+# Also correct
+cd breachresponse && python main.py
+# Incorrect
+python agent/main.py  # relative imports will fail
+```
+
+---
+
+## Next Steps
+
+- **[Agent Configuration](/agent/configuration)** -- Full environment variable reference
+- **[Response Modes](/agent/response-modes)** -- Manual vs autonomous mode setup
+- **[Deployment: Railway](/deployment/railway-worker)** -- Production deployment guide

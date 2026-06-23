@@ -1,0 +1,272 @@
+---
+title: Neon PostgreSQL Setup
+description: Configure Neon serverless PostgreSQL for BreachResponse telemetry and sentinel persistence
+---
+
+# Neon PostgreSQL Setup
+
+BreachResponse uses [Neon](https://neon.tech) for serverless PostgreSQL -- storing sentinel node state, telemetry logs, and providing a durable backend that survives deployments and restarts.
+
+---
+
+## Why Neon?
+
+| Feature | Benefit for BreachResponse |
+|---|---|
+| **Serverless** | No server to manage -- database scales to zero when idle |
+| **Free tier** | 0.5 GB storage, 1 compute unit -- sufficient for development and small production |
+| **Branching** | Create database branches for testing schema changes safely |
+| **Connection pooling** | Built-in PgBouncer for efficient connection management |
+| **SSL enforced** | Secure connections by default |
+| **PostgreSQL 16** | Full PostgreSQL compatibility |
+
+---
+
+## Setup Steps
+
+### Step 1: Create a Neon Project
+
+1. Go to [neon.tech](https://neon.tech) and sign up
+2. Click **Create Project**
+3. Configure:
+   - **Name:** `breachresponse`
+   - **Region:** Choose closest to your Vercel deployment (e.g., `US East`)
+   - **PostgreSQL version:** 16
+4. Click **Create Project**
+
+### Step 2: Get the Connection String
+
+1. In the Neon Dashboard, find **Connection Details**
+2. Copy the connection string (starts with `postgresql://`)
+3. It should look like:
+
+```
+postgresql://breachresponse_owner:np***@ep-cool-darkness-a1b2c3d4.us-east-2.aws.neon.tech/breachresponse?sslmode=require
+```
+
+### Step 3: Configure Environment Variables
+
+Add the connection string to your deployments:
+
+**Vercel:**
+```
+DATABASE_URL=postgresql://breachresponse_owner:***@ep-xxxx.us-east-2.aws.neon.tech/breachresponse?sslmode=require
+```
+
+**Railway (agent doesn't use PostgreSQL directly, but the variable should still be documented):**
+
+The agent uses the frontend API for data persistence, not direct database connections.
+
+### Step 4: Verify Schema Creation
+
+The database schema is auto-created on first connection. The frontend's `db.ts` module runs migrations automatically:
+
+```typescript
+async function ensureSchema() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS sentinel_nodes (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      address TEXT NOT NULL UNIQUE,
+      owner TEXT,
+      status TEXT NOT NULL CHECK (status IN ('ACTIVE', 'PAUSED', 'OFFLINE')),
+      latency TEXT NOT NULL DEFAULT '6.4ms',
+      events INTEGER NOT NULL DEFAULT 0,
+      last_heartbeat TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      registered_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS telemetry_logs (
+      id TEXT PRIMARY KEY,
+      text TEXT,
+      level TEXT,
+      tx_hash TEXT,
+      protocol TEXT,
+      verification_type TEXT,
+      gas_saved TEXT,
+      status TEXT,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+
+  // Seed data (only if empty)
+  const count = await pool.query('SELECT COUNT(*)::text AS count FROM sentinel_nodes');
+  if (Number(count.rows[0]?.count ?? 0) === 0) {
+    // Insert seed node...
+  }
+}
+```
+
+### Step 5: Test Connectivity
+
+From your local machine or deployment:
+
+```bash
+psql "postgresql://breachresponse_owner:***@ep-xxxx.us-east-2.aws.neon.tech/breachresponse?sslmode=require" \
+  -c "SELECT * FROM sentinel_nodes;"
+```
+
+You should see the seed node:
+
+```
+        id         |       name       |                  address                  | status | latency | events | ...
+-------------------+------------------+-------------------------------------------+--------+---------+--------+
+ sentinel-ax-node  | Sentinel.ax Node | 0x9f758be3ae3D985713964339E2f0bD783fC6015c | ACTIVE | 8ms     |    939 | ...
+```
+
+---
+
+## Connection Pooling
+
+The database module uses connection pooling with conservative settings:
+
+```typescript
+const pool = new Pool({
+  connectionString: databaseUrl,
+  ssl: { rejectUnauthorized },
+  max: 3  // Maximum 3 concurrent connections
+});
+```
+
+Neon's free tier supports up to 100 simultaneous connections, so the pool size of 3 is well within limits.
+
+### SSL Configuration
+
+By default, SSL is enforced with certificate validation:
+
+```typescript
+const rejectUnauthorized =
+  (process.env.DATABASE_SSL_REJECT_UNAUTHORIZED ?? 'true').toLowerCase() !== 'false';
+```
+
+If you encounter SSL certificate errors (unlikely with Neon), you can disable strict validation:
+
+```
+DATABASE_SSL_REJECT_UNAUTHORIZED=false
+```
+
+> **Warning:** Only disable SSL validation in development. Production should always use validated SSL connections.
+
+---
+
+## Schema Details
+
+### `sentinel_nodes`
+
+```sql
+CREATE TABLE IF NOT EXISTS sentinel_nodes (
+  id              TEXT PRIMARY KEY,
+  name            TEXT NOT NULL,
+  address         TEXT NOT NULL UNIQUE,    -- Contract address (unique constraint)
+  owner           TEXT,                    -- Protocol owner wallet address
+  status          TEXT NOT NULL CHECK (status IN ('ACTIVE', 'PAUSED', 'OFFLINE')),
+  latency         TEXT NOT NULL DEFAULT '6.4ms',
+  events          INTEGER NOT NULL DEFAULT 0,
+  last_heartbeat  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  registered_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+```
+
+The `address` column has a `UNIQUE` constraint -- each contract can only be registered once.
+
+### `telemetry_logs`
+
+```sql
+CREATE TABLE IF NOT EXISTS telemetry_logs (
+  id                TEXT PRIMARY KEY,
+  text              TEXT,
+  level             TEXT,
+  tx_hash           TEXT,
+  protocol          TEXT,
+  verification_type TEXT,
+  gas_saved         TEXT,
+  status            TEXT,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+```
+
+This table grows unbounded. For production with high event volume, consider:
+
+1. **Time-based partitioning** -- Partition by `created_at` month
+2. **Retention policy** -- Delete logs older than 30 days
+3. **Analytics pipeline** -- Archive to data warehouse for long-term analysis
+
+---
+
+## Fallback: In-Memory Storage
+
+When `DATABASE_URL` is **not** configured, the system falls back to in-memory storage:
+
+```typescript
+function getMemoryStore(): Store {
+  if (!globalStore.breachResponseStore) {
+    globalStore.breachResponseStore = {
+      sentinelNodes: [...seedNodes],
+      alerts: []
+    };
+  }
+  return globalStore.breachResponseStore;
+}
+```
+
+This is suitable for development but **data is lost on restart**. Always use Neon for any deployment where you want data to persist.
+
+---
+
+## Monitoring
+
+### Check Database Size
+
+```sql
+SELECT
+  pg_size_pretty(pg_database_size('breachresponse')) AS db_size,
+  (SELECT COUNT(*) FROM sentinel_nodes) AS sentinel_count,
+  (SELECT COUNT(*) FROM telemetry_logs) AS log_count;
+```
+
+### Check Active Connections
+
+```sql
+SELECT COUNT(*) AS active_connections
+FROM pg_stat_activity
+WHERE datname = 'breachresponse';
+```
+
+### Neon Dashboard
+
+The Neon dashboard provides:
+- CPU and memory usage graphs
+- Connection counts
+- Storage utilization
+- Query performance metrics
+
+---
+
+## Troubleshooting
+
+### "Connection refused" or timeout
+
+**Cause:** Neon compute may have scaled to zero (inactive period).
+
+**Fix:** The first request after inactivity will wake the compute (cold start ~1-2 seconds). Subsequent requests are fast.
+
+### "Too many connections"
+
+**Cause:** Connection pool exhausted.
+
+**Fix:** The pool has `max: 3` connections. If you see this error, ensure you're not creating additional connection pools elsewhere in the code.
+
+### "SSL connection error"
+
+**Cause:** SSL certificate validation failing.
+
+**Fix:** Set `DATABASE_SSL_REJECT_UNAUTHORIZED=false` temporarily. For a permanent fix, ensure your deployment environment has up-to-date CA certificates.
+
+---
+
+## Next Steps
+
+- **[Environment Variables](/deployment/environment-variables)** -- Complete reference for all configuration
+- **[Vercel Deployment](/deployment/vercel)** -- Frontend deployment guide

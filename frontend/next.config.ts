@@ -13,6 +13,8 @@ const nextConfig: NextConfig = {
     "127.0.0.1",
     "localhost",
     "health-explorer-arcade-economic.trycloudflare.com",
+    "ballot-jewish-lil-financing.trycloudflare.com",
+    "*.trycloudflare.com",
   ],
 };
 

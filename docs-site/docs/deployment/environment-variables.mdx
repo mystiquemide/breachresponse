@@ -1,0 +1,250 @@
+---
+title: Environment Variables
+description: Complete reference for all BreachResponse environment variables
+---
+
+# Environment Variables
+
+Complete reference for every environment variable used across the BreachResponse stack -- frontend (Next.js), agent (Python), and database.
+
+---
+
+## Variable Categories
+
+| Category | Count | Components |
+|---|---|---|
+| **Required** | 2 | Frontend + Agent |
+| **On-Chain** | 5 | Agent wallet, RPC, network |
+| **AI / LLM** | 5 | Groq, Hunyuan, OpenAI-compatible |
+| **Database** | 3 | PostgreSQL, SSL |
+| **Security** | 1 | Ingest authentication |
+| **GenLayer** | 2 | Consensus guard |
+| **Frontend Config** | 2 | Sentinel registry, Mantle network |
+| **Redis / Upstash** | 2 | Event bus, cross-instance SSE |
+
+---
+
+## Full Variable Reference
+
+### Required
+
+| Variable | Used By | Description | Example |
+|---|---|---|---|
+| `MANTLE_RPC_URL` | Agent, Frontend | Mantle Sepolia RPC endpoint | `https://rpc.sepolia.mantle.xyz` |
+| `FRONTEND_API_BASE_URL` | Agent | Frontend API base URL for agent telemetry | `https://breachresponse.vercel.app/api` |
+
+### On-Chain / Wallet
+
+| Variable | Used By | Description | Example |
+|---|---|---|---|
+| `PRIVATE_KEY` | Agent | Agent wallet private key for signing pause transactions | `0xabc123...` (64 hex chars) |
+| `MANTLE_RPC_URL` | Agent, Frontend | RPC URL for block scanning and contract interaction | `https://rpc.sepolia.mantle.xyz` |
+| `MANTLE_NETWORK` | Frontend | Network name for value-monitored metrics | `mantle-sepolia` |
+| `MANTLE_CHAIN_ID` | Frontend | Chain ID for RPC calls | `5003` |
+| `MANTLE_NATIVE_PRICE_ID` | Frontend | CoinGecko price ID for native token | `mantle` |
+| `MANTLE_TOKEN_ALLOWLIST` | Frontend | Comma-separated token allowlist for value metrics | `USDC:0x...,WETH:0x...` |
+
+### AI / LLM
+
+| Variable | Used By | Description | Example |
+|---|---|---|---|
+| `GROQ_API_KEY` | Frontend | Groq API key for Llama 3.1 classification | `gsk_yo...n` |
+| `HUNYUAN_API_KEY` | Frontend | Tencent Hunyuan API key for contract auditing | `sk-...` |
+| `OPENAI_API_KEY` | Agent | OpenAI-compatible API key (works with Groq) | `gsk_yo...n` |
+| `OPENAI_BASE_URL` | Agent | Base URL for OpenAI-compatible endpoint (set for Groq) | `https://api.groq.com/openai/v1` |
+| `LLM_MODEL` | Agent | Model name for agent-side AI analysis | `llama-3.1-8b-instant` |
+
+> **Note:** The agent uses `OPENAI_API_KEY` + `OPENAI_BASE_URL` for OpenAI-compatible providers (Groq, Hunyuan, etc.). The frontend uses `GROQ_API_KEY` and `HUNYUAN_API_KEY` directly.
+
+### Database
+
+| Variable | Used By | Description | Example |
+|---|---|---|---|
+| `DATABASE_URL` | Frontend | Neon PostgreSQL connection string | `postgresql://user:***@ep-xxxx.us-east-2.aws.neon.tech/breachresponse` |
+| `DATABASE_SSL_REJECT_UNAUTHORIZED` | Frontend | Whether to validate SSL certificates | `true` (default) |
+| `UPSTASH_REDIS_REST_URL` | Frontend | Upstash Redis REST URL for event bus | `https://...upstash.io` |
+| `UPSTASH_REDIS_REST_TOKEN` | Frontend | Upstash Redis auth token | `...` |
+
+### Security
+
+| Variable | Used By | Description | Example |
+|---|---|---|---|
+| `INGEST_TOKEN` | Agent, Frontend | Bearer token for agent-to-frontend authentication | `your-s...n` |
+
+### GenLayer Consensus
+
+| Variable | Used By | Description | Example |
+|---|---|---|---|
+| `NEXT_PUBLIC_GENLAYER_CONSENSUS_GUARD_ADDRESS` | Frontend | GenLayer consensus guard contract address | `0x86369EC44fbB5EB682729368557176858aBe0c73` |
+| `NEXT_PUBLIC_GENLAYER_STUDIO_URL` | Frontend | GenLayer StudioNet API endpoint | `https://studio.genlayer.com/api` |
+
+### Response Mode
+
+| Variable | Used By | Description | Example |
+|---|---|---|---|
+| `SENTINEL_RESPONSE_MODE` | Agent | Response mode: `manual` or `autonomous` | `manual` (default) |
+
+### Frontend Config
+
+| Variable | Used By | Description | Example |
+|---|---|---|---|
+| `NEXT_PUBLIC_REGISTRY_ADDRESS` | Frontend | SentinelRegistry contract address | `0xea3C039795B5b04105B795c8B0cB85e0a42Cc85C` |
+
+---
+
+## Example `.env` File
+
+```bash
+# === REQUIRED ===
+MANTLE_RPC_URL=https://rpc.sepolia.mantle.xyz
+FRONTEND_API_BASE_URL=https://breachresponse.vercel.app/api
+
+# === ON-CHAIN ===
+PRIVATE_KEY=0x_your_agent_wallet_private_key_64_hex_chars
+
+# === AI / LLM ===
+GROQ_API_KEY=gsk_your_groq_api_key_here
+HUNYUAN_API_KEY=sk-your-hunyuan-api-key-here
+OPENAI_API_KEY=gsk_your_groq_api_key_here
+OPENAI_BASE_URL=https://api.groq.com/openai/v1
+LLM_MODEL=llama-3.1-8b-instant
+
+# === DATABASE ===
+DATABASE_URL=postgresql://breachresponse_owner:***@ep-xxxx.us-east-2.aws.neon.tech/breachresponse?sslmode=require
+
+# === SECURITY ===
+INGEST_TOKEN=your-secure-random-token-here
+
+# === RESPONSE MODE ===
+SENTINEL_RESPONSE_MODE=manual
+
+# === GENLAYER ===
+NEXT_PUBLIC_GENLAYER_CONSENSUS_GUARD_ADDRESS=0x86369EC44fbB5EB682729368557176858aBe0c73
+NEXT_PUBLIC_GENLAYER_STUDIO_URL=https://studio.genlayer.com/api
+```
+
+---
+
+## Variable by Component
+
+### Agent Only
+
+These variables are used exclusively by the Python sentinel agent:
+
+```
+MANTLE_RPC_URL
+PRIVATE_KEY
+OPENAI_API_KEY
+OPENAI_BASE_URL
+LLM_MODEL
+FRONTEND_API_BASE_URL
+INGEST_TOKEN
+SENTINEL_RESPONSE_MODE
+```
+
+Set these in:
+- `.env` file in the repo root (loaded by `python-dotenv`)
+- Railway environment variables
+- System environment variables
+
+### Frontend Only
+
+These variables are used exclusively by the Next.js frontend:
+
+```
+GROQ_API_KEY
+HUNYUAN_API_KEY
+DATABASE_URL
+DATABASE_SSL_REJECT_UNAUTHORIZED
+UPSTASH_REDIS_REST_URL
+UPSTASH_REDIS_REST_TOKEN
+NEXT_PUBLIC_GENLAYER_CONSENSUS_GUARD_ADDRESS
+NEXT_PUBLIC_GENLAYER_STUDIO_URL
+NEXT_PUBLIC_REGISTRY_ADDRESS
+MANTLE_NETWORK
+MANTLE_CHAIN_ID
+MANTLE_NATIVE_PRICE_ID
+MANTLE_TOKEN_ALLOWLIST
+INGEST_TOKEN
+```
+
+Set these in:
+- Vercel environment variables
+- `.env.local` file in `frontend/` directory
+- `next.config.ts` (for build-time variables)
+
+### Shared
+
+These variables are used by both components:
+
+```
+MANTLE_RPC_URL
+INGEST_TOKEN
+```
+
+Make sure these match between agent and frontend.
+
+---
+
+## Security Best Practices
+
+### Never Commit `.env` Files
+
+The project's `.gitignore` should exclude:
+
+```
+.env
+.env.local
+.env.*.local
+```
+
+### Use Different Keys per Environment
+
+| Environment | PRIVATE_KEY | Database |
+|---|---|---|
+| **Local dev** | Mantle Sepolia test wallet | None (in-memory) |
+| **Staging** | Separate test wallet | Neon dev branch |
+| **Production** | Dedicated production wallet | Neon production database |
+
+### Rotate INGEST_TOKEN
+
+If the `INGEST_TOKEN` is ever exposed:
+1. Generate a new random token
+2. Update it in both Vercel and Railway
+3. Redeploy both services
+4. The old token is immediately invalidated
+
+### Minimal Agent Wallet Balance
+
+The agent wallet should hold:
+- Enough MNT for gas (~1 MNT covers thousands of transactions)
+- No protocol funds or valuable tokens
+- If the wallet is compromised, the attacker can only pause contracts, not drain value
+
+---
+
+## Default Values
+
+If a variable is not set, the system uses these defaults:
+
+| Variable | Default |
+|---|---|
+| `MANTLE_RPC_URL` | `https://rpc.sepolia.mantle.xyz` |
+| `FRONTEND_API_BASE_URL` | `http://127.0.0.1:3000/api` |
+| `LLM_MODEL` | `gpt-4o-mini` |
+| `SENTINEL_RESPONSE_MODE` | `manual` |
+| `DATABASE_SSL_REJECT_UNAUTHORIZED` | `true` |
+| `NEXT_PUBLIC_GENLAYER_CONSENSUS_GUARD_ADDRESS` | `0x86369EC44fbB5EB682729368557176858aBe0c73` |
+| `NEXT_PUBLIC_GENLAYER_STUDIO_URL` | `https://studio.genlayer.com/api` |
+| `NEXT_PUBLIC_REGISTRY_ADDRESS` | `0xea3C039795B5b04105B795c8B0cB85e0a42Cc85C` |
+| `MANTLE_NETWORK` | `mantle-sepolia` |
+| `MANTLE_CHAIN_ID` | `5003` |
+| `MANTLE_NATIVE_PRICE_ID` | `mantle` |
+
+---
+
+## Next Steps
+
+- **[Vercel Deployment](/deployment/vercel)** -- Deploy the frontend
+- **[Railway Agent](/deployment/railway-worker)** -- Deploy the sentinel agent
+- **[Neon PostgreSQL](/deployment/neon-postgres)** -- Set up the database

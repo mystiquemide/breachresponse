@@ -1,0 +1,177 @@
+---
+title: API Overview
+description: Base URL, authentication, rate limits, and common patterns
+---
+
+# API Reference
+
+BreachResponse exposes a RESTful API through the Next.js frontend. All endpoints are served from the same origin as the Command Center dashboard.
+
+---
+
+## Base URL
+
+| Environment | URL |
+|---|---|
+| **Local Development** | `http://localhost:3000/api` |
+| **Production (Vercel)** | `https://your-domain.vercel.app/api` |
+
+All endpoints are prefixed with `/api/`.
+
+---
+
+## Authentication
+
+### Public Endpoints (No Auth)
+
+| Endpoint | Method | Auth Required |
+|---|---|---|
+| `/api/audit` | POST | No |
+| `/api/analyze` | POST | No |
+| `/api/compare` | POST | No |
+| `/api/gas-estimate` | POST | No |
+| `/api/sentinels` | GET | No |
+| `/api/vault/status` | GET | No |
+| `/api/metrics/value-monitored` | GET | No |
+
+### Agent-Only Endpoints (Bearer Token)
+
+| Endpoint | Method | Auth Required |
+|---|---|---|
+| `/api/sentinels` | POST, PUT | Optional (`INGEST_TOKEN`) |
+| `/api/nodes/heartbeat` | POST | Optional (`INGEST_TOKEN`) |
+| `/api/logs/ingest` | POST | Optional (`INGEST_TOKEN`) |
+| `/api/logs/stream` | GET | Optional (`INGEST_TOKEN`) |
+
+#### Bearer Token Authentication
+
+When `INGEST_TOKEN` is configured in the environment, agent-only endpoints require:
+
+```
+Authorization: Bearer <INGEST_TOKEN>
+```
+
+The token is compared using constant-time comparison (`timingSafeEqual`) to prevent timing attacks:
+
+```typescript
+const a = Buffer.from(token);
+const b = Buffer.from(expected);
+if (a.length !== b.length) return false;
+return timingSafeEqual(a, b);
+```
+
+If `INGEST_TOKEN` is **not** set, these endpoints are open -- suitable for local development.
+
+The agent sends the token via `reporter.py`:
+
+```python
+def ingest_headers() -> dict:
+    headers = {"Content-Type": "application/json"}
+    token = os.getenv("INGEST_TOKEN")
+    if token:
+        headers["Authorization"] = f"Bearer {token}"
+    return headers
+```
+
+---
+
+## Common Request Patterns
+
+### Content Type
+
+All POST endpoints accept and return:
+
+```
+Content-Type: application/json
+```
+
+### Error Responses
+
+Errors follow a consistent format:
+
+```json
+{
+  "error": "Human-readable error description"
+}
+```
+
+HTTP status codes:
+
+| Code | Meaning |
+|---|---|
+| `200` | Success |
+| `400` | Bad request -- invalid input parameters |
+| `401` | Unauthorized -- missing or invalid `INGEST_TOKEN` |
+| `404` | Not found -- resource doesn't exist |
+| `422` | Unprocessable -- valid request but operation failed |
+| `500` | Internal server error -- unexpected failure |
+
+### Fallback Behavior
+
+AI-dependent endpoints return deterministic fallback data when no API key is configured:
+
+```typescript
+// Example: /api/analyze fallback
+const FALLBACK = {
+  confidence: 0.91,
+  severity: 'CRITICAL',
+  evidencePoints: ['Recursive external call detected', ...],
+  recommendation: 'Pause protocol',
+  reasoning: '...',
+  gasAnomalyFlag: true,
+  gasAnomalyFactor: 4.2,
+};
+```
+
+Fallback responses include the same structure as live responses but are clearly identifiable by the absence of AI-specific reasoning detail.
+
+---
+
+## Rate Limiting
+
+The API does not currently enforce rate limits server-side. However:
+
+- **Groq API** has its own rate limits (typically 30 requests/minute on free tier)
+- **Hunyuan API** has its own rate limits (varies by plan)
+- **Mantle RPC** public endpoints may rate-limit excessive calls
+
+For production deployments, consider adding rate limiting middleware.
+
+---
+
+## API Endpoints Summary
+
+| Endpoint | Method | Description |
+|---|---|---|
+| `/api/audit` | POST | AI-powered contract security audit |
+| `/api/analyze` | POST | Single-model threat classification |
+| `/api/compare` | POST | Dual-model (Groq vs Hunyuan) parallel analysis |
+| `/api/gas-estimate` | POST | On-chain gas cost estimation with AI optimizations |
+| `/api/sentinels` | GET | List registered sentinel nodes |
+| `/api/sentinels` | POST | Register a new sentinel node |
+| `/api/sentinels` | PUT | Toggle sentinel status (ACTIVE ↔ PAUSED) |
+| `/api/nodes/heartbeat` | POST | Agent heartbeat ping |
+| `/api/vault/status` | GET | Check TargetVault pause status |
+| `/api/metrics/value-monitored` | GET | Total value monitored across sentinels |
+| `/api/logs/ingest` | POST | Ingest telemetry from agent |
+| `/api/logs/stream` | GET | SSE stream of telemetry events |
+
+---
+
+## Runtime
+
+All API routes run in the **Node.js runtime** (`runtime = 'nodejs'`), not Edge. This is required because routes use:
+
+- `process.env` for environment variables
+- `pg` (node-postgres) for database access
+- `crypto` module for `timingSafeEqual`
+- `ethers` for RPC calls
+- `EventEmitter` for SSE
+
+---
+
+## Next Steps
+
+- **[Audit Contract](/api-reference/audit)** -- AI-powered bytecode analysis endpoint
+- **[Analyze Threat](/api-reference/analyze)** -- Single-model threat classification
+- **[Compare Models](/api-reference/compare)** -- Dual-model parallel analysis

@@ -3,8 +3,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle, Terminal, Shield, ArrowRight, CheckCircle2, Zap } from 'lucide-react';
-import { useSendTransaction } from 'wagmi';
-import { parseEther } from 'viem';
 
 interface AttackModalProps {
   isOpen: boolean;
@@ -40,10 +38,10 @@ const payloadLines = [
 ];
 
 export default function AttackModal({ isOpen, onClose, onSuccess }: AttackModalProps) {
-  const { sendTransaction, isPending, isSuccess, isError } = useSendTransaction();
   const [payloadText, setPayloadText] = useState('');
   const [analysis, setAnalysis] = useState<Analysis | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [showSimulationResult, setShowSimulationResult] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
@@ -51,6 +49,7 @@ export default function AttackModal({ isOpen, onClose, onSuccess }: AttackModalP
 
     if (intervalRef.current) clearInterval(intervalRef.current);
     // eslint-disable-next-line react-hooks/set-state-in-effect
+    setShowSimulationResult(false);
     setAnalysis(null);
     setIsAnalyzing(true);
 
@@ -75,7 +74,6 @@ export default function AttackModal({ isOpen, onClose, onSuccess }: AttackModalP
       .finally(() => setIsAnalyzing(false));
 
     let i = 0;
-    // Build text from scratch each tick — avoids accumulation bugs on re-render
     intervalRef.current = setInterval(() => {
       i++;
       setPayloadText(payloadLines.slice(0, i).join('\n'));
@@ -93,12 +91,6 @@ export default function AttackModal({ isOpen, onClose, onSuccess }: AttackModalP
     };
   }, [isOpen]);
 
-  useEffect(() => {
-    if (isSuccess) {
-      setTimeout(() => onSuccess(), 1500);
-    }
-  }, [isSuccess, onSuccess]);
-
   if (!isOpen) return null;
 
   const confidencePct = analysis ? `${(analysis.confidence * 100).toFixed(0)}%` : '—';
@@ -107,10 +99,14 @@ export default function AttackModal({ isOpen, onClose, onSuccess }: AttackModalP
   const recommendation = analysis?.recommendation ?? '—';
 
   const handleExecute = () => {
-    sendTransaction({
-      to: '0x0000000000000000000000000000000000000000',
-      value: parseEther('0'),
-    });
+    // DEMO/SIMULATION MODE: In production this would send a real pause transaction
+    // to the protocol's emergency pause contract. For the hackathon demo, we
+    // display the response workflow without requiring a real on-chain tx.
+    setShowSimulationResult(true);
+    setTimeout(() => {
+      onSuccess();
+      setShowSimulationResult(false);
+    }, 2500);
   };
 
   return (
@@ -138,10 +134,17 @@ export default function AttackModal({ isOpen, onClose, onSuccess }: AttackModalP
                 <AlertTriangle className="w-6 h-6" />
                 CRITICAL ANOMALY DETECTED
               </div>
-              <span className="font-mono text-xs">SEVERITY: TIER 1</span>
+              <span className="font-mono text-xs">SEVERITY: TIER 1 | DEMO MODE</span>
             </div>
 
             <div className="p-8 space-y-6">
+
+              {/* Demo Mode Banner */}
+              <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-lg px-4 py-2 text-center">
+                <span className="text-yellow-400 text-[10px] uppercase tracking-widest font-bold">
+                  🧪 Simulation Mode — No real transaction will be submitted
+                </span>
+              </div>
 
               {/* AI Analysis Cards */}
               <div className="grid grid-cols-2 gap-4">
@@ -234,28 +237,22 @@ export default function AttackModal({ isOpen, onClose, onSuccess }: AttackModalP
                   Dismiss / Ignore
                 </button>
 
-                {isSuccess ? (
-                  <div className="bg-[#10B981]/20 border border-[#10B981] text-[#10B981] px-8 py-4 rounded font-bold flex items-center gap-2">
-                    <CheckCircle2 className="w-5 h-5" /> Response Executed
+                {showSimulationResult ? (
+                  <div className="bg-[#10B981]/20 border border-[#10B981] text-[#10B981] px-8 py-4 rounded font-bold flex items-center gap-2 animate-pulse">
+                    <CheckCircle2 className="w-5 h-5" /> Response Simulated — Protocol Paused
                   </div>
                 ) : (
                   <button
                     onClick={handleExecute}
-                    disabled={isPending || payloadText.split('\n').length < payloadLines.length}
-                    className={`bg-[#10B981] text-black font-bold px-8 py-4 rounded flex items-center gap-3 transition-all ${isPending || payloadText.split('\n').length < payloadLines.length ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-400 hover:shadow-[0_0_30px_rgba(16,185,129,0.5)]'}`}
+                    disabled={payloadText.split('\n').length < payloadLines.length}
+                    className={`bg-[#10B981] text-black font-bold px-8 py-4 rounded flex items-center gap-3 transition-all ${payloadText.split('\n').length < payloadLines.length ? 'opacity-50 cursor-not-allowed' : 'hover:bg-green-400 hover:shadow-[0_0_30px_rgba(16,185,129,0.5)]'}`}
                   >
                     <Shield className="w-5 h-5" />
-                    {isPending ? "Awaiting Signature..." : "Approve Response"}
-                    {!isPending && <ArrowRight className="w-5 h-5" />}
+                    Simulate Response (Demo)
+                    <ArrowRight className="w-5 h-5" />
                   </button>
                 )}
               </div>
-
-              {isError && (
-                <div className="text-red-500 text-xs text-center font-bold mt-2">
-                  Signature rejected or transaction failed. Response remains pending.
-                </div>
-              )}
             </div>
           </motion.div>
         </div>

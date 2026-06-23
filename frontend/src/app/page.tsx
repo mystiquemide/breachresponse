@@ -15,7 +15,6 @@ import {
 import { Shield, Target, Activity, Hexagon, Component, CheckCircle2, Layers, Cpu, ShieldCheck } from 'lucide-react';
 import { useAccount } from 'wagmi';
 import { mantleSepoliaTestnet } from 'wagmi/chains';
-import { createPublicClient, http, type Transaction as ViemTransaction } from 'viem';
 import {
   DASHBOARD_PATH,
   PIPELINE_EXECUTION_ANCHOR,
@@ -24,6 +23,11 @@ import {
   navigateToAppPath,
 } from '../lib/navigation';
 import { WalletConnectControl } from '../components/WalletConnectControl';
+import { scanRecentThreats, relativeTime, type ScannedThreat } from '../lib/threatScan';
+import LivePipeline from '../components/LivePipeline';
+import ModelComparison from '../components/ModelComparison';
+import VaultBeforeAfter from '../components/VaultBeforeAfter';
+import GasSavingsCounter from '../components/GasSavingsCounter';
 
 // ─── Variants ────────────────────────────────────────────────────────────────
 
@@ -145,8 +149,11 @@ function MagneticBtn({ children, className, onClick, ariaLabel }: { children: Re
   );
 }
 
-const FirstLoadPreloader = () => (
-  <div className="fixed inset-0 z-[140] bg-[#050507] flex items-center justify-center p-6">
+const FirstLoadPreloader = ({ onDismiss }: { onDismiss?: () => void }) => (
+  <div
+    className="fixed inset-0 z-[140] bg-[#050507] flex items-center justify-center p-6 animate-[preloaderFadeOut_0.5s_ease-out_4s_forwards]"
+    onClick={onDismiss}
+  >
     <div className="w-full max-w-sm border border-[#10B981]/30 bg-black/80 rounded-2xl p-6 shadow-[0_0_70px_rgba(16,185,129,0.16)]">
       <div className="flex items-center gap-3 mb-5">
         <span className="w-2.5 h-2.5 rounded-full bg-[#10B981] animate-pulse" />
@@ -170,8 +177,12 @@ interface Transaction {
 
 const initialTransactions: Transaction[] = [
   { id: '1', txHash: '0x8f2a...9aac', protocol: 'MantleSwap', type: 'Reentrancy', gasSaved: 'response package ready', status: 'PROPOSED', timestamp: '2 mins ago' },
-  { id: '2', txHash: '0x1b4d...2ccf', protocol: 'LendX Protocol', type: 'Normal Tx', gasSaved: '0 MNT', status: 'SAFE', timestamp: '5 mins ago' },
-  { id: '3', txHash: '0x48ce...eB7a', protocol: 'YieldFlow', type: 'Oracle Manipulation', gasSaved: 'multisig review queued', status: 'PROPOSED', timestamp: '12 mins ago' },
+  { id: '2', txHash: '0x1b4d...2ccf', protocol: 'LendX Protocol', type: 'Flash Loan Attack', gasSaved: 'multisig review queued', status: 'SCANNING', timestamp: '3 mins ago' },
+  { id: '3', txHash: '0xd5e9...3f72', protocol: 'YieldFlow', type: 'Oracle Manipulation', gasSaved: 'response package ready', status: 'PROPOSED', timestamp: '5 mins ago' },
+  { id: '4', txHash: '0x7a43...81ce', protocol: 'ApexVaults', type: 'Normal Transfer', gasSaved: '-', status: 'SAFE', timestamp: '7 mins ago' },
+  { id: '5', txHash: '0x48ce...eB7a', protocol: 'LiquidMNT', type: 'Reentrancy', gasSaved: 'multisig review queued', status: 'SCANNING', timestamp: '11 mins ago' },
+  { id: '6', txHash: '0x9f2b...4e6a', protocol: 'MantleBridge', type: 'Normal Transfer', gasSaved: '-', status: 'SAFE', timestamp: '14 mins ago' },
+  { id: '7', txHash: '0x3c1a...d9f8', protocol: 'MantleSwap', type: 'Oracle Manipulation', gasSaved: 'response package ready', status: 'PROPOSED', timestamp: '18 mins ago' },
 ];
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -198,8 +209,17 @@ export default function LandingPage() {
   useEffect(() => { router.prefetch('/dashboard'); router.prefetch('/history'); }, [router]);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setShowFirstLoadPreloader(false), 650);
+    const timer = window.setTimeout(() => setShowFirstLoadPreloader(false), 300);
     return () => window.clearTimeout(timer);
+  }, []);
+
+  // CSS fallback: hide preloader after 5s even if JS never runs
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = '@keyframes plFade{0%,85%{opacity:1}100%{opacity:0;pointer-events:none}}.pl-auto{animation:plFade .5s ease-out 5s forwards}';
+    document.head.appendChild(style);
+    document.querySelector('.fixed.inset-0.z-\\[140\\]')?.classList.add('pl-auto');
+    return () => style.remove();
   }, []);
 
   useEffect(() => {
@@ -225,48 +245,53 @@ export default function LandingPage() {
   const handleCommandCenterAccess = () => { beginCommandCenterLaunch(); navigateToAppPath(window.location, DASHBOARD_PATH); };
 
   useEffect(() => {
-    const publicClient = createPublicClient({ chain: mantleSepoliaTestnet, transport: http() });
-    const protocols = ['MantleSwap', 'LendX Protocol', 'YieldFlow', 'ApexVaults', 'LiquidMNT', 'MantleBridge'];
-    const threatTypes = ['Reentrancy', 'Oracle Manipulation', 'Flash Loan Attack'];
+    // Real ledger: sample recent Mantle blocks, score each tx heuristically,
+    // then classify the suspicious ones with Groq via /api/analyze.
+    // Shared with the Threat History page through src/lib/threatScan.
     let cancelled = false;
 
-    const runWhenIdle = (cb: () => void) => {
-      const w = window as Window & { requestIdleCallback?: (cb: IdleRequestCallback, o?: IdleRequestOptions) => number };
-      if (w.requestIdleCallback) w.requestIdleCallback(cb, { timeout: 1500 });
-      else setTimeout(cb, 250);
+    const toTx = (t: ScannedThreat): Transaction => {
+      const aiTag = t.aiAnalyzed && typeof t.aiConfidence === 'number'
+        ? ` (AI: ${(t.aiConfidence * 100).toFixed(0)}%)`
+        : '';
+      return {
+        id: t.id,
+        txHash: t.txHash.length > 14 ? `${t.txHash.slice(0, 8)}...${t.txHash.slice(-4)}` : t.txHash,
+        protocol: t.protocol,
+        type: t.type === 'Normal Transfer' ? 'Normal Transfer' : `${t.type}${aiTag}`,
+        gasSaved: t.status === 'SAFE' ? '-' : t.gasSaved,
+        status: t.status,
+        timestamp: relativeTime(t.timestamp),
+      };
     };
 
-    const fetchRealScans = async () => {
+    const runScan = async () => {
+      if (cancelled || document.hidden) return;
       try {
-        const block = await Promise.race([
-          publicClient.getBlock({ includeTransactions: true }),
-          new Promise<null>((r) => setTimeout(() => r(null), 2200)),
-        ]);
-        if (cancelled || !block || !block.transactions?.length) return;
-        setTransactions(block.transactions.slice(0, 5).map((tx: ViemTransaction) => {
-          const h = parseInt(tx.hash.slice(2, 10), 16);
-          const isThreat = h % 15 === 0;
-          return {
-            id: tx.hash,
-            txHash: tx.hash.slice(0, 8) + '...' + tx.hash.slice(-6),
-            protocol: protocols[h % protocols.length],
-            type: isThreat ? threatTypes[h % threatTypes.length] : 'Normal Transfer',
-            gasSaved: isThreat ? 'response proposal ready' : '-',
-            status: isThreat ? 'PROPOSED' : 'SAFE',
-            timestamp: new Date(Number(block.timestamp) * 1000).toISOString(),
-          };
-        }));
-      } catch (err) { console.error('Failed to fetch live mantle blocks', err); }
+        const scanned = await scanRecentThreats({ blockCount: 4, txPerBlock: 8, maxAiCalls: 3 });
+        if (cancelled || scanned.length === 0) return;
+        // Surface threats first so the ledger leads with AI-classified incidents.
+        const ordered = [...scanned].sort((a, b) => (a.status === 'SAFE' ? 1 : 0) - (b.status === 'SAFE' ? 1 : 0));
+        setTransactions(ordered.slice(0, 7).map(toTx));
+      } catch {
+        // Keep the seeded initialTransactions on any RPC/AI failure.
+      }
     };
 
-    runWhenIdle(fetchRealScans);
-    const interval = setInterval(() => { if (!document.hidden) runWhenIdle(fetchRealScans); }, 120000);
+    const idleWindow = window as Window & { requestIdleCallback?: (cb: () => void) => void };
+    if (idleWindow.requestIdleCallback) idleWindow.requestIdleCallback(runScan);
+    else setTimeout(runScan, 300);
+
+    const interval = setInterval(() => {
+      if (!document.hidden) runScan();
+    }, 60000);
+
     return () => { cancelled = true; clearInterval(interval); };
   }, []);
 
   return (
-    <main id="main-content" className="min-h-screen bg-[#050507] text-white font-mono overflow-x-hidden selection:bg-[#10B981] selection:text-black relative">
-      {showFirstLoadPreloader && <FirstLoadPreloader />}
+    <main className="min-h-screen bg-[#050507] text-white font-mono overflow-x-hidden selection:bg-[#10B981] selection:text-black relative">
+      {showFirstLoadPreloader && <FirstLoadPreloader onDismiss={() => setShowFirstLoadPreloader(false)} />
       {mounted && <AmbientParticles />}
       {mounted && <CursorGlow />}
 
@@ -288,7 +313,7 @@ export default function LandingPage() {
         </div>
         <div className="hidden md:flex gap-8 text-xs tracking-widest uppercase font-bold text-gray-300">
           <Link href={PIPELINE_EXECUTION_PATH} className="hover:text-white transition-colors duration-500">Features</Link>
-          <a href="https://docs.mantle.xyz" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors duration-500">Documentation</a>
+          <a href="https://docs.breachresponse.xyz" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors duration-500">Documentation</a>
         </div>
         <div>
           <WalletConnectControl
@@ -502,6 +527,11 @@ export default function LandingPage() {
             </motion.div>
           ))}
         </motion.div>
+
+        {/* Live, AI-driven run of the pipeline above */}
+        <motion.div initial="hidden" whileInView="visible" viewport={vp} variants={fadeUpC} className="mt-16 max-w-3xl mx-auto">
+          <LivePipeline />
+        </motion.div>
       </section>
 
       {/* ─── Features ─────────────────────────────────────────────────────── */}
@@ -539,6 +569,23 @@ export default function LandingPage() {
               </div>
             </motion.div>
           ))}
+        </motion.div>
+      </section>
+
+      {/* ─── Dual-model consensus ─────────────────────────────────────────── */}
+      <section className="py-28 px-8 md:px-16 max-w-5xl mx-auto relative z-40 border-t border-gray-900/30">
+        <motion.div initial="hidden" whileInView="visible" viewport={vp} variants={stagger} className="text-center mb-12">
+          <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#101014]/60 border border-gray-800/80 mb-4 text-xs font-bold text-[#10B981]">
+            <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
+            TWO MODELS, ONE VERDICT
+          </motion.div>
+          <motion.h2 variants={fadeUpB} className="text-3xl md:text-4xl font-bold text-white mb-4">AI Model Comparison</motion.h2>
+          <motion.p variants={fadeUpC} className="text-gray-400 max-w-xl mx-auto font-sans text-sm">
+            The same incident is classified by Groq (Llama 3.1) and Tencent Hunyuan in parallel. Agreement raises confidence; disagreement escalates to a human.
+          </motion.p>
+        </motion.div>
+        <motion.div initial="hidden" whileInView="visible" viewport={vp} variants={reveal}>
+          <ModelComparison />
         </motion.div>
       </section>
 
@@ -603,6 +650,27 @@ export default function LandingPage() {
             </div>
           </motion.div>
         </div>
+      </section>
+
+      {/* ─── Impact: before/after + gas savings ───────────────────────────── */}
+      <section className="py-28 px-8 md:px-16 max-w-6xl mx-auto relative z-40 border-t border-gray-900/30">
+        <motion.div initial="hidden" whileInView="visible" viewport={vp} variants={stagger} className="text-center mb-12">
+          <motion.div variants={fadeUp} className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#101014]/60 border border-gray-800/80 mb-4 text-xs font-bold text-[#10B981]">
+            <span className="w-2 h-2 rounded-full bg-[#10B981] animate-pulse" />
+            MEASURABLE IMPACT
+          </motion.div>
+          <motion.h2 variants={fadeUpB} className="text-3xl md:text-4xl font-bold text-white mb-4">What an automated pause is worth</motion.h2>
+          <motion.p variants={fadeUpC} className="text-gray-400 max-w-xl mx-auto font-sans text-sm">
+            The same reentrancy exploit, with and without BreachResponse watching — plus the gas burned chasing exploits that never landed.
+          </motion.p>
+        </motion.div>
+
+        <motion.div initial="hidden" whileInView="visible" viewport={vp} variants={reveal} className="mb-8">
+          <VaultBeforeAfter />
+        </motion.div>
+        <motion.div initial="hidden" whileInView="visible" viewport={vp} variants={fadeUpC}>
+          <GasSavingsCounter />
+        </motion.div>
       </section>
 
       {/* ─── Ledger ───────────────────────────────────────────────────────── */}
@@ -672,7 +740,7 @@ export default function LandingPage() {
               connectedClassName="bg-[#10B981] text-black font-bold px-8 py-4 rounded text-sm hover:bg-green-400 transition-all duration-500 shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:shadow-[0_0_40px_rgba(16,185,129,0.5)] text-center font-mono flex items-center gap-2"
               connectedLabel="Enter Command Center"
             />
-            <a href="https://docs.mantle.xyz" target="_blank" rel="noopener noreferrer" className="bg-black/50 border border-gray-800 hover:border-gray-700 text-white font-bold px-8 py-4 rounded text-sm transition-all duration-500 text-center font-mono">
+            <a href="https://docs.breachresponse.xyz" target="_blank" rel="noopener noreferrer" className="bg-black/50 border border-gray-800 hover:border-gray-700 text-white font-bold px-8 py-4 rounded text-sm transition-all duration-500 text-center font-mono">
               View Documentation
             </a>
           </motion.div>
@@ -682,7 +750,7 @@ export default function LandingPage() {
       {/* ─── Footer ───────────────────────────────────────────────────────── */}
       <footer className="bg-black/40 backdrop-blur-sm border-t border-gray-800/40 py-16 px-8 md:px-16 relative z-40">
         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-8">
-          <div className="flex flex-col items-center md:items-start text-center md:text-left md:col-span-1">
+          <div className="flex flex-col items-center md:items-start text-center md:text-left">
             <div className="flex items-center gap-3 mb-6">
               <Image src="/logo.png" alt="BreachResponse Logo" width={24} height={24} className="object-contain" />
               <span className="text-lg font-bold tracking-widest text-white">BREACH RESPONSE</span>
@@ -702,8 +770,15 @@ export default function LandingPage() {
           <div className="flex flex-col items-center md:items-start text-center md:text-left">
             <h4 className="text-white font-bold mb-6 tracking-widest uppercase text-xs">Links</h4>
             <ul className="space-y-4 flex flex-col">
-              <a href="https://github.com/mystiquemide/breachresponse" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#10B981] transition-colors duration-500 text-sm font-sans">GitHub</a>
+              <a href="https://github.com/mystiquemide/breachresponse" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#10B981] transition-colors duration-500 text-sm font-sans flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="opacity-70"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                GitHub
+              </a>
               <a href="https://docs.breachresponse.xyz" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#10B981] transition-colors duration-500 text-sm font-sans">Documentation</a>
+              <a href="https://x.com/nousresearch" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#10B981] transition-colors duration-500 text-sm font-sans flex items-center gap-2">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="opacity-70"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                X / Twitter
+              </a>
             </ul>
           </div>
           <div className="flex flex-col items-center md:items-start text-center md:text-left">
@@ -714,8 +789,9 @@ export default function LandingPage() {
             </ul>
           </div>
         </div>
-        <div className="max-w-4xl mx-auto mt-12 pt-8 border-t border-gray-800/40 text-center text-xs text-gray-600 font-sans">
-          &copy; 2026 BreachResponse. All rights reserved.
+        <div className="max-w-4xl mx-auto mt-12 pt-8 border-t border-gray-800/40 text-center text-gray-600 text-xs font-sans space-y-1">
+          <p>&copy; 2026 BreachResponse. All rights reserved.</p>
+          <p>Built for the Turing Test Hackathon 2026 — AI DevTools Track</p>
         </div>
       </footer>
     </main>

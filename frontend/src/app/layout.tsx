@@ -22,7 +22,9 @@ export default function RootLayout({
           Skip to main content
         </a>
         <Web3Provider>
-          {children}
+          <div id="main-content">
+            {children}
+          </div>
         </Web3Provider>
       </body>
     </html>

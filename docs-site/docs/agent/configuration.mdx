@@ -1,0 +1,243 @@
+---
+title: Agent Configuration
+description: Complete reference for all sentinel agent environment variables
+---
+
+# Agent Configuration
+
+The Python Sentinel Agent is configured entirely through environment variables. This page documents every variable, its purpose, and its effect on agent behavior.
+
+---
+
+## Configuration File
+
+The agent loads variables from a `.env` file in the repository root:
+
+```python
+# agent/main.py
+from dotenv import load_dotenv
+load_dotenv(dotenv_path="../.env")
+```
+
+Create `.env` in `/root/breachresponse/.env`:
+
+```bash
+# /root/breachresponse/.env
+
+# ─── Required ───────────────────────────────────
+MANTLE_RPC_URL=https://rpc.sepolia.mantle.xyz
+
+# ─── On-Chain Response ──────────────────────────
+PRIVATE_KEY=0x_your_agent_wallet_private_key
+SENTINEL_RESPONSE_MODE=manual
+
+# ─── AI / LLM ───────────────────────────────────
+OPENAI_API_KEY=gsk_your_groq_key
+OPENAI_BASE_URL=https://api.groq.com/openai/v1
+LLM_MODEL=llama-3.1-8b-instant
+
+# ─── Alternative AI Providers ───────────────────
+GROQ_API_KEY=gsk_your_groq_key
+HUNYUAN_API_KEY=your_hunyuan_key
+
+# ─── Frontend Bridge ────────────────────────────
+FRONTEND_API_BASE_URL=http://localhost:3000/api
+INGEST_TOKEN=your_shared_secret_token
+
+# ─── Database ───────────────────────────────────
+DATABASE_URL=postgresql://...
+UPSTASH_REDIS_REST_URL=https://...
+UPSTASH_REDIS_REST_TOKEN=your_token
+
+# ─── GenLayer ───────────────────────────────────
+NEXT_PUBLIC_GENLAYER_CONSENSUS_GUARD_ADDRESS=0x86369EC44fbB5EB682729368557176858aBe0c73
+NEXT_PUBLIC_GENLAYER_STUDIO_URL=https://studio.genlayer.com/api
+
+# ─── Mantle Configuration ──────────────────────
+MANTLE_NETWORK=mantle-sepolia
+MANTLE_CHAIN_ID=5003
+MANTLE_NATIVE_PRICE_ID=mantle
+MANTLE_TOKEN_ALLOWLIST=
+```
+
+---
+
+## Variable Reference
+
+### Required
+
+| Variable | Default | Description |
+|---|---|---|
+| `MANTLE_RPC_URL` | `https://rpc.sepolia.mantle.xyz` | Mantle Sepolia JSON-RPC endpoint. The agent uses this for block scanning, event log queries, and transaction broadcasting. |
+
+### On-Chain Response
+
+| Variable | Default | Description |
+|---|---|---|
+| `PRIVATE_KEY` | _(none)_ | Private key for the agent's wallet. Must be funded with Mantle Sepolia MNT for gas. Without this, the agent can monitor but cannot execute emergency pause transactions. |
+| `SENTINEL_RESPONSE_MODE` | `manual` | Response mode. `manual` = propose actions, wait for operator approval. `autonomous` = broadcast pause transactions immediately on high-confidence detection. |
+
+### AI / LLM Configuration
+
+| Variable | Default | Description |
+|---|---|---|
+| `OPENAI_API_KEY` | _(none)_ | API key for the LLM provider. Used by the agent's `IncidentAnalyzer`. When using Groq, set this to your Groq API key. |
+| `OPENAI_BASE_URL` | _(none)_ | Base URL for OpenAI-compatible API. For Groq: `https://api.groq.com/openai/v1`. For Hunyuan: `https://api.hunyuan.cloud.tencent.com/v1`. For OpenAI: leave unset. |
+| `LLM_MODEL` | `gpt-4o-mini` | Model name passed to the API. For Groq: `llama-3.1-8b-instant`. For Hunyuan: `hunyuan-lite`. For OpenAI: any supported model. |
+
+> **Note:** The agent's `IncidentAnalyzer` uses `OPENAI_API_KEY` / `OPENAI_BASE_URL` / `LLM_MODEL`. The frontend API routes use `GROQ_API_KEY` and `HUNYUAN_API_KEY` separately. These are different clients -- configure both for the full pipeline.
+
+### Alternative AI Providers (Frontend API Routes)
+
+| Variable | Default | Description |
+|---|---|---|
+| `GROQ_API_KEY` | _(none)_ | Groq API key. Used by frontend routes: `/api/analyze`, `/api/compare`, `/api/audit`. Groq is the primary model (Llama 3.1-8B-Instant). |
+| `HUNYUAN_API_KEY` | _(none)_ | Tencent Hunyuan API key. Used by frontend routes: `/api/audit` (primary), `/api/compare` (parallel). Falls back to Groq if Hunyuan fails. |
+
+**Provider Priority:**
+
+| Endpoint | Priority |
+|---|---|
+| `/api/audit` | Hunyuan -> Groq -> Fallback |
+| `/api/analyze` | Groq only -> Fallback |
+| `/api/compare` | Both in parallel -> Fallback |
+| `/api/gas-estimate` | Hunyuan -> Groq -> Fallback |
+| Agent `IncidentAnalyzer` | Configured via `OPENAI_API_KEY` -> Fallback |
+
+### Frontend Bridge
+
+| Variable | Default | Description |
+|---|---|---|
+| `FRONTEND_API_BASE_URL` | `http://127.0.0.1:3000/api` | Base URL for the Next.js frontend API. The agent posts telemetry and heartbeats to this URL. Change to the production deployment URL for non-local setups. |
+| `INGEST_TOKEN` | _(none)_ | Shared secret for agent-to-frontend authentication. When set, the agent includes `Authorization: Bearer {token}` in all API calls. The frontend rejects calls without a matching token. Uses constant-time comparison. |
+
+### Database
+
+| Variable | Default | Description |
+|---|---|---|
+| `DATABASE_URL` | _(none)_ | PostgreSQL connection string. When configured, telemetry and sentinel state persist to PostgreSQL. Without this, the system falls back to in-memory storage. |
+| `DATABASE_SSL_REJECT_UNAUTHORIZED` | `true` | Whether to reject connections to PostgreSQL servers with untrusted certificates. Set to `false` only for development or when using a self-signed certificate. |
+| `UPSTASH_REDIS_REST_URL` | _(none)_ | Upstash Redis REST URL for cross-instance SSE event bus. Without this, SSE events are delivered via in-process EventEmitter (single-instance only). |
+| `UPSTASH_REDIS_REST_TOKEN` | _(none)_ | Authentication token for Upstash Redis. |
+
+### GenLayer Consensus
+
+| Variable | Default | Description |
+|---|---|---|
+| `NEXT_PUBLIC_GENLAYER_CONSENSUS_GUARD_ADDRESS` | `0x86369EC44fbB5EB682729368557176858aBe0c73` | Address of the `IncidentConsensusGuard` contract on GenLayer StudioNet. |
+| `NEXT_PUBLIC_GENLAYER_STUDIO_URL` | `https://studio.genlayer.com/api` | GenLayer StudioNet API endpoint. |
+
+### Mantle Configuration
+
+| Variable | Default | Description |
+|---|---|---|
+| `MANTLE_NETWORK` | `mantle-sepolia` | Network identifier used in metrics display. |
+| `MANTLE_CHAIN_ID` | `5003` | Mantle Sepolia chain ID. Used for transaction construction. |
+| `MANTLE_NATIVE_PRICE_ID` | `mantle` | CoinGecko price ID for the native token (MNT). |
+| `MANTLE_TOKEN_ALLOWLIST` | _(empty)_ | Comma-separated list of ERC-20 tokens to include in value-monitored metrics. Format: `SYMBOL:ADDRESS:DECIMALS:PRICE_ID,...`. |
+
+#### Token Allowlist Format
+
+```
+MNT:0x...:18:mantle,USDT:0x...:6:tether,USDC:0x...:6:usd-coin
+```
+
+Each token entry:
+```
+SYMBOL:CONTRACT_ADDRESS:DECIMALS:COINGECKO_PRICE_ID
+```
+
+If `PRICE_ID` is empty, the token balance is reported without USD value.
+
+---
+
+## Configuration Profiles
+
+### Development (Local)
+
+```bash
+# Minimal setup for local development
+MANTLE_RPC_URL=https://rpc.sepolia.mantle.xyz
+# No PRIVATE_KEY -- agent monitors only
+# No database -- in-memory storage
+# No API keys -- falls back to deterministic analysis
+FRONTEND_API_BASE_URL=http://localhost:3000/api
+```
+
+### Development (Full Stack)
+
+```bash
+MANTLE_RPC_URL=https://rpc.sepolia.mantle.xyz
+PRIVATE_KEY=0x_your_testnet_key
+SENTINEL_RESPONSE_MODE=manual
+OPENAI_API_KEY=gsk_...
+OPENAI_BASE_URL=https://api.groq.com/openai/v1
+LLM_MODEL=llama-3.1-8b-instant
+GROQ_API_KEY=gsk_...
+FRONTEND_API_BASE_URL=http://localhost:3000/api
+INGEST_TOKEN=dev-secret
+DATABASE_URL=postgresql://...
+```
+
+### Production
+
+```bash
+MANTLE_RPC_URL=https://rpc.sepolia.mantle.xyz  # Or mainnet RPC
+PRIVATE_KEY=0x_your_production_key
+SENTINEL_RESPONSE_MODE=manual  # Always manual for production
+OPENAI_API_KEY=gsk_...
+OPENAI_BASE_URL=https://api.groq.com/openai/v1
+LLM_MODEL=llama-3.1-8b-instant
+GROQ_API_KEY=gsk_...
+HUNYUAN_API_KEY=...
+FRONTEND_API_BASE_URL=https://your-domain.vercel.app/api
+INGEST_TOKEN=strong_random_secret_here
+DATABASE_URL=postgresql://...
+DATABASE_SSL_REJECT_UNAUTHORIZED=true
+UPSTASH_REDIS_REST_URL=https://...
+UPSTASH_REDIS_REST_TOKEN=...
+NEXT_PUBLIC_GENLAYER_CONSENSUS_GUARD_ADDRESS=0x86369EC44fbB5EB682729368557176858aBe0c73
+NEXT_PUBLIC_GENLAYER_STUDIO_URL=https://studio.genlayer.com/api
+```
+
+---
+
+## Environment Validation
+
+The agent validates its configuration at startup:
+
+```python
+# Agent prints warnings for missing critical configuration
+if not PRIVATE_KEY:
+    # Agent monitors but cannot execute on-chain actions
+    pass  # Warning printed about missing key
+
+if not OPENAI_API_KEY:
+    print("[ANALYZER] Warning: OPENAI_API_KEY not found. Using fallback mock mode.")
+
+if not w3.is_connected():
+    print(f"[SENTINEL] Warning: Could not connect to Web3 provider: {MANTLE_RPC_URL}")
+```
+
+The agent never crashes due to missing configuration -- it degrades gracefully:
+- Without `PRIVATE_KEY`: monitors blocks, cannot execute transactions
+- Without `OPENAI_API_KEY`: uses keyword-based fallback detection
+- Without `DATABASE_URL`: uses in-memory storage
+- Without RPC connectivity: retries on next iteration
+
+---
+
+## Secrets Management
+
+> **Warning:** Never commit `.env` files to version control. The repository's `.gitignore` excludes `.env*` files. For production deployments, use your platform's secrets management:
+> - **Vercel:** Environment Variables in project settings
+> - **Railway:** Variables tab in service settings
+> - **GitHub Actions:** Repository Secrets
+> - **Docker:** `--env-file` or secrets management
+
+---
+
+## Next Steps
+
+- **[Response Modes](/agent/response-modes)** -- Understanding manual vs autonomous response
+- **[Deployment: Environment Variables](/deployment/environment-variables)** -- Platform-specific env var setup

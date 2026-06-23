@@ -1,0 +1,230 @@
+---
+title: Analyze Threat
+description: POST /api/analyze -- AI-powered threat classification for on-chain transactions
+---
+
+# POST /api/analyze
+
+Classifies a suspicious on-chain transaction using AI (Groq Llama 3.1-8B-Instant). Returns a structured threat assessment with confidence score, severity, evidence points, and gas anomaly analysis.
+
+---
+
+## Endpoint
+
+```
+POST /api/analyze
+```
+
+**Runtime:** Node.js  
+**Auth:** Not required
+
+---
+
+## Request
+
+### Body
+
+```json
+{
+  "txHash": "0x8f2a9aac...",
+  "protocol": "TargetVault",
+  "threatType": "Reentrancy"
+}
+```
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `txHash` | `string` | No | Transaction hash for context |
+| `protocol` | `string` | No | Protocol name (e.g., "TargetVault", "MantleSwap") |
+| `threatType` | `string` | No | Detection signature (e.g., "Reentrancy", "Anomalous pattern") |
+
+All parameters are optional -- the endpoint falls back gracefully.
+
+---
+
+## Response
+
+### Success (200)
+
+```json
+{
+  "confidence": 0.91,
+  "severity": "CRITICAL",
+  "evidencePoints": [
+    "Recursive external call detected",
+    "State mutation after external transfer",
+    "Gas pattern matches known reentrancy exploit"
+  ],
+  "recommendation": "Pause protocol",
+  "reasoning": "Transaction exhibits classic reentrancy pattern with recursive calls preceding state updates in the vault withdrawal path.",
+  "gasUsed": 187420,
+  "expectedGas": 45000,
+  "gasAnomalyFactor": 4.2,
+  "gasAnomalyFlag": true,
+  "gasAnomalyReason": "Gas consumption is 4.2x above the baseline for a standard vault withdrawal, consistent with recursive call overhead."
+}
+```
+
+### Response Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `confidence` | `number` | Threat confidence (0.70 – 0.99) |
+| `severity` | `string` | `CRITICAL`, `HIGH`, or `MEDIUM` |
+| `evidencePoints` | `string[]` | 3 specific evidence items supporting the classification |
+| `recommendation` | `string` | `Pause protocol`, `Alert operators`, `Monitor only`, or `Multisig review` |
+| `reasoning` | `string` | 1-2 sentences explaining the threat assessment |
+| `gasUsed` | `number` | Estimated gas units for this exploit type |
+| `expectedGas` | `number` | Baseline gas for a normal operation of this type |
+| `gasAnomalyFactor` | `number` | Ratio of `gasUsed` / `expectedGas` |
+| `gasAnomalyFlag` | `boolean` | Whether gas consumption is anomalous |
+| `gasAnomalyReason` | `string` | Explanation of the gas anomaly |
+
+---
+
+## How It Works
+
+### AI Call
+
+The endpoint calls Groq's API with a structured prompt:
+
+```typescript
+const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+  method: 'POST',
+  headers: {
+    'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    model: 'llama-3.1-8b-instant',
+    messages: [
+      {
+        role: 'system',
+        content: 'You are a smart contract security AI running on a real-time threat detection platform. Analyze on-chain exploit patterns and return structured threat assessments. Always respond with valid JSON only, no markdown.'
+      },
+      {
+        role: 'user',
+        content: `Analyze this smart contract security incident detected on Mantle network:
+
+Protocol: ${protocol}
+Transaction hash: ${txHash}
+Detection signature: ${threatType}
+
+Return this exact JSON (no other text):
+{
+  "confidence": <float 0.70-0.99>,
+  "severity": "<CRITICAL|HIGH|MEDIUM>",
+  "evidencePoints": ["<evidence 1>", "<evidence 2>", "<evidence 3>"],
+  "recommendation": "<Pause protocol|Alert operators|Monitor only|Multisig review>",
+  "reasoning": "&lt;1-2 sentences explaining the threat>",
+  "gasUsed": <estimated integer gas units for this exploit type>,
+  "expectedGas": <integer baseline gas for a normal operation of this type>,
+  "gasAnomalyFactor": <float, gasUsed/expectedGas>,
+  "gasAnomalyFlag": <true|false>,
+  "gasAnomalyReason": "&lt;1 sentence explaining the gas anomaly>"
+}`
+      }
+    ],
+    temperature: 0.2,
+    max_tokens: 350,
+    response_format: { type: 'json_object' }
+  })
+});
+```
+
+### Fallback
+
+If `GROQ_API_KEY` is not configured or the API call fails:
+
+```typescript
+const FALLBACK = {
+  confidence: 0.91,
+  severity: 'CRITICAL',
+  evidencePoints: [
+    'Recursive external call detected',
+    'State mutation after external transfer',
+    'Gas pattern matches known reentrancy exploit'
+  ],
+  recommendation: 'Pause protocol',
+  reasoning: 'Transaction exhibits classic reentrancy pattern with recursive calls preceding state updates in the vault withdrawal path.',
+  gasUsed: 187420,
+  expectedGas: 45000,
+  gasAnomalyFactor: 4.2,
+  gasAnomalyFlag: true,
+  gasAnomalyReason: 'Gas consumption is 4.2x above the baseline for a standard vault withdrawal, consistent with recursive call overhead.',
+};
+```
+
+---
+
+## Client-Side Integration
+
+The threat scanner (`frontend/src/lib/threatScan.ts`) batches suspicious transactions and classifies them:
+
+```typescript
+async function classifyBatch(
+  batch: { txHash: string; protocol: string; threatType: string }[],
+  results: ScannedThreat[],
+): Promise<void> {
+  const settled = await Promise.allSettled(
+    batch.map(async ({ txHash, protocol, threatType }) => {
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ txHash, protocol, threatType }),
+      });
+      if (!res.ok) return null;
+      const data = await res.json();
+      return { txHash, ...data };
+    })
+  );
+
+  for (const outcome of settled) {
+    if (outcome.status !== 'fulfilled' || !outcome.value) continue;
+    const { txHash, confidence, severity, reasoning } = outcome.value;
+    const entry = results.find((r) => r.txHash === txHash);
+    if (!entry) continue;
+
+    entry.aiAnalyzed = true;
+    entry.aiConfidence = confidence;
+    entry.aiSeverity = severity;
+    entry.aiReasoning = reasoning;
+    entry.gasSaved = confidence > 0.85
+      ? `AI verified (${(confidence * 100).toFixed(0)}%) -- response ready`
+      : `AI flagged (${(confidence * 100).toFixed(0)}%) -- review needed`;
+    entry.status = confidence > 0.85 ? 'PROPOSED' : 'SCANNING';
+  }
+}
+```
+
+---
+
+## Example: cURL
+
+```bash
+curl -X POST http://localhost:3000/api/analyze \
+  -H "Content-Type: application/json" \
+  -d '{
+    "txHash": "0x8f2a9aac9e3a4d5b6c7d8e9f0a1b2c3d4e5f6a7b8",
+    "protocol": "TargetVault",
+    "threatType": "Reentrancy"
+  }'
+```
+
+---
+
+## Performance
+
+| Stage | Typical Latency |
+|---|---|
+| Groq API call | 200-600ms |
+| JSON parsing | &lt;5ms |
+| Fallback | &lt;1ms |
+| **Total** | **200-600ms** |
+
+---
+
+## Next Steps
+
+- **[Compare Models](/api-reference/compare)** -- Run the same analysis against two AI models in parallel
+- **[Gas Estimate](/api-reference/gas-estimate)** -- Estimate gas costs for contract interactions

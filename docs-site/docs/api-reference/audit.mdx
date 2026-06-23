@@ -1,0 +1,268 @@
+---
+title: Audit Contract
+description: POST /api/audit -- AI-powered smart contract security auditing
+---
+
+# POST /api/audit
+
+Audits a deployed smart contract on Mantle Sepolia using AI-powered bytecode and source code analysis.
+
+---
+
+## Endpoint
+
+```
+POST /api/audit
+```
+
+**Runtime:** Node.js  
+**Auth:** Not required
+
+---
+
+## Request
+
+### Headers
+
+```
+Content-Type: application/json
+```
+
+### Body
+
+```json
+{
+  "address": "0x9d9b602CFe69cfF9706EAc399808E84682ce94FB"
+}
+```
+
+| Parameter | Type | Required | Description |
+|---|---|---|---|
+| `address` | `string` | Yes | 42-character hex address (`0x` prefix + 40 hex chars) |
+
+### Validation
+
+- Must match regex `/^0x[0-9a-fA-F]{40}$/`
+- Returns `400` if address format is invalid
+- Returns `404` if no bytecode found at the address
+
+---
+
+## Response
+
+### Success (200)
+
+```json
+{
+  "riskScore": 72,
+  "riskLabel": "HIGH",
+  "vulnerabilities": [
+    {
+      "name": "Potential Reentrancy",
+      "severity": "HIGH",
+      "description": "External calls detected before state updates."
+    },
+    {
+      "name": "Unchecked Return Values",
+      "severity": "MEDIUM",
+      "description": "Low-level calls without return value validation."
+    }
+  ],
+  "gasFlags": [
+    "Unbounded loop pattern detected -- potential gas exhaustion",
+    "Repeated SLOAD in hot path -- cache in memory variable"
+  ],
+  "recommendations": "Add reentrancy guards (ReentrancyGuard) and validate all external call return values. Use checks-effects-interactions pattern throughout.",
+  "summary": "Static analysis identified patterns consistent with common EVM vulnerabilities. Manual review recommended before deploying significant value.",
+  "sourceAvailable": false,
+  "metadata": {
+    "bytecodeSize": 2456,
+    "dangerousOpcodes": [
+      { "name": "DELEGATECALL", "severity": "HIGH" }
+    ],
+    "selectorsFound": 8
+  }
+}
+```
+
+### Response Fields
+
+| Field | Type | Description |
+|---|---|---|
+| `riskScore` | `number` | 0-100 risk score |
+| `riskLabel` | `string` | `CRITICAL`, `HIGH`, `MEDIUM`, or `LOW` |
+| `vulnerabilities` | `array` | Up to 4 vulnerability findings |
+| `vulnerabilities[].name` | `string` | Vulnerability name |
+| `vulnerabilities[].severity` | `string` | `CRITICAL`, `HIGH`, `MEDIUM`, or `LOW` |
+| `vulnerabilities[].description` | `string` | One-sentence description |
+| `gasFlags` | `array` | Up to 3 gas optimization issues |
+| `recommendations` | `string` | 2-3 actionable remediation steps |
+| `summary` | `string` | 2-3 sentence executive summary |
+| `sourceAvailable` | `boolean` | Whether verified Solidity source was found on Sourcify |
+| `metadata.bytecodeSize` | `number` | Bytecode size in bytes |
+| `metadata.dangerousOpcodes` | `array` | Dangerous EVM opcodes found in bytecode |
+| `metadata.selectorsFound` | `number` | Number of unique function selectors extracted |
+
+### Error Responses
+
+**400 -- Invalid Address**
+```json
+{
+  "error": "Invalid address. Must be a 42-char 0x hex address."
+}
+```
+
+**404 -- No Contract Found**
+```json
+{
+  "error": "No contract bytecode found at this address on Mantle Sepolia. Verify the address is a deployed contract."
+}
+```
+
+---
+
+## How It Works
+
+### Step 1: Fetch Bytecode
+
+The endpoint calls `eth_getCode` on Mantle Sepolia RPC:
+
+```typescript
+const bytecode: string = await rpcCall('eth_getCode', [address, 'latest']);
+```
+
+If bytecode is empty (`0x`), the address is an EOA or undeployed contract.
+
+### Step 2: Static Analysis
+
+**Dangerous Opcode Detection:**
+
+```typescript
+const DANGEROUS_OPCODES = [
+  { hex: 'ff', name: 'SELFDESTRUCT', severity: 'CRITICAL' },
+  { hex: 'f4', name: 'DELEGATECALL', severity: 'HIGH' },
+  { hex: 'f0', name: 'CREATE', severity: 'MEDIUM' },
+  { hex: 'f5', name: 'CREATE2', severity: 'MEDIUM' },
+];
+
+const foundOpcodes = DANGEROUS_OPCODES.filter(op => {
+  const regex = new RegExp(`(^|[0-9a-f]{2})${op.hex}([0-9a-f]{2}|$)`);
+  return regex.test(hex);
+});
+```
+
+**Function Selector Extraction:**
+
+```typescript
+// Scan for PUSH4 opcode (0x63) and extract following 4 bytes
+for (let i = 0; i < hex.length - 10; i += 2) {
+  if (hex[i] === '6' && hex[i + 1] === '3') {
+    selectors.push('0x' + hex.slice(i + 2, i + 10));
+  }
+}
+```
+
+### Step 3: Source Fetch (Sourcify)
+
+Attempts to retrieve verified Solidity source code:
+
+```typescript
+const res = await fetch(
+  `https://sourcify.dev/server/files/any/5003/${address}`
+);
+```
+
+If source is found, the largest `.sol` file (up to 6000 chars) is included in the AI prompt for richer analysis.
+
+### Step 4: AI Analysis
+
+**Provider priority:** Hunyuan -> Groq -> Fallback
+
+```typescript
+async function callAI(prompt: string): Promise<string | null> {
+  // Try Hunyuan first
+  if (process.env.HUNYUAN_API_KEY) {
+    const res = await fetch('https://api.hunyuan.cloud.tencent.com/v1/chat/completions', {
+      model: 'hunyuan-lite',
+      messages: [{ role: 'system', content: 'You are a smart contract security auditor...' }, ...],
+      temperature: 0.15,
+      max_tokens: 700,
+    });
+    // ...
+  }
+
+  // Fall back to Groq
+  if (process.env.GROQ_API_KEY) {
+    const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+      model: 'llama-3.1-8b-instant',
+      response_format: { type: 'json_object' },
+      temperature: 0.15,
+      max_tokens: 700,
+    });
+    // ...
+  }
+
+  return null; // No AI provider available -> fallback
+}
+```
+
+### Step 5: Fallback
+
+If no AI provider is available, returns a deterministic fallback:
+
+```typescript
+const FALLBACK: AuditResult = {
+  riskScore: 72,
+  riskLabel: 'HIGH',
+  vulnerabilities: [
+    { name: 'Potential Reentrancy', severity: 'HIGH', ... },
+    { name: 'Unchecked Return Values', severity: 'MEDIUM', ... },
+  ],
+  gasFlags: [...],
+  recommendations: 'Add reentrancy guards...',
+  summary: 'Static analysis identified patterns...',
+  sourceAvailable: false,
+  metadata: { bytecodeSize: 0, dangerousOpcodes: [], selectorsFound: 0 },
+};
+```
+
+---
+
+## Example: cURL
+
+```bash
+curl -X POST http://localhost:3000/api/audit \
+  -H "Content-Type: application/json" \
+  -d '{"address": "0x9d9b602CFe69cfF9706EAc399808E84682ce94FB"}'
+```
+
+### With Source Available
+
+```bash
+# Audit a verified contract for richer analysis
+curl -X POST http://localhost:3000/api/audit \
+  -H "Content-Type: application/json" \
+  -d '{"address": "0xea3C039795B5b04105B795c8B0cB85e0a42Cc85C"}'
+```
+
+---
+
+## Performance
+
+| Stage | Typical Latency |
+|---|---|
+| RPC call (`eth_getCode`) | 100-300ms |
+| Static analysis | &lt;5ms |
+| Sourcify fetch | 200-800ms |
+| AI analysis (Hunyuan) | 500-1500ms |
+| AI analysis (Groq) | 200-600ms |
+| Fallback | &lt;10ms |
+| **Total (with AI)** | **~1-3 seconds** |
+| **Total (fallback)** | **~100-500ms** |
+
+---
+
+## Next Steps
+
+- **[Analyze Threat](/api-reference/analyze)** -- Real-time transaction threat classification
+- **[Compare Models](/api-reference/compare)** -- Dual-model parallel analysis
