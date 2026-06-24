@@ -121,6 +121,7 @@ export default function VaultBeforeAfter() {
         <span className="text-xs text-gray-300 tracking-wider font-bold truncate">REENTRANCY EXPLOIT · SIDE-BY-SIDE</span>
         <button
           type="button"
+          aria-label="Replay reentrancy exploit simulation"
           onClick={() => { if (!playing) play(); }}
           disabled={playing}
           className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#10B981] hover:text-white disabled:text-gray-600 transition-colors shrink-0"

@@ -82,12 +82,17 @@ export function WalletConnectControl({
         }
 
         if (!status.connected) {
+          const hasProvider = typeof window !== 'undefined' && Boolean((window as Window & { ethereum?: unknown }).ethereum);
           return (
             <button
               type="button"
               aria-label={disconnectedLabel}
               onClick={() => {
                 onBeforeConnect?.();
+                if (!hasProvider) {
+                  window.open('https://metamask.io/download/', '_blank', 'noopener,noreferrer');
+                  return;
+                }
                 openConnectModal?.();
               }}
               className={className}

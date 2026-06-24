@@ -120,6 +120,7 @@ export default function ModelComparison() {
         </div>
         <button
           type="button"
+          aria-label="Re-run dual-model AI classification"
           onClick={() => { if (!loading) run(); }}
           disabled={loading}
           className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[#10B981] hover:text-white disabled:text-gray-600 transition-colors shrink-0"

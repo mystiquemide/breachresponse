@@ -144,6 +144,21 @@ body {
   }
 }
 
+/* Cursor affordance — all enabled interactive elements show pointer */
+button:not([disabled]),
+[role="button"]:not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+
+button[disabled] {
+  cursor: not-allowed;
+}
+
+@keyframes preloaderFadeOut {
+  from { opacity: 1; pointer-events: auto; }
+  to   { opacity: 0; pointer-events: none; }
+}
+
 /* Accessibility: Minimum font size and improved focus styles */
 .sr-only {
   position: absolute;
