@@ -4,7 +4,21 @@ import { Web3Provider } from "./Web3Provider";
 
 export const metadata: Metadata = {
   title: "Breach Response Command Center",
-  description: "Active Defense Node for Mantle Smart Contracts",
+  description: "AI-powered active-defense monitoring for Mantle smart contracts. Dual-model threat classification, GenLayer consensus validation, and human-gated incident response.",
+  openGraph: {
+    title: "Breach Response — AI DevTools for Smart Contract Security",
+    description: "AI-powered active-defense monitoring for Mantle smart contracts. Dual-model threat classification, GenLayer consensus validation, and human-gated incident response.",
+    url: "https://breachresponse.xyz",
+    siteName: "BreachResponse",
+    images: [{ url: "https://breachresponse.xyz/icon.png", width: 512, height: 512, alt: "BreachResponse Logo" }],
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "Breach Response — AI DevTools for Smart Contract Security",
+    description: "Dual-model AI threat classification with GenLayer consensus and human-gated execution. Built for Mantle.",
+    images: ["https://breachresponse.xyz/icon.png"],
+  },
 };
 
 export default function RootLayout({
@@ -22,9 +36,7 @@ export default function RootLayout({
           Skip to main content
         </a>
         <Web3Provider>
-          <div id="main-content">
-            {children}
-          </div>
+          {children}
         </Web3Provider>
       </body>
     </html>
