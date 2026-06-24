@@ -74,7 +74,7 @@ export function WalletConnectControl({
 
         if (!status.ready) {
           return (
-            <button type="button" disabled className={`${className} opacity-70 cursor-wait`}>
+            <button type="button" disabled aria-label="Wallet loading, please wait" className={`${className} opacity-70 cursor-wait`}>
               <Power className="w-3.5 h-3.5" />
               Restoring wallet...
             </button>
@@ -85,6 +85,7 @@ export function WalletConnectControl({
           return (
             <button
               type="button"
+              aria-label={disconnectedLabel}
               onClick={() => {
                 onBeforeConnect?.();
                 openConnectModal?.();
@@ -102,6 +103,7 @@ export function WalletConnectControl({
             <div className="flex items-center gap-2">
               <button
                 type="button"
+                aria-label="Switch to Mantle Sepolia network"
                 onClick={() => {
                   onBeforeConnect?.();
                   openChainModal?.();
@@ -111,7 +113,7 @@ export function WalletConnectControl({
                 <Power className="w-3.5 h-3.5" />
                 Switch Network
               </button>
-              <button type="button" onClick={() => disconnect()} className={disconnectClass}>
+              <button type="button" aria-label="Disconnect wallet" onClick={() => disconnect()} className={disconnectClass}>
                 Disconnect
               </button>
             </div>
@@ -122,6 +124,7 @@ export function WalletConnectControl({
           <div className="flex items-center gap-2">
             <button
               type="button"
+              aria-label={connectedLabel ?? `Connected: ${account?.displayName}`}
               onClick={onConnectedClick ?? openAccountModal}
               className={connectedClassName}
             >
@@ -129,7 +132,7 @@ export function WalletConnectControl({
               <span className="text-gray-500 uppercase tracking-widest">Connected:</span>
               <span className="font-bold text-white">{connectedLabel ?? account?.displayName}</span>
             </button>
-            <button type="button" onClick={() => disconnect()} className={disconnectClass}>
+            <button type="button" aria-label="Disconnect wallet" onClick={() => disconnect()} className={disconnectClass}>
               Disconnect
             </button>
           </div>

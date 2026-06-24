@@ -121,7 +121,7 @@ function CursorGlow() {
   );
 }
 
-function MagneticBtn({ children, className, onClick }: { children: React.ReactNode; className?: string; onClick?: () => void }) {
+function MagneticBtn({ children, className, onClick, ariaLabel }: { children: React.ReactNode; className?: string; onClick?: () => void; ariaLabel?: string }) {
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const sx = useSpring(x, { stiffness: 200, damping: 20 });
@@ -130,6 +130,7 @@ function MagneticBtn({ children, className, onClick }: { children: React.ReactNo
   return (
     <motion.button
       type="button"
+      aria-label={ariaLabel}
       className={className}
       style={{ x: sx, y: sy }}
       onMouseMove={(e) => {
@@ -299,6 +300,7 @@ export default function LandingPage() {
       <motion.div style={{ y: decorY }} className="fixed bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-[800px] h-[800px] bg-[#10B981]/3 rounded-full blur-[180px] pointer-events-none z-0" />
 
       {/* Nav */}
+      <header>
       <motion.nav
         initial={{ opacity: 0, y: -24 }}
         animate={{ opacity: 1, y: 0 }}
@@ -324,6 +326,7 @@ export default function LandingPage() {
           />
         </div>
       </motion.nav>
+      </header>
 
       {/* ─── Hero ─────────────────────────────────────────────────────────── */}
       <div className="relative min-h-screen w-full overflow-hidden flex items-center justify-center bg-[#050505]">
@@ -432,7 +435,7 @@ export default function LandingPage() {
                     <div className="text-gray-500">Scanning pending blocks</div>
                   </div>
                   <div className="relative z-10 sm:pl-8">
-                    <h3 className="text-white font-bold mb-6 flex items-center gap-2 text-lg"><Target className="w-5 h-5 text-[#10B981]" /> Mempool Radar</h3>
+                    <h2 className="text-white font-bold mb-6 flex items-center gap-2 text-lg"><Target className="w-5 h-5 text-[#10B981]" /> Mempool Radar</h2>
                     <div className="space-y-4 font-mono text-sm">
                       <div className="text-gray-400 flex justify-between bg-white/5 p-2 rounded"><span>Tx: 0x8f2...9aa</span> <span className="text-[#10B981]">SAFE</span></div>
                       <div className="text-gray-400 flex justify-between bg-white/5 p-2 rounded"><span>Tx: 0x1b4...2cc</span> <span className="text-[#10B981]">SAFE</span></div>
@@ -442,13 +445,14 @@ export default function LandingPage() {
                 </div>
                 <div className="bg-black/60 border border-white/10 rounded-xl p-6 flex flex-col justify-between shadow-inner">
                   <div>
-                    <h3 className="text-white font-bold mb-4 flex items-center gap-2 text-lg"><Shield className="w-5 h-5 text-[#10B981]" /> Defense Matrix</h3>
+                    <h2 className="text-white font-bold mb-4 flex items-center gap-2 text-lg"><Shield className="w-5 h-5 text-[#10B981]" /> Defense Matrix</h2>
                     <p className="text-sm text-gray-400 mb-8 leading-relaxed font-sans">
                       Mantle telemetry, LLM triage, operator approval, and GenLayer consensus checks turn suspicious activity into scoped response proposals.
                     </p>
                   </div>
                   <MagneticBtn
                     onClick={handleCommandCenterAccess}
+                    ariaLabel="Enter Command Center"
                     className="w-full py-4 rounded-lg bg-[#10B981] text-black text-center font-bold text-sm shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_40px_rgba(16,185,129,0.6)] hover:bg-white transition-all"
                   >
                     Enter Command Center
@@ -610,8 +614,8 @@ export default function LandingPage() {
           <motion.div initial="hidden" whileInView="visible" viewport={vp} variants={reveal} className="bg-[#0C0C0E] border border-gray-800 rounded-xl overflow-hidden shadow-2xl flex flex-col">
             <div className="bg-[#141416] border-b border-gray-800 px-4 py-3 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <button onClick={() => setCodeTab('python')} className={`text-xs px-3 py-1.5 rounded font-mono font-bold transition-all duration-300 ${codeTab === 'python' ? 'bg-[#09090B] text-[#10B981] border border-gray-800' : 'text-gray-500 hover:text-white'}`}>sentinel.py</button>
-                <button onClick={() => setCodeTab('typescript')} className={`text-xs px-3 py-1.5 rounded font-mono font-bold transition-all duration-300 ${codeTab === 'typescript' ? 'bg-[#09090B] text-[#10B981] border border-gray-800' : 'text-gray-500 hover:text-white'}`}>sentinel.ts</button>
+                <button aria-label="Show Python sentinel agent quickstart (sentinel.py)" onClick={() => setCodeTab('python')} className={`text-xs px-3 py-1.5 rounded font-mono font-bold transition-all duration-300 ${codeTab === 'python' ? 'bg-[#09090B] text-[#10B981] border border-gray-800' : 'text-gray-500 hover:text-white'}`}>sentinel.py</button>
+                <button aria-label="Show TypeScript sentinel agent quickstart (sentinel.ts)" onClick={() => setCodeTab('typescript')} className={`text-xs px-3 py-1.5 rounded font-mono font-bold transition-all duration-300 ${codeTab === 'typescript' ? 'bg-[#09090B] text-[#10B981] border border-gray-800' : 'text-gray-500 hover:text-white'}`}>sentinel.ts</button>
               </div>
               <span className="text-[10px] text-gray-500 tracking-widest font-bold uppercase">REPO QUICK START</span>
             </div>
@@ -766,10 +770,11 @@ export default function LandingPage() {
           <div className="flex flex-col items-center md:items-start text-center md:text-left">
             <h4 className="text-white font-bold mb-6 tracking-widest uppercase text-xs">Links</h4>
             <ul className="space-y-4 flex flex-col">
-              <a href="https://docs.breachresponse.xyz" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#10B981] transition-colors duration-500 text-sm font-sans flex items-center gap-2">
+              <a href="https://github.com/mystiquemide/breachresponse" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#10B981] transition-colors duration-500 text-sm font-sans flex items-center gap-2">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="opacity-70"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
                 GitHub
               </a>
+              <a href="https://docs.breachresponse.xyz" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#10B981] transition-colors duration-500 text-sm font-sans">Documentation</a>
               <a href="https://x.com/nousresearch" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-[#10B981] transition-colors duration-500 text-sm font-sans flex items-center gap-2">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="opacity-70"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
                 X / Twitter
@@ -784,8 +789,9 @@ export default function LandingPage() {
             </ul>
           </div>
         </div>
-        <div className="max-w-4xl mx-auto mt-12 pt-8 border-t border-gray-800/40 text-center text-gray-600 text-xs font-sans">
-          Built for the Turing Test Hackathon 2026 — AI DevTools Track
+        <div className="max-w-4xl mx-auto mt-12 pt-8 border-t border-gray-800/40 text-center text-gray-600 text-xs font-sans space-y-1">
+          <p>&copy; 2026 BreachResponse. All rights reserved.</p>
+          <p>Built for the Turing Test Hackathon 2026 — AI DevTools Track</p>
         </div>
       </footer>
     </main>

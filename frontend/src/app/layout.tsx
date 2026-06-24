@@ -14,10 +14,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="antialiased" role="application" aria-label="Breach Response Command Center">
-        <a href="#main-content" className="skip-to-main">Skip to main content</a>
+      <body className="antialiased">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:bg-[#10B981] focus:text-black focus:px-4 focus:py-2 focus:rounded focus:font-bold focus:text-sm"
+        >
+          Skip to main content
+        </a>
         <Web3Provider>
-          <main id="main-content">{children}</main>
+          <div id="main-content">
+            {children}
+          </div>
         </Web3Provider>
       </body>
     </html>
