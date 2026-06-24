@@ -291,7 +291,7 @@ export default function LandingPage() {
 
   return (
     <main className="min-h-screen bg-[#050507] text-white font-mono overflow-x-hidden selection:bg-[#10B981] selection:text-black relative">
-      {showFirstLoadPreloader && <FirstLoadPreloader onDismiss={() => setShowFirstLoadPreloader(false)} />
+      {showFirstLoadPreloader && <FirstLoadPreloader onDismiss={() => setShowFirstLoadPreloader(false)} />}
       {mounted && <AmbientParticles />}
       {mounted && <CursorGlow />}
 
